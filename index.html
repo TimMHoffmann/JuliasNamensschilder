@@ -1142,6 +1142,12 @@
                aria-label="Mindestabstand zwischen den Motiven in Millimetern">
       </div>
 
+      <div class="field-group">
+        <span class="lbl">Abstand zur Papierkante <span class="val" id="lbl-edge">–</span></span>
+        <input type="range" id="in-edge" min="-5" max="8" step="0.5" value="0"
+               aria-label="Abstand der Motive zur Papierkante in Millimetern">
+      </div>
+
       <div class="field-group span-all">
         <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
       </div>
@@ -1453,7 +1459,7 @@ Schuljahr 2026/27</span></div>
    * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
    * bleibt mindestens `gap` Millimeter Luft.
    */
-  function buildScene(svg, W, H, card, seed, motifScale, gap, iconIds, fillerIds, whole) {
+  function buildScene(svg, W, H, card, seed, motifScale, gap, edge, iconIds, fillerIds, whole) {
     const rnd = mulberry32(seed);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -1468,10 +1474,9 @@ Schuljahr 2026/27</span></div>
 
     // "whole": kein Ueberstand ueber die Blattkante - jedes Motiv ist ganz zu sehen.
     // Sonst duerfen Motive wie bisher am Rand angeschnitten werden.
-    const bleed = whole ? 0 : 3;
-    const edgePad = 1.5;   // Sicherheitsabstand zur Papierkante
+    const bleed = whole ? 0 : Math.max(3, -edge);
+    const edgePad = edge;
     const pad = 1.6;
-    const foldPad = 1.6;   // Streifen an der Faltkante (lokal y = 0) bleibt frei
     const placed = [];
 
     const clearOfCard = (x, y, r) =>
@@ -1479,8 +1484,9 @@ Schuljahr 2026/27</span></div>
       y + r < card.y - pad || y - r > card.y + card.h + pad;
 
     const free = (x, y, r) => {
-      if (y - r < foldPad) return false;
-      if (whole && (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad)) return false;
+      if (y - r < edgePad) return false;
+      if (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad) return false;
+      if (whole && (x - r < 0 || x + r > W || y + r > H)) return false;
       if (!clearOfCard(x, y, r)) return false;
       for (let i = 0; i < placed.length; i++) {
         const p = placed[i];
@@ -1551,7 +1557,7 @@ Schuljahr 2026/27</span></div>
     portrait:  { w: 148, h: 210, page: "A5 portrait" }
   };
 
-  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, whole: false, seed: 20260827 };
+  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false, seed: 20260827 };
 
   const text = {
     front: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
@@ -1576,10 +1582,12 @@ Schuljahr 2026/27</span></div>
     band: document.getElementById("in-band"),
     scale: document.getElementById("in-scale"),
     gap: document.getElementById("in-gap"),
+    edge: document.getElementById("in-edge"),
     whole: document.getElementById("in-whole"),
     lblBand: document.getElementById("lbl-band"),
     lblScale: document.getElementById("lbl-scale"),
     lblGap: document.getElementById("lbl-gap"),
+    lblEdge: document.getElementById("lbl-edge"),
     lblCount: document.getElementById("lbl-count"),
     acc: document.getElementById("acc"),
     shuffle: document.getElementById("btn-shuffle"),
@@ -1745,7 +1753,7 @@ Schuljahr 2026/27</span></div>
     const iconIds = pick(false);
     const fillerIds = pick(true);
     const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
-      sheetState.motif, sheetState.gap, iconIds, fillerIds, sheetState.whole);
+      sheetState.motif, sheetState.gap, sheetState.edge, iconIds, fillerIds, sheetState.whole);
 
     draw(el.sceneFront, sheetState.seed);
     draw(el.sceneBack, sheetState.seed + 977);
@@ -1753,6 +1761,9 @@ Schuljahr 2026/27</span></div>
     el.lblBand.textContent = sheetState.band + " ";
     el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
     el.lblGap.textContent = sheetState.gap.toFixed(1).replace(".", ",") + " mm";
+    el.lblEdge.textContent = sheetState.edge === 0
+      ? "Kante"
+      : (sheetState.edge > 0 ? "+" : "") + sheetState.edge.toFixed(1).replace(".", ",") + " mm";
   }
 
   /* ---------- Vorschau auf die verfuegbare Breite skalieren ---------- */
@@ -1840,6 +1851,8 @@ Schuljahr 2026/27</span></div>
     el.band.value = sheetState.band;
     el.scale.value = Math.round(sheetState.motif * 100);
     el.gap.value = sheetState.gap;
+    el.edge.value = sheetState.edge;
+    el.edge.disabled = sheetState.whole;
     el.whole.checked = sheetState.whole;
 
     el.lblSize.textContent = (s.size * panelH / 100).toFixed(1).replace(".", ",") + " mm"
@@ -1915,6 +1928,8 @@ Schuljahr 2026/27</span></div>
 
       const importedIds = project.enabled.filter((id) => ALL_ITEMS.some((item) => item.id === id));
       Object.assign(sheetState, project.sheetState);
+      if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
+      if (sheetState.whole) sheetState.edge = 0;
       Object.assign(text.front, project.text.front);
       Object.assign(text.back, project.text.back);
       enabled.clear();
@@ -1971,9 +1986,16 @@ Schuljahr 2026/27</span></div>
     layout();
   });
 
+  el.edge.addEventListener("input", () => {
+    sheetState.edge = parseFloat(el.edge.value);
+    layout();
+  });
+
   el.whole.addEventListener("change", () => {
     sheetState.whole = el.whole.checked;
+    if (sheetState.whole) sheetState.edge = 0;
     layout();
+    syncControls();
   });
 
   el.shuffle.addEventListener("click", () => {
