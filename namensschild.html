@@ -1,0 +1,1677 @@
+<title>Namensschild</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Baloo+2:wght@600;800&family=Bungee&family=Lora:wght@600;700&family=Patrick+Hand&family=Work+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ui-bg: #f0eadb;
+    --ui-panel: #fbf7ec;
+    --ui-ink: #22201a;
+    --ui-muted: #6d685a;
+    --ui-line: rgba(34, 32, 26, 0.13);
+    --ui-accent: #35785f;
+    --ui-accent-dark: #24523f;
+    --ui-accent-ink: #f7fbf7;
+    --ui-warn: #b4552c;
+
+    --paper: #ffffff;
+    --paper-ink: #1a1a1a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ui-bg: #161a17;
+      --ui-panel: #1f2420;
+      --ui-ink: #eee8da;
+      --ui-muted: #9aa396;
+      --ui-line: rgba(238, 232, 218, 0.14);
+      --ui-accent: #86ceac;
+      --ui-accent-dark: #4b8e70;
+      --ui-accent-ink: #12241c;
+      --ui-warn: #e0a06f;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ui-bg: #161a17;
+    --ui-panel: #1f2420;
+    --ui-ink: #eee8da;
+    --ui-muted: #9aa396;
+    --ui-line: rgba(238, 232, 218, 0.14);
+    --ui-accent: #86ceac;
+    --ui-accent-dark: #4b8e70;
+    --ui-accent-ink: #12241c;
+    --ui-warn: #e0a06f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ui-bg);
+    color: var(--ui-ink);
+    font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+    padding: 40px 20px 64px;
+  }
+
+  .app { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+  /* Desktop: links das Schild, rechts die Werkzeuge */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+    grid-template-areas: "sheet panel";
+    gap: 28px;
+    align-items: start;
+  }
+
+  .stage-left { grid-area: sheet; position: sticky; top: 24px; }
+  .stage-right { grid-area: panel; display: flex; flex-direction: column; gap: 20px; }
+
+  @media (max-width: 1080px) {
+    .stage { grid-template-columns: 1fr; grid-template-areas: "sheet" "panel"; }
+    .stage-left { position: static; }
+  }
+
+  header.masthead { text-align: center; max-width: 620px; margin: 0 auto; }
+
+  .eyebrow {
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--ui-accent);
+  }
+
+  h1 {
+    font-family: "Archivo Black", "Work Sans", sans-serif;
+    font-size: clamp(28px, 4.4vw, 42px);
+    line-height: 1.02; margin: 10px 0 10px;
+    text-transform: uppercase; letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  header.masthead p { margin: 0; color: var(--ui-muted); font-size: 15px; line-height: 1.6; }
+
+  /* ---------- Bedienfelder ---------- */
+
+  .controls {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-line);
+    border-radius: 16px;
+    padding: 18px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .controls-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
+  }
+
+  .controls-title {
+    font-family: "Archivo Black", sans-serif;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ui-accent); margin: 0;
+  }
+
+  .seg {
+    display: inline-flex;
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line);
+    border-radius: 11px;
+    padding: 3px; gap: 3px;
+  }
+
+  .seg-btn {
+    font-family: "Work Sans", sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--ui-muted);
+    background: none; border: none; cursor: pointer;
+    padding: 8px 15px; border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .seg-btn:hover { color: var(--ui-ink); }
+
+  .seg-btn.is-on,
+  .seg-btn.is-on:hover {
+    background: var(--ui-accent);
+    color: var(--ui-accent-ink);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  }
+  .seg-btn:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 16px 20px;
+  }
+
+  .span-all { grid-column: 1 / -1; }
+
+  .field-group { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+
+  .field-group > label, .field-group > .lbl {
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ui-muted);
+  }
+
+  .field-group .val { color: var(--ui-ink); font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+  input[type="text"], textarea, select {
+    font-family: "Work Sans", sans-serif;
+    font-size: 14.5px; color: var(--ui-ink);
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line);
+    border-radius: 9px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+
+  textarea { min-height: 46px; line-height: 1.4; resize: vertical; }
+  select { cursor: pointer; }
+
+  input[type="text"]:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2.5px solid var(--ui-accent); outline-offset: 1px; border-color: transparent;
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--ui-accent); cursor: pointer; margin: 6px 0 0; }
+  input[type="range"]:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 4px; border-radius: 4px; }
+
+  .size-row { display: flex; align-items: center; gap: 12px; }
+  .size-row input[type="range"] { flex: 1; }
+
+  .check {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: var(--ui-muted); cursor: pointer; white-space: nowrap;
+  }
+
+  .check input { accent-color: var(--ui-accent); cursor: pointer; }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 2px; }
+
+  .swatch {
+    width: 27px; height: 27px; border-radius: 8px;
+    border: 2px solid transparent; cursor: pointer; padding: 0;
+    box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.22);
+  }
+
+  .swatch.is-on { border-color: var(--ui-ink); }
+  .swatch:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
+
+  .chip {
+    font-family: "Work Sans", sans-serif;
+    font-size: 12.5px; font-weight: 600; color: var(--ui-muted);
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line); border-radius: 8px;
+    padding: 8px 12px; cursor: pointer;
+  }
+
+  .chip:hover { color: var(--ui-ink); }
+
+  .chip.is-on, .chip.is-on:hover {
+    background: var(--ui-accent);
+    color: var(--ui-accent-ink);
+    border-color: var(--ui-accent);
+  }
+  .chip:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
+
+  /* Akkordeon mit Motivgruppen */
+  .acc { display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
+
+  details.group {
+    border: 1.5px solid var(--ui-line);
+    border-radius: 11px;
+    background: var(--ui-bg);
+    overflow: hidden;
+  }
+
+  details.group > summary {
+    list-style: none; cursor: pointer;
+    padding: 11px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font-size: 13.5px; font-weight: 600; color: var(--ui-ink);
+  }
+
+  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -2px; }
+
+  .group-name { display: flex; align-items: center; gap: 10px; }
+
+  .group-caret {
+    width: 8px; height: 8px; flex: none;
+    border-right: 2px solid var(--ui-muted);
+    border-bottom: 2px solid var(--ui-muted);
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+
+  details.group[open] > summary .group-caret { transform: rotate(45deg); }
+
+  @media (prefers-reduced-motion: reduce) { .group-caret { transition: none; } }
+
+  .group-count {
+    font-size: 12px; font-weight: 600; color: var(--ui-muted);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+
+  .group-body {
+    padding: 0 12px 12px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .chip.mini { padding: 5px 11px; font-size: 11.5px; }
+
+  .motif-list { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .motif {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px 5px 8px;
+    border: 1.5px solid var(--ui-line); border-radius: 9px;
+    background: var(--ui-bg);
+    font-size: 12.5px; font-weight: 500; color: var(--ui-muted);
+    cursor: pointer; user-select: none;
+  }
+
+  .motif svg {
+    width: 20px; height: 20px; flex: none;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .motif input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  .motif.is-on {
+    color: var(--ui-accent);
+    border-color: var(--ui-accent);
+    background: color-mix(in srgb, var(--ui-accent) 9%, var(--ui-panel));
+  }
+
+  .motif:not(.is-on) { opacity: 0.55; }
+  .motif:not(.is-on) svg { stroke-dasharray: 2 2; }
+
+  .motif:has(input:focus-visible) { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  .foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    border-top: 1px solid var(--ui-line); padding-top: 16px;
+  }
+
+  .warn { margin: 0; font-size: 13px; color: var(--ui-warn); font-weight: 600; }
+  .warn[hidden] { display: none; }
+
+  button.print {
+    font-family: "Archivo Black", sans-serif;
+    text-transform: uppercase; letter-spacing: 0.04em; font-size: 14px;
+    background: var(--ui-accent); color: var(--ui-accent-ink);
+    border: none; border-radius: 10px;
+    padding: 14px 22px; cursor: pointer;
+    box-shadow: 0 3px 0 var(--ui-accent-dark);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+
+  button.print:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--ui-accent-dark); }
+  button.print:active { transform: translateY(3px); box-shadow: 0 0 0 var(--ui-accent-dark); }
+  button.print:focus-visible { outline: 2.5px solid var(--ui-ink); outline-offset: 3px; }
+
+  /* ---------- Blatt ---------- */
+
+  .sheet-wrap { width: 100%; }
+
+  /* Haelt den skalierten Platzbedarf des Blattes im Fluss */
+  .sheet-fit { position: relative; width: 100%; }
+
+  .sheet {
+    --sw: 210mm; --sh: 148mm;
+    position: relative;
+    width: var(--sw);
+    height: var(--sh);
+    transform-origin: top left;
+    background: var(--paper);
+    overflow: hidden;
+    box-shadow: 0 20px 44px rgba(20, 16, 12, 0.26);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .panel {
+    position: absolute; left: 0; width: 100%; height: 50%;
+    container-type: size;
+    overflow: hidden;
+  }
+
+  .panel--back { top: 0; transform: rotate(180deg); }
+  .panel--front { bottom: 0; }
+
+  .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  .card {
+    position: absolute;
+    background: var(--paper);
+    border: 0.9mm solid var(--paper-ink);
+    display: flex;
+    padding: 4cqh 4cqw;
+    overflow: hidden;
+  }
+
+  .card-inner {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  .card-text {
+    display: block; max-width: 100%;
+    color: var(--paper-ink);
+    text-align: center;
+    white-space: pre-wrap;
+    word-break: break-word;
+    hyphens: auto;
+    letter-spacing: -0.005em;
+  }
+
+  .fold {
+    position: absolute; left: 0; right: 0; top: 50%;
+    height: 1.6mm; transform: translateY(-0.8mm);
+    background: var(--paper);
+    z-index: 4;
+    display: flex; align-items: center;
+  }
+
+  .fold::before {
+    content: ""; flex: 1; height: 0;
+    border-top: 0.4mm dashed var(--paper-ink);
+  }
+
+  .fold-label {
+    position: absolute; left: 4mm; top: 50%;
+    transform: translateY(-50%);
+    background: var(--paper);
+    padding: 0 1.6mm;
+    font-family: "Work Sans", sans-serif;
+    font-size: 2.2mm; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--paper-ink);
+  }
+
+  /* ---------- Hinweise ---------- */
+
+  .tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+
+  @media (max-width: 760px) { .tips { grid-template-columns: 1fr; } }
+
+  .tip {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-line);
+    border-radius: 13px;
+    padding: 15px 17px;
+  }
+
+  .tip h2 {
+    font-family: "Archivo Black", sans-serif;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+    margin: 0 0 7px; color: var(--ui-accent);
+  }
+
+  .tip p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--ui-muted); }
+  .tip b { color: var(--ui-ink); font-weight: 600; }
+
+  /* ---------- Druck ---------- */
+
+  @media print {
+    body { background: #fff; padding: 0; margin: 0; }
+    .app { max-width: none; gap: 0; }
+    .ui { display: none !important; }
+    .stage { display: block; }
+    .stage-left { position: static; }
+    .sheet-wrap { display: block; }
+    .sheet-fit { height: auto !important; }
+    .sheet {
+      width: var(--sw); height: var(--sh);
+      transform: none !important;
+      box-shadow: none;
+    }
+  }
+</style>
+
+<style id="page-rule">@page { size: A5 landscape; margin: 0; }</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="d-suitcase">
+      <rect x="3.6" y="7" width="16.8" height="12.6" rx="1.8"/>
+      <path d="M9 7V5.3a1.4 1.4 0 0 1 1.4-1.4h3.2A1.4 1.4 0 0 1 15 5.3V7"/>
+      <path d="M8.6 7v12.6M15.4 7v12.6"/>
+    </g>
+
+    <g id="d-camera">
+      <rect x="2.6" y="7.2" width="18.8" height="12.4" rx="2"/>
+      <path d="M8 7.2 9.4 4.6h5.2L16 7.2"/>
+      <circle cx="12" cy="13.4" r="3.6"/>
+      <circle cx="12" cy="13.4" r="1.4" fill="currentColor"/>
+      <circle cx="5.8" cy="10.2" r="0.8" fill="currentColor"/>
+    </g>
+
+    <g id="d-plane">
+      <path d="M12.6 2.4c.9 0 1.5.9 1.5 2v4.3l7.4 4.3v1.9l-7.4-2.3v4.4l2.4 1.7v1.5l-3.9-1.1-3.9 1.1v-1.5l2.4-1.7v-4.4l-7.4 2.3v-1.9l7.4-4.3V4.4c0-1.1.6-2 1.5-2Z"/>
+    </g>
+
+    <g id="d-palm">
+      <path d="M3.8 21.2C7 14 12 7.4 19.8 2.8"/>
+      <path d="M5.8 19.2c-.9-1.9-.3-3.4 1.7-4.3M8.4 15.6c-.7-2 .2-3.4 2.3-4M11 12c-.5-2.1.5-3.4 2.6-3.9M13.8 8.6c-.3-2.1.8-3.3 2.9-3.6"/>
+      <path d="M9.6 15.4c1.9.9 2.6 2.4 2.1 4.4M12.2 11.8c1.9.8 2.7 2.2 2.3 4.3M14.9 8.6c1.9.7 2.8 2.1 2.5 4.2M17.6 5.8c1.9.6 2.9 1.9 2.7 4"/>
+    </g>
+
+    <g id="d-icecream">
+      <circle cx="9.2" cy="7.6" r="3.4"/>
+      <circle cx="14.8" cy="7.6" r="3.4"/>
+      <circle cx="12" cy="4.8" r="3.2"/>
+      <path d="M6.6 10.4h10.8L12 21.4Z"/>
+    </g>
+
+    <g id="d-passport">
+      <rect x="5.2" y="2.8" width="13.6" height="18.4" rx="1.6"/>
+      <circle cx="12" cy="9.6" r="3.4"/>
+      <path d="M8.6 9.6h6.8M12 6.2c1.6 1.9 1.6 5 0 6.8M12 6.2c-1.6 1.9-1.6 5 0 6.8"/>
+      <path d="M8.8 16.4h6.4M9.9 18.6h4.2"/>
+    </g>
+
+    <g id="d-shootingstar">
+      <path d="M15.8 2.6 17.7 6.6l4.4.6-3.2 3.1.8 4.4-3.9-2.1-3.9 2.1.8-4.4-3.2-3.1 4.4-.6Z"/>
+      <path d="M9.6 12.6 3.2 17.8M12 16.2 7 20.6M6.6 10.8 1.8 13.8"/>
+    </g>
+
+    <g id="d-pin">
+      <path d="M12 21.6s7-6.4 7-11.4a7 7 0 1 0-14 0c0 5 7 11.4 7 11.4Z"/>
+      <circle cx="12" cy="9.8" r="2.8"/>
+    </g>
+
+    <g id="d-cloud">
+      <path d="M6.4 18.4c-2.1 0-3.8-1.6-3.8-3.6s1.7-3.6 3.8-3.6h.3c.3-2.6 2.6-4.6 5.4-4.6 2.4 0 4.5 1.5 5.2 3.7h.3c2.1 0 3.8 1.6 3.8 3.6s-1.7 4.5-3.8 4.5Z"/>
+    </g>
+
+    <g id="d-sun">
+      <circle cx="12" cy="12" r="4.2"/>
+      <path d="M12 1.6 13.7 5.1h-3.4ZM12 22.4 10.3 18.9h3.4ZM1.6 12 5.1 10.3v3.4ZM22.4 12 18.9 13.7v-3.4Z"/>
+      <path d="M4.6 4.6 8.2 5.8 5.8 8.2ZM19.4 19.4 15.8 18.2l2.4-2.4ZM4.6 19.4 5.8 15.8l2.4 2.4ZM19.4 4.6 18.2 8.2l-2.4-2.4Z"/>
+    </g>
+
+    <g id="d-envelope">
+      <rect x="2.6" y="5.8" width="18.8" height="12.4" rx="1.4"/>
+      <path d="M2.6 7.4 12 13.6l9.4-6.2"/>
+    </g>
+
+    <g id="d-ticket">
+      <path d="M3 8.4h18v2.4a1.6 1.6 0 0 0 0 3.2v2.4H3v-2.4a1.6 1.6 0 0 0 0-3.2Z"/>
+      <path d="M9.2 8.4v8.4" stroke-dasharray="1.3 1.4"/>
+      <path d="M13 11.4h4.4M13 13.8h3"/>
+    </g>
+
+    <g id="d-map">
+      <path d="M2.6 6.4 9 4l6 2.4 6.4-2.4v13.6L15 20l-6-2.4-6.4 2.4Z"/>
+      <path d="M9 4v13.6M15 6.4V20"/>
+    </g>
+
+    <g id="d-flipflop">
+      <path d="M12 3.4c3 0 4.8 2 4.8 5 0 3.6-1.2 6-1.2 9 0 2-1.4 3.2-3.6 3.2s-3.6-1.2-3.6-3.2c0-3-1.2-5.4-1.2-9 0-3 1.8-5 4.8-5Z"/>
+      <path d="M12 8.8 9.5 5.7M12 8.8l2.5-3.1M12 8.8v3.4"/>
+    </g>
+
+    <g id="d-starfish">
+      <path d="M12 2.6 15 9.4l7.4.6-5.6 4.8 1.7 7.2-6.5-3.9-6.5 3.9 1.7-7.2L1.6 10l7.4-.6Z"/>
+    </g>
+
+    <g id="d-cocktail">
+      <path d="M4 5.6h16L12 14.2Z"/>
+      <path d="M12 14.2v6.2M8.4 20.4h7.2"/>
+      <path d="M15.2 5.6 19.4 1.8"/>
+    </g>
+
+    <g id="d-balloon">
+      <path d="M12 2.4c4 0 6.8 3.2 6.8 6.8 0 3.6-3.6 6.8-6.8 9.2-3.2-2.4-6.8-5.6-6.8-9.2 0-3.6 2.8-6.8 6.8-6.8Z"/>
+      <path d="M12 2.4c-2 3.4-2 11.2 0 16M12 2.4c2 3.4 2 11.2 0 16"/>
+      <path d="M9.8 18.6v2.2h4.4v-2.2"/>
+    </g>
+
+    <g id="d-pillow">
+      <path d="M12 3.6c-5 0-8.4 3.4-8.4 8 0 3.4 1.8 5.6 4 5.6 1.8 0 2.8-1.2 2.8-3 0-1.6-.6-2.6-.6-3.8 0-1.2.9-2 2.2-2s2.2.8 2.2 2c0 1.2-.6 2.2-.6 3.8 0 1.8 1 3 2.8 3 2.2 0 4-2.2 4-5.6 0-4.6-3.4-8-8.4-8Z"/>
+    </g>
+
+    <g id="d-ball">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3.4 9.4c5.5 2.5 11.7 2.5 17.2 0M3.4 14.6c5.5-2.5 11.7-2.5 17.2 0"/>
+      <path d="M12 3c-2.6 2.8-2.6 15.2 0 18M12 3c2.6 2.8 2.6 15.2 0 18"/>
+    </g>
+
+    <g id="d-heart">
+      <path d="M12 20.6S3.4 15.2 3.4 9.4a4.5 4.5 0 0 1 8.6-1.9 4.5 4.5 0 0 1 8.6 1.9c0 5.8-8.6 11.2-8.6 11.2Z"/>
+    </g>
+
+    <g id="d-tag">
+      <rect x="6" y="7" width="13.4" height="9.6" rx="1.8"/>
+      <circle cx="9.2" cy="11.8" r="1.1"/>
+      <path d="M6 11.8 2.4 9.2"/>
+      <path d="M12.6 10.4h4.2M12.6 13.2h3"/>
+    </g>
+
+    <g id="d-sunscreen">
+      <rect x="8" y="6.6" width="8" height="14.2" rx="1.8"/>
+      <rect x="9.9" y="2.9" width="4.2" height="3.7" rx="1"/>
+      <path d="M8 11h8"/>
+    </g>
+
+    <g id="d-photo">
+      <rect x="3.4" y="4" width="17.2" height="16" rx="1.4"/>
+      <path d="M3.4 15.6 8.6 10.4l3.6 3.2 3.2-2.6 5.2 4.6"/>
+      <circle cx="7.8" cy="8" r="1.2"/>
+    </g>
+
+    <g id="d-sunglasses">
+      <rect x="2.4" y="9" width="8.2" height="6" rx="2.6"/>
+      <rect x="13.4" y="9" width="8.2" height="6" rx="2.6"/>
+      <path d="M10.6 11.2h2.8"/>
+    </g>
+
+    <g id="d-mountain">
+      <path d="M1.8 19.4 8.8 7.4l4.4 6.8 2.4-3.4 6.6 8.6Z"/>
+      <path d="M6.4 11.8 8.8 13.4l2.2-1.6"/>
+    </g>
+
+    <g id="d-sign">
+      <path d="M13 4.2v16.4"/>
+      <path d="M13 5.8H4.6L7 8.8l-2.4 3H13Z"/>
+    </g>
+
+    <g id="d-shell">
+      <path d="M12 20.8c-5.1 0-9.2-4.1-9.2-8.8a9.2 9.2 0 0 1 18.4 0c0 4.7-4.1 8.8-9.2 8.8Z"/>
+      <path d="M12 20.8V3.2M12 20.8 6.4 5.6M12 20.8 17.6 5.6M12 20.8 3.4 9.2M12 20.8 20.6 9.2"/>
+    </g>
+
+    <g id="d-bottle">
+      <path d="M9.4 8.6h5.2v10.6a1.8 1.8 0 0 1-1.8 1.8h-1.6a1.8 1.8 0 0 1-1.8-1.8Z"/>
+      <rect x="10.2" y="3.2" width="3.6" height="3.4" rx="0.8"/>
+      <path d="M10.6 6.6h2.8v2h-2.8ZM9.4 12.6h5.2"/>
+    </g>
+
+    <g id="d-anchor">
+      <circle cx="12" cy="4.6" r="2"/>
+      <path d="M12 6.6v14.2M7.4 9.4h9.2"/>
+      <path d="M4.4 13.6c0 4 3.4 7.2 7.6 7.2s7.6-3.2 7.6-7.2"/>
+    </g>
+
+    <!-- ===== Verkehr ===== -->
+    <g id="d-train">
+      <rect x="4" y="4.6" width="16" height="12" rx="2.4"/>
+      <path d="M4 10.6h16"/>
+      <circle cx="8.4" cy="13.6" r="1.4"/><circle cx="15.6" cy="13.6" r="1.4"/>
+      <path d="M6.6 16.6 4.6 20.4M17.4 16.6l2 3.8M9 19.4h6"/>
+    </g>
+
+    <g id="d-bus">
+      <rect x="3" y="4.6" width="18" height="12.6" rx="2.2"/>
+      <path d="M3 10.6h18M9 4.6v6M15 4.6v6"/>
+      <circle cx="7.4" cy="19" r="1.9"/><circle cx="16.6" cy="19" r="1.9"/>
+      <path d="M5 13.6h2.4M16.6 13.6H19"/>
+    </g>
+
+    <g id="d-car">
+      <path d="M2.6 15.4v-3.2l2.6-.6 2.4-3.8h8l2.4 3.8 2.6.6v3.2Z"/>
+      <circle cx="7" cy="15.6" r="2.2"/><circle cx="17" cy="15.6" r="2.2"/>
+      <path d="M7.8 11.6h8.4"/>
+    </g>
+
+    <g id="d-bicycle">
+      <circle cx="5.6" cy="16.6" r="4"/><circle cx="18.4" cy="16.6" r="4"/>
+      <path d="M5.6 16.6 10.2 9.4h5.2l2.6 7.2M10.2 9.4h5.6M12.4 16.6 15.4 9.4"/>
+      <path d="M15.4 7.6h2.4"/>
+    </g>
+
+    <g id="d-ship">
+      <path d="M2.6 15.4h18.8l-2.6 5H5.2Z"/>
+      <path d="M12 15.4V3.2M12 5.4l6 3-6 3"/>
+      <path d="M6.6 15.4v-4h4"/>
+    </g>
+
+    <g id="d-rocket">
+      <path d="M12 2.4c3 2.6 4.6 6.2 4.6 10.2l-1.8 3.6H9.2L7.4 12.6C7.4 8.6 9 5 12 2.4Z"/>
+      <circle cx="12" cy="9.6" r="1.9"/>
+      <path d="M9.2 16.2 7 19.4l3.4-1M14.8 16.2l2.2 3.2-3.4-1"/>
+      <path d="M10.6 18.6 12 21.6l1.4-3"/>
+    </g>
+
+    <g id="d-globe">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3.2 9.6h17.6M3.2 14.4h17.6"/>
+      <path d="M12 3c-3 2.6-3 15.4 0 18M12 3c3 2.6 3 15.4 0 18"/>
+    </g>
+
+    <g id="d-compass">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M15.4 8.6 13.6 13.6 8.6 15.4 10.4 10.4Z"/>
+      <circle cx="12" cy="12" r="0.9" fill="currentColor"/>
+    </g>
+
+    <!-- ===== Strand & Meer ===== -->
+    <g id="d-seagull">
+      <path d="M2.6 12.4c2.8-4 5-4 6.4-.6 1.6-3.6 3.8-3.6 6.4.6"/>
+      <path d="M9.6 17.6c2.4-3.4 4.2-3.4 5.4-.4 1.4-3 3.2-3 5.4.4"/>
+    </g>
+
+    <g id="d-dolphin">
+      <path d="M3 13.4c2.6-5 7-7.6 13.2-7.8-.6 2.2-.2 3.8 1.2 4.8 2 1.4 3 3 3 4.8-3.4-.4-5.6.4-6.6 2.4-1 2-2.6 3-4.8 3 .8-1.6.8-3 0-4.2-2-.6-4-1.6-6-3Z"/>
+      <circle cx="14.4" cy="10.4" r="0.7" fill="currentColor"/>
+    </g>
+
+    <g id="d-fish">
+      <path d="M4.6 12c2.8-3.8 6-5.6 9.6-5.6 3.2 0 5.4 1.9 6.4 5.6-1 3.7-3.2 5.6-6.4 5.6-3.6 0-6.8-1.8-9.6-5.6Z"/>
+      <path d="M4.6 12 1.6 8.2v7.6Z"/>
+      <circle cx="16.6" cy="10.6" r="0.75" fill="currentColor"/>
+    </g>
+
+    <g id="d-crab">
+      <path d="M6 13.6c0-2.6 2.7-4.6 6-4.6s6 2 6 4.6-2.7 4.6-6 4.6-6-2-6-4.6Z"/>
+      <circle cx="10" cy="12.4" r="0.75" fill="currentColor"/><circle cx="14" cy="12.4" r="0.75" fill="currentColor"/>
+      <path d="M9.4 9.2 8 6.4M14.6 9.2 16 6.4"/>
+      <path d="M6.4 11.4 3 8.6l-.6 2.8M17.6 11.4 21 8.6l.6 2.8"/>
+      <path d="M7 17 5 19.4M17 17l2 2.4M10 18.4l-1 2.4M14 18.4l1 2.4"/>
+    </g>
+
+    <g id="d-sandcastle">
+      <path d="M3 20.4h18"/>
+      <path d="M4.6 20.4v-7h3v7M10.4 20.4v-9h3.2v9M16.4 20.4v-7h3v7"/>
+      <path d="M4.6 13.4 6.1 10.6l1.5 2.8M16.4 13.4l1.5-2.8 1.5 2.8"/>
+      <path d="M12 11.4V6.6l3.4 1.4L12 9.4"/>
+    </g>
+
+    <g id="d-beachumbrella">
+      <path d="M2.4 11.6a9.6 9.6 0 0 1 19.2 0Z"/>
+      <path d="M7 11.4c.6-5.2 2.2-8.6 5-9.4M17 11.4c-.6-5.2-2.2-8.6-5-9.4"/>
+      <path d="M12 11.6v9.8"/>
+    </g>
+
+    <g id="d-snorkel">
+      <rect x="3.4" y="8.6" width="13.6" height="7.4" rx="2.6"/>
+      <path d="M10.2 8.8v7"/>
+      <path d="M17 10.6h1.8v6.6a2.2 2.2 0 0 1-4.4 0"/>
+    </g>
+
+    <g id="d-wave">
+      <path d="M2.4 16.6c2.2-3.6 4.8-3.6 7 0 2.2-3.6 4.8-3.6 7 0M2.4 20.4c2.2-3.6 4.8-3.6 7 0 2.2-3.6 4.8-3.6 7 0"/>
+      <path d="M16.4 16.6c-1-5.6 1.2-9.4 5.2-9.6-1.8 1.4-2.6 3.2-2.4 5.4"/>
+    </g>
+
+    <!-- ===== Natur & Wetter ===== -->
+    <g id="d-rainbow">
+      <path d="M2.6 19.4a9.4 9.4 0 0 1 18.8 0"/>
+      <path d="M6 19.4a6 6 0 0 1 12 0"/>
+      <path d="M9.4 19.4a2.6 2.6 0 0 1 5.2 0"/>
+    </g>
+
+    <g id="d-flower">
+      <circle cx="12" cy="5.6" r="2.4"/><circle cx="15.8" cy="8.4" r="2.4"/>
+      <circle cx="14.4" cy="12.8" r="2.4"/><circle cx="9.6" cy="12.8" r="2.4"/>
+      <circle cx="8.2" cy="8.4" r="2.4"/>
+      <circle cx="12" cy="9.4" r="1.8"/>
+      <path d="M12 11.6v9.2M12 16.6c-2-1.4-4-1.2-5 .6"/>
+    </g>
+
+    <g id="d-tree">
+      <path d="M12 2.6 5.6 11h3.2L4.4 17.4h15.2L15.2 11h3.2Z"/>
+      <path d="M12 17.4v3.8M10 21.2h4"/>
+    </g>
+
+    <g id="d-cactus">
+      <path d="M9.6 20.6V7.6a2.4 2.4 0 0 1 4.8 0v13"/>
+      <path d="M9.6 15.4H8a2.6 2.6 0 0 1-2.6-2.6v-2.2M14.4 13.4H16a2.6 2.6 0 0 0 2.6-2.6V8.6"/>
+      <path d="M7.2 20.6h9.6"/>
+    </g>
+
+    <g id="d-snowflake">
+      <path d="M12 2.6v18.8M3.9 7.3l16.2 9.4M20.1 7.3 3.9 16.7"/>
+      <path d="M12 6.6 9.8 4.4M12 6.6l2.2-2.2M12 17.4l-2.2 2.2M12 17.4l2.2 2.2"/>
+      <path d="M7.4 9.6 4.4 9.4M7.4 14.4l-3 .2M16.6 9.6l3-.2M16.6 14.4l3 .2"/>
+    </g>
+
+    <g id="d-moon">
+      <path d="M19.4 14.6A8.4 8.4 0 0 1 9.4 4.6a8.4 8.4 0 1 0 10 10Z"/>
+    </g>
+
+    <g id="d-butterfly">
+      <path d="M12 6.6v11.4"/>
+      <path d="M12 8.6c-1.6-3.4-4-4.6-6.2-3.4-2.2 1.2-2 4 .4 5.4-2.4.8-3 3.4-1.2 5 1.8 1.6 4.6.6 7-2.6"/>
+      <path d="M12 8.6c1.6-3.4 4-4.6 6.2-3.4 2.2 1.2 2 4-.4 5.4 2.4.8 3 3.4 1.2 5-1.8 1.6-4.6.6-7-2.6"/>
+      <path d="M12 6.6 10.4 3.8M12 6.6l1.6-2.8"/>
+    </g>
+
+    <g id="d-ladybug">
+      <circle cx="12" cy="13" r="6.6"/>
+      <path d="M8.6 8.4a4.2 4.2 0 0 1 6.8 0"/>
+      <path d="M12 6.4v13.2"/>
+      <circle cx="8.9" cy="11.2" r="1" fill="currentColor"/><circle cx="15.1" cy="11.2" r="1" fill="currentColor"/>
+      <circle cx="9.3" cy="15.4" r="0.9" fill="currentColor"/><circle cx="14.7" cy="15.4" r="0.9" fill="currentColor"/>
+      <path d="M9.6 7.4 8.2 4.6M14.4 7.4 15.8 4.6"/>
+    </g>
+
+    <g id="d-bee">
+      <ellipse cx="12" cy="14" rx="4.6" ry="5.6"/>
+      <path d="M7.6 12.6h8.8M7.6 15.8h8.8"/>
+      <path d="M9.6 9.4c-2.6-3-5.4-3.4-6.4-1.4-.8 1.8 1 3.8 4 4.6M14.4 9.4c2.6-3 5.4-3.4 6.4-1.4.8 1.8-1 3.8-4 4.6"/>
+      <path d="M10.6 8.6 9.6 5.8M13.4 8.6l1-2.8"/>
+    </g>
+
+    <g id="d-mushroom">
+      <path d="M3.4 11.6a8.6 8.6 0 0 1 17.2 0Z"/>
+      <path d="M9.6 11.6v5.6a2.4 2.4 0 0 0 4.8 0v-5.6"/>
+      <circle cx="8.4" cy="8.6" r="1.3"/><circle cx="14.6" cy="7.6" r="1.6"/>
+    </g>
+
+    <!-- ===== Essen & Trinken ===== -->
+    <g id="d-pizza">
+      <path d="M12 3.4 21 19.4c-5.6 2.6-12.4 2.6-18 0Z"/>
+      <path d="M4.6 16.4c4.8 2 9.8 2 14.6 0"/>
+      <circle cx="10.4" cy="12.4" r="1.1" fill="currentColor"/><circle cx="14" cy="15.4" r="1.1" fill="currentColor"/>
+      <circle cx="12" cy="8.6" r="0.9" fill="currentColor"/>
+    </g>
+
+    <g id="d-burger">
+      <path d="M3.4 9.8a8.6 8.6 0 0 1 17.2 0Z"/>
+      <path d="M3.6 12.4h16.8"/>
+      <path d="M3.6 15.2c.4 1.2 1.6 1.2 2.6.4 1-.8 2.2-.8 3 .2.8 1 2 1 3-.2 1-1.2 2.2-1 3 0"/>
+      <path d="M3.4 17.6a8.6 8.6 0 0 0 17.2 0Z"/>
+      <circle cx="9" cy="7.2" r="0.7" fill="currentColor"/><circle cx="13.6" cy="6.6" r="0.7" fill="currentColor"/>
+    </g>
+
+    <g id="d-fries">
+      <path d="M6.6 11.4h10.8l-1.2 8.2a1.8 1.8 0 0 1-1.8 1.6H9.6a1.8 1.8 0 0 1-1.8-1.6Z"/>
+      <path d="M6.9 14.4h10.2"/>
+      <path d="M9 11.4 8.4 5.6l2.4-.4.6 6.2M12.4 11.4 12.6 4l2.4.4-.6 7"/>
+    </g>
+
+    <g id="d-donut">
+      <circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="3"/>
+      <path d="M4.4 8.6c1.6 2.2 4.2 2 5.4-.4M14.6 4.4c-.6 2.4 1 4.2 3.4 3.8M19.2 15.2c-2.4-.8-4.4.6-4.2 3M6 17.6c1.4-1.8 3.6-1.6 4.6.6"/>
+    </g>
+
+    <g id="d-watermelon">
+      <path d="M2.6 6.6h18.8c0 7.4-4.2 13.4-9.4 13.4S2.6 14 2.6 6.6Z"/>
+      <path d="M5.4 8.4h13.2c-.4 5.6-3.2 9.8-6.6 9.8S5.8 14 5.4 8.4Z"/>
+      <circle cx="9.6" cy="11" r="0.8" fill="currentColor"/><circle cx="14.4" cy="11" r="0.8" fill="currentColor"/>
+      <circle cx="12" cy="14.6" r="0.8" fill="currentColor"/>
+    </g>
+
+    <g id="d-pineapple">
+      <path d="M12 8.4c3.4 0 5.6 2.6 5.6 6.2S15 21.4 12 21.4s-5.6-3.2-5.6-6.8S8.6 8.4 12 8.4Z"/>
+      <path d="M7.4 12.4 16.6 18M16.6 12.4 7.4 18"/>
+      <path d="M12 8.4V4.6"/>
+      <path d="M12 6.4c-1.6-2.4-3.6-2.6-4.6-1 1.6.4 2.8 1.6 3.4 3M12 6.4c1.6-2.4 3.6-2.6 4.6-1-1.6.4-2.8 1.6-3.4 3"/>
+    </g>
+
+    <g id="d-strawberry">
+      <path d="M12 7.6c4 0 6.6 2.6 6.6 6 0 3.6-3.4 7.8-6.6 7.8S5.4 17.2 5.4 13.6c0-3.4 2.6-6 6.6-6Z"/>
+      <path d="M8.4 6.6c1-1.6 5.8-1.6 7.2 0-1.2.8-1.2 2-3.6 2s-2.4-1.2-3.6-2Z"/>
+      <path d="M12 4.4v2.2"/>
+      <circle cx="9.8" cy="12.4" r="0.7" fill="currentColor"/><circle cx="14" cy="12" r="0.7" fill="currentColor"/>
+      <circle cx="12" cy="15.4" r="0.7" fill="currentColor"/><circle cx="10.4" cy="17.6" r="0.7" fill="currentColor"/>
+      <circle cx="14.6" cy="16.4" r="0.7" fill="currentColor"/>
+    </g>
+
+    <g id="d-cupcake">
+      <path d="M6.4 12.6h11.2l-1.4 7.4a1.6 1.6 0 0 1-1.6 1.4H9.4a1.6 1.6 0 0 1-1.6-1.4Z"/>
+      <path d="M6.4 12.6c-1.8-3 .6-5.4 3-4.6.4-3 4.8-3.6 5.6-.6 2.4-1.2 4.8 1.4 3.4 4.2"/>
+      <path d="M9.8 15.4h4.4"/>
+      <circle cx="12" cy="5.6" r="1.1"/>
+    </g>
+
+    <g id="d-popcorn">
+      <path d="M7.4 11.4h9.2l-1 9.4a1.4 1.4 0 0 1-1.4 1.2H9.8a1.4 1.4 0 0 1-1.4-1.2Z"/>
+      <path d="M9.4 11.4 10 21.8M14.6 11.4 14 21.8"/>
+      <path d="M8.4 11.4c-1.8-1.6-.6-4 1.4-3.6-.6-2.4 2.6-3.6 3.8-1.6 1.4-1.8 4-.4 3.4 1.8 2 .2 2.4 2.6.6 3.4"/>
+    </g>
+
+    <!-- ===== Freizeit & Schule ===== -->
+    <g id="d-backpack">
+      <rect x="4.6" y="7.6" width="14.8" height="13" rx="3.4"/>
+      <path d="M8.6 7.6V6a3.4 3.4 0 0 1 6.8 0v1.6"/>
+      <path d="M9 13.6h6a1.6 1.6 0 0 1 1.6 1.6v5.4H7.4v-5.4A1.6 1.6 0 0 1 9 13.6Z"/>
+      <path d="M10.6 16.8h2.8"/>
+    </g>
+
+    <g id="d-book">
+      <path d="M3.6 5.4h6.2A2.2 2.2 0 0 1 12 7.6v12a2.2 2.2 0 0 0-2.2-2.2H3.6Z"/>
+      <path d="M20.4 5.4h-6.2A2.2 2.2 0 0 0 12 7.6v12a2.2 2.2 0 0 1 2.2-2.2h6.2Z"/>
+    </g>
+
+    <g id="d-pencil">
+      <path d="M17.6 2.8 21.2 6.4 8.4 19.2l-4.8 1.2 1.2-4.8Z"/>
+      <path d="M15 5.4 18.6 9M4.8 15.6 8.4 19.2"/>
+    </g>
+
+    <g id="d-soccer">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7.2 15.8 10l-1.4 4.6h-4.8L8.2 10Z"/>
+      <path d="M12 3v4.2M8.2 10 4.2 8.8M15.8 10l4-1.2M9.6 14.6 7.4 18.4M14.4 14.6l2.2 3.8"/>
+    </g>
+
+    <g id="d-basketball">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3 12h18M12 3v18"/>
+      <path d="M5.6 5.6c4 4 4 8.8 0 12.8M18.4 5.6c-4 4-4 8.8 0 12.8"/>
+    </g>
+
+    <g id="d-guitar">
+      <circle cx="9" cy="16" r="4.6"/>
+      <circle cx="11.4" cy="9.8" r="3.4"/>
+      <circle cx="10" cy="13.4" r="1.4"/>
+      <path d="M13.4 7.6 18.4 3"/>
+      <path d="M17.4 1.8 21 5.2 19.2 7 15.6 3.6Z"/>
+    </g>
+
+    <g id="d-headphones">
+      <path d="M4.4 15.6v-3.2a7.6 7.6 0 0 1 15.2 0v3.2"/>
+      <rect x="2.6" y="14.4" width="4.4" height="6.4" rx="2.2"/>
+      <rect x="17" y="14.4" width="4.4" height="6.4" rx="2.2"/>
+    </g>
+
+    <g id="d-musicnote">
+      <path d="M9.6 18.4V5.6l9-2v12.8"/>
+      <ellipse cx="7" cy="18.4" rx="2.6" ry="2.2"/>
+      <ellipse cx="16" cy="16.4" rx="2.6" ry="2.2"/>
+      <path d="M9.6 9.4 18.6 7.4"/>
+    </g>
+
+    <g id="d-skateboard">
+      <path d="M2.6 10.6c1.4-1.8 3.4-2.6 6-2.6h6.8c2.6 0 4.6.8 6 2.6-1.4 1.8-3.4 2.6-6 2.6H8.6c-2.6 0-4.6-.8-6-2.6Z"/>
+      <path d="M7.4 13.2v1.6M16.6 13.2v1.6"/>
+      <circle cx="7.4" cy="16.6" r="2"/><circle cx="16.6" cy="16.6" r="2"/>
+    </g>
+
+    <g id="d-tent">
+      <path d="M12 4 21.4 20.4H2.6Z"/>
+      <path d="M12 8.6 15.6 20.4H8.4Z"/>
+    </g>
+
+    <g id="d-campfire">
+      <path d="M12 3.4c3.4 3.4 5 6.2 5 8.6a5 5 0 0 1-10 0c0-2.4 1.6-5.2 5-8.6Z"/>
+      <path d="M12 9.4c1.6 1.8 2.4 3.2 2.4 4.4a2.4 2.4 0 0 1-4.8 0c0-1.2.8-2.6 2.4-4.4Z"/>
+      <path d="M3.6 19.6 20.4 17M3.6 17l16.8 2.6"/>
+    </g>
+
+    <g id="d-crown">
+      <path d="M3.4 18.6V7.4l4.6 3.6L12 4.6l4 6.4 4.6-3.6v11.2Z"/>
+      <path d="M3.4 15.4h17.2"/>
+    </g>
+
+    <g id="d-smiley">
+      <circle cx="12" cy="12" r="9"/>
+      <circle cx="9" cy="10" r="0.9" fill="currentColor"/><circle cx="15" cy="10" r="0.9" fill="currentColor"/>
+      <path d="M7.6 14c1.2 2.2 2.8 3.2 4.4 3.2s3.2-1 4.4-3.2"/>
+    </g>
+
+    <g id="d-robot">
+      <rect x="4.6" y="8" width="14.8" height="11.4" rx="2.6"/>
+      <circle cx="9.4" cy="12.6" r="1.4"/><circle cx="14.6" cy="12.6" r="1.4"/>
+      <path d="M9.4 16.4h5.2"/>
+      <path d="M12 8V5.2"/><circle cx="12" cy="4" r="1.2"/>
+      <path d="M2.8 12.4v3.6M21.2 12.4v3.6"/>
+    </g>
+
+    <g id="d-paperplane">
+      <path d="M21.4 3 2.6 10.6l7.2 3 3 7.4Z"/>
+      <path d="M21.4 3 9.8 13.6"/>
+    </g>
+
+    <!-- Fuellmotive -->
+    <g id="d-dot"><circle cx="12" cy="12" r="2.6" fill="currentColor"/></g>
+    <g id="d-drop"><path d="M12 3.4c3 4.5 4.6 7.2 4.6 9.4a4.6 4.6 0 0 1-9.2 0c0-2.2 1.6-4.9 4.6-9.4Z"/></g>
+    <g id="d-leaflet">
+      <path d="M4.6 19.4C4.6 11.2 9.4 5.6 19.4 4.6c.6 8.8-5 14.8-14.8 14.8Z"/>
+      <path d="M8 16 16.2 8"/>
+    </g>
+    <g id="d-triangle"><path d="M12 6.4 18.2 17.6H5.8Z"/></g>
+    <g id="d-star">
+      <path d="M12 3.2c.9 5.1 3.7 7.9 8.8 8.8-5.1.9-7.9 3.7-8.8 8.8-.9-5.1-3.7-7.9-8.8-8.8 5.1-.9 7.9-3.7 8.8-8.8Z"/>
+    </g>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="masthead ui">
+    <h1>Namensschild</h1>
+    <p>
+      Ein DIN-A5-Blatt, in der Mitte gefaltet: Es steht als kleines Zelt auf dem Tisch.
+      Rundherum ein Rahmen aus gekritzelten Motiven, in der Mitte bleibt Platz
+      für Name und Text.
+    </p>
+  </header>
+
+  <div class="stage">
+  <div class="stage-right ui">
+
+  <section class="controls">
+    <div class="controls-head">
+      <h2 class="controls-title">Blatt &amp; Rahmen</h2>
+      <div class="seg" role="group" aria-label="Papierformat">
+        <button type="button" class="seg-btn is-on" data-orient="landscape">Querformat</button>
+        <button type="button" class="seg-btn" data-orient="portrait">Hochformat</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field-group">
+        <span class="lbl">Rahmenbreite <span class="val" id="lbl-band">–</span></span>
+        <input type="range" id="in-band" min="14" max="46" step="1" value="30"
+               aria-label="Rahmenbreite in Millimetern">
+      </div>
+
+      <div class="field-group">
+        <span class="lbl">Motivgröße <span class="val" id="lbl-scale">–</span></span>
+        <input type="range" id="in-scale" min="70" max="145" step="5" value="100"
+               aria-label="Größe der Doodle-Motive">
+      </div>
+
+      <div class="field-group">
+        <span class="lbl">Mindestabstand <span class="val" id="lbl-gap">–</span></span>
+        <input type="range" id="in-gap" min="0" max="5" step="0.2" value="1.2"
+               aria-label="Mindestabstand zwischen den Motiven in Millimetern">
+      </div>
+
+      <div class="field-group span-all">
+        <span class="lbl">Motive <span class="val" id="lbl-count">–</span></span>
+        <div class="acc" id="acc"></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="btn-row">
+        <button type="button" class="chip" id="btn-all">Alle auswählen</button>
+        <button type="button" class="chip" id="btn-none">Alle abwählen</button>
+      </div>
+      <button class="print" type="button" id="btn-shuffle">Rahmen neu würfeln</button>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="controls-head">
+      <h2 class="controls-title">Beschriftung</h2>
+      <div class="seg" role="tablist" aria-label="Seite auswählen">
+        <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite · Name</button>
+        <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">Rückseite · Text</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field-group span-all" data-only="front">
+        <label for="in-name">Name</label>
+        <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="field-group span-all" data-only="back" hidden>
+        <label for="in-text">Text</label>
+        <textarea id="in-text" rows="2" spellcheck="false">Klasse 5b
+Schuljahr 2026/27</textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="in-font">Schriftart</label>
+        <select id="in-font"></select>
+      </div>
+
+      <div class="field-group">
+        <label for="in-size">Schriftgröße <span class="val" id="lbl-size">–</span></label>
+        <div class="size-row">
+          <input type="range" id="in-size" min="3" max="26" step="0.2" value="15">
+          <label class="check"><input type="checkbox" id="in-auto" checked> automatisch</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="in-lh">Zeilenabstand <span class="val" id="lbl-lh">–</span></label>
+        <input type="range" id="in-lh" min="0.85" max="1.9" step="0.05" value="1.1">
+      </div>
+
+      <div class="field-group">
+        <span class="lbl" id="lbl-color">Schriftfarbe</span>
+        <div class="swatch-row" id="swatches" role="group" aria-labelledby="lbl-color"></div>
+      </div>
+
+      <div class="field-group">
+        <span class="lbl" id="lbl-align">Ausrichtung</span>
+        <div class="btn-row" id="aligns" role="group" aria-labelledby="lbl-align">
+          <button type="button" class="chip" data-align="left">Links</button>
+          <button type="button" class="chip" data-align="center">Mittig</button>
+          <button type="button" class="chip" data-align="right">Rechts</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <span class="lbl" id="lbl-style">Stil</span>
+        <div class="btn-row" role="group" aria-labelledby="lbl-style">
+          <button type="button" class="chip" id="tg-upper" aria-pressed="false">GROSSBUCHSTABEN</button>
+          <button type="button" class="chip" id="tg-shadow" aria-pressed="false">Schatten</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <p class="warn" id="warn" hidden>Der Text ragt über das Feld hinaus – Größe verkleinern oder „automatisch“ aktivieren.</p>
+      <button class="print" type="button" id="btn-print">Drucken</button>
+    </div>
+  </section>
+
+  </div><!-- /stage-right -->
+
+  <div class="stage-left">
+  <div class="sheet-wrap">
+   <div class="sheet-fit" id="sheet-fit">
+    <div class="sheet" id="sheet">
+
+      <div class="panel panel--back">
+        <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
+        <div class="card card--text" id="card-back">
+          <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
+Schuljahr 2026/27</span></div>
+        </div>
+      </div>
+
+      <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
+
+      <div class="panel panel--front">
+        <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
+        <div class="card card--name" id="card-front">
+          <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
+        </div>
+      </div>
+
+    </div>
+   </div>
+  </div>
+
+  </div><!-- /stage-left -->
+  </div><!-- /stage -->
+
+  <section class="tips ui">
+    <div class="tip">
+      <h2>Drucken</h2>
+      <p>Format wählen, dann im Druckdialog <b>A5</b>, Skalierung <b>100 %</b> und <b>Hintergrundgrafiken</b> aktivieren. Auf A4 gedruckt einfach mittig zuschneiden.</p>
+    </div>
+    <div class="tip">
+      <h2>Falten</h2>
+      <p>Entlang der gestrichelten Linie knicken. Die obere Hälfte steht kopf – nach dem Falten liest sich die Rückseite richtig herum.</p>
+    </div>
+    <div class="tip">
+      <h2>Anpassen</h2>
+      <p>In der Motivliste lässt sich jedes Motiv <b>an- und abwählen</b>. „Rahmen neu würfeln“ ordnet alles neu an – Motive überlappen dabei nie und halten den eingestellten Mindestabstand.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+  /* ---------- Motive ---------- */
+
+  const GROUPS = [
+    {
+      id: "travel", label: "Reisen & Transport", items: [
+        { id: "suitcase", label: "Koffer" }, { id: "plane", label: "Flugzeug" },
+        { id: "paperplane", label: "Papierflieger" }, { id: "passport", label: "Reisepass" },
+        { id: "ticket", label: "Ticket" }, { id: "map", label: "Landkarte" },
+        { id: "pin", label: "Standort" }, { id: "sign", label: "Wegweiser" },
+        { id: "tag", label: "Kofferanhänger" }, { id: "balloon", label: "Heißluftballon" },
+        { id: "train", label: "Zug" }, { id: "bus", label: "Bus" },
+        { id: "car", label: "Auto" }, { id: "bicycle", label: "Fahrrad" },
+        { id: "ship", label: "Schiff" }, { id: "rocket", label: "Rakete" },
+        { id: "globe", label: "Weltkugel" }, { id: "compass", label: "Kompass" },
+        { id: "anchor", label: "Anker" }
+      ]
+    },
+    {
+      id: "beach", label: "Strand & Meer", items: [
+        { id: "palm", label: "Palmwedel" }, { id: "flipflop", label: "Flip-Flop" },
+        { id: "starfish", label: "Seestern" }, { id: "shell", label: "Muschel" },
+        { id: "ball", label: "Wasserball" }, { id: "sunscreen", label: "Sonnencreme" },
+        { id: "cocktail", label: "Cocktail" }, { id: "sunglasses", label: "Sonnenbrille" },
+        { id: "pillow", label: "Nackenkissen" }, { id: "bottle", label: "Trinkflasche" },
+        { id: "seagull", label: "Möwe" }, { id: "dolphin", label: "Delfin" },
+        { id: "fish", label: "Fisch" }, { id: "crab", label: "Krabbe" },
+        { id: "sandcastle", label: "Sandburg" }, { id: "beachumbrella", label: "Sonnenschirm" },
+        { id: "snorkel", label: "Taucherbrille" }, { id: "wave", label: "Welle" }
+      ]
+    },
+    {
+      id: "nature", label: "Natur & Wetter", items: [
+        { id: "sun", label: "Sonne" }, { id: "cloud", label: "Wolke" },
+        { id: "shootingstar", label: "Sternschnuppe" }, { id: "moon", label: "Mond" },
+        { id: "rainbow", label: "Regenbogen" }, { id: "snowflake", label: "Schneeflocke" },
+        { id: "mountain", label: "Berge" }, { id: "tree", label: "Baum" },
+        { id: "flower", label: "Blume" }, { id: "cactus", label: "Kaktus" },
+        { id: "mushroom", label: "Pilz" }, { id: "butterfly", label: "Schmetterling" },
+        { id: "ladybug", label: "Marienkäfer" }, { id: "bee", label: "Biene" }
+      ]
+    },
+    {
+      id: "food", label: "Essen & Trinken", items: [
+        { id: "icecream", label: "Eis" }, { id: "pizza", label: "Pizza" },
+        { id: "burger", label: "Burger" }, { id: "fries", label: "Pommes" },
+        { id: "donut", label: "Donut" }, { id: "cupcake", label: "Cupcake" },
+        { id: "popcorn", label: "Popcorn" }, { id: "watermelon", label: "Melone" },
+        { id: "pineapple", label: "Ananas" }, { id: "strawberry", label: "Erdbeere" }
+      ]
+    },
+    {
+      id: "fun", label: "Freizeit & Schule", items: [
+        { id: "camera", label: "Kamera" }, { id: "photo", label: "Foto" },
+        { id: "envelope", label: "Brief" }, { id: "heart", label: "Herz" },
+        { id: "backpack", label: "Rucksack" }, { id: "book", label: "Buch" },
+        { id: "pencil", label: "Bleistift" }, { id: "soccer", label: "Fußball" },
+        { id: "basketball", label: "Basketball" }, { id: "skateboard", label: "Skateboard" },
+        { id: "guitar", label: "Gitarre" }, { id: "headphones", label: "Kopfhörer" },
+        { id: "musicnote", label: "Musiknote" }, { id: "tent", label: "Zelt" },
+        { id: "campfire", label: "Lagerfeuer" }, { id: "crown", label: "Krone" },
+        { id: "smiley", label: "Smiley" }, { id: "robot", label: "Roboter" }
+      ]
+    },
+    {
+      id: "fill", label: "Füllmotive", role: "filler", items: [
+        { id: "dot", label: "Punkt" }, { id: "star", label: "Funkeln" },
+        { id: "drop", label: "Tropfen" }, { id: "leaflet", label: "Blatt" },
+        { id: "triangle", label: "Dreieck" }
+      ]
+    }
+  ];
+
+  const ALL_ITEMS = GROUPS.flatMap((g) => g.items);
+  const enabled = new Set(ALL_ITEMS.map((m) => m.id));
+
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const XLINK = "http://www.w3.org/1999/xlink";
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /**
+   * Streut Doodles als Rahmen um das freie Mittelfeld.
+   * Grosse Motive zuerst, kleine fuellen die Luecken. Jede Position wird gegen
+   * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
+   * bleibt mindestens `gap` Millimeter Luft.
+   */
+  function buildScene(svg, W, H, card, seed, motifScale, gap, iconIds, fillerIds) {
+    const rnd = mulberry32(seed);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    const root = document.createElementNS(SVG_NS, "g");
+    root.setAttribute("fill", "none");
+    root.setAttribute("stroke", "currentColor");
+    root.setAttribute("color", "#1a1a1a");
+    root.setAttribute("stroke-linecap", "round");
+    root.setAttribute("stroke-linejoin", "round");
+    svg.append(root);
+
+    const bleed = 3;
+    const pad = 1.6;
+    const placed = [];
+
+    const clearOfCard = (x, y, r) =>
+      x + r < card.x - pad || x - r > card.x + card.w + pad ||
+      y + r < card.y - pad || y - r > card.y + card.h + pad;
+
+    const free = (x, y, r) => {
+      if (!clearOfCard(x, y, r)) return false;
+      for (let i = 0; i < placed.length; i++) {
+        const p = placed[i];
+        const dx = x - p.x;
+        const dy = y - p.y;
+        const min = p.r + r + gap;
+        if (dx * dx + dy * dy < min * min) return false;
+      }
+      return true;
+    };
+
+    const place = (id, x, y, size, rot) => {
+      const s = size / 24;
+      const use = document.createElementNS(SVG_NS, "use");
+      use.setAttributeNS(XLINK, "xlink:href", "#d-" + id);
+      use.setAttribute("href", "#d-" + id);
+      use.setAttribute("transform",
+        `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
+        `scale(${s.toFixed(4)}) translate(-12 -12)`);
+      use.setAttribute("stroke-width", (0.42 / s).toFixed(2));
+      root.append(use);
+    };
+
+    const passes = [
+      { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
+      { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
+      { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
+    ];
+
+    for (const pass of passes) {
+      if (!pass.ids.length) continue;
+      for (let i = 0; i < pass.tries; i++) {
+        const size = (pass.from + rnd() * (pass.to - pass.from)) * motifScale;
+        const r = size * 0.5;
+        const x = -bleed + rnd() * (W + 2 * bleed);
+        const y = -bleed + rnd() * (H + 2 * bleed);
+        if (!free(x, y, r)) continue;
+        place(pass.ids[Math.floor(rnd() * pass.ids.length)], x, y, size, (rnd() - 0.5) * pass.turn);
+        placed.push({ x, y, r });
+      }
+    }
+  }
+
+  /* ---------- Schrift ---------- */
+
+  const FONTS = [
+    { id: "archivo", label: "Plakativ (Archivo Black)",   css: "'Archivo Black', system-ui, sans-serif", weight: 400 },
+    { id: "bungee",  label: "Pop (Bungee)",               css: "'Bungee', system-ui, sans-serif",        weight: 400 },
+    { id: "baloo",   label: "Rund (Baloo 2)",             css: "'Baloo 2', system-ui, sans-serif",       weight: 800 },
+    { id: "work",    label: "Schlicht (Work Sans)",       css: "'Work Sans', system-ui, sans-serif",     weight: 600 },
+    { id: "hand",    label: "Handschrift (Patrick Hand)", css: "'Patrick Hand', cursive",                weight: 400 },
+    { id: "lora",    label: "Klassisch (Lora)",           css: "'Lora', Georgia, serif",                 weight: 700 }
+  ];
+
+  const COLORS = [
+    { label: "Schwarz", v: "#1a1a1a" },
+    { label: "Rot",     v: "#e8402a" },
+    { label: "Blau",    v: "#1f7ae0" },
+    { label: "Grün",    v: "#2fb457" },
+    { label: "Pink",    v: "#e5459b" },
+    { label: "Orange",  v: "#f58220" }
+  ];
+
+  /* ---------- Zustand ---------- */
+
+  const FORMATS = {
+    landscape: { w: 210, h: 148, page: "A5 landscape" },
+    portrait:  { w: 148, h: 210, page: "A5 portrait" }
+  };
+
+  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, seed: 20260827 };
+
+  const text = {
+    front: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
+             align: "center", upper: true, shadow: false, max: 26, min: 3 },
+    back:  { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
+             align: "center", upper: false, shadow: false, max: 17, min: 3 }
+  };
+
+  let side = "front";
+
+  const el = {
+    sheet: document.getElementById("sheet"),
+    fit: document.getElementById("sheet-fit"),
+    pageRule: document.getElementById("page-rule"),
+    sceneFront: document.getElementById("scene-front"),
+    sceneBack: document.getElementById("scene-back"),
+    cardFront: document.getElementById("card-front"),
+    cardBack: document.getElementById("card-back"),
+    band: document.getElementById("in-band"),
+    scale: document.getElementById("in-scale"),
+    gap: document.getElementById("in-gap"),
+    lblBand: document.getElementById("lbl-band"),
+    lblScale: document.getElementById("lbl-scale"),
+    lblGap: document.getElementById("lbl-gap"),
+    lblCount: document.getElementById("lbl-count"),
+    acc: document.getElementById("acc"),
+    shuffle: document.getElementById("btn-shuffle"),
+    all: document.getElementById("btn-all"),
+    none: document.getElementById("btn-none"),
+    name: document.getElementById("in-name"),
+    text: document.getElementById("in-text"),
+    outName: document.getElementById("out-name"),
+    outText: document.getElementById("out-text"),
+    boxFront: document.getElementById("box-front"),
+    boxBack: document.getElementById("box-back"),
+    font: document.getElementById("in-font"),
+    size: document.getElementById("in-size"),
+    auto: document.getElementById("in-auto"),
+    lh: document.getElementById("in-lh"),
+    lblSize: document.getElementById("lbl-size"),
+    lblLh: document.getElementById("lbl-lh"),
+    swatches: document.getElementById("swatches"),
+    aligns: document.getElementById("aligns"),
+    upper: document.getElementById("tg-upper"),
+    shadow: document.getElementById("tg-shadow"),
+    warn: document.getElementById("warn")
+  };
+
+  const parts = (key) => key === "front"
+    ? { span: el.outName, box: el.boxFront, src: el.name, fallback: "Name" }
+    : { span: el.outText, box: el.boxBack,  src: el.text, fallback: "Text" };
+
+  FONTS.forEach((f) => {
+    const opt = document.createElement("option");
+    opt.value = f.id;
+    opt.textContent = f.label;
+    opt.style.fontFamily = f.css;
+    el.font.append(opt);
+  });
+
+  COLORS.forEach((c) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "swatch";
+    b.style.background = c.v;
+    b.dataset.color = c.v;
+    b.title = c.label;
+    b.setAttribute("aria-label", c.label);
+    el.swatches.append(b);
+  });
+
+  /* ---------- Motiv-Akkordeon ---------- */
+
+  GROUPS.forEach((g, i) => {
+    const box = document.createElement("details");
+    box.className = "group";
+    box.open = i === 0;
+
+    const sum = document.createElement("summary");
+    sum.innerHTML =
+      `<span class="group-name"><span class="group-caret"></span>${g.label}</span>` +
+      `<span class="group-count" data-count="${g.id}"></span>`;
+
+    const list = document.createElement("div");
+    list.className = "motif-list";
+    g.items.forEach((m) => {
+      const lab = document.createElement("label");
+      lab.className = "motif is-on";
+      lab.innerHTML =
+        `<input type="checkbox" checked data-id="${m.id}">` +
+        `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#d-${m.id}"></use></svg>` +
+        `<span>${m.label}</span>`;
+      list.append(lab);
+    });
+
+    const row = document.createElement("div");
+    row.className = "btn-row";
+    row.innerHTML =
+      `<button type="button" class="chip mini" data-group="${g.id}" data-set="on">alle</button>` +
+      `<button type="button" class="chip mini" data-group="${g.id}" data-set="off">keine</button>`;
+
+    const body = document.createElement("div");
+    body.className = "group-body";
+    body.append(list, row);
+
+    box.append(sum, body);
+    el.acc.append(box);
+  });
+
+  function syncMotifs() {
+    el.acc.querySelectorAll(".motif input").forEach((box) => {
+      box.checked = enabled.has(box.dataset.id);
+      box.closest(".motif").classList.toggle("is-on", box.checked);
+    });
+    GROUPS.forEach((g) => {
+      const on = g.items.filter((m) => enabled.has(m.id)).length;
+      el.acc.querySelector(`[data-count="${g.id}"]`).textContent = on + " / " + g.items.length;
+    });
+    el.lblCount.textContent = enabled.size + " von " + ALL_ITEMS.length + " aktiv";
+  }
+
+  function setMotifs(items, on) {
+    items.forEach((m) => (on ? enabled.add(m.id) : enabled.delete(m.id)));
+    syncMotifs();
+    layout();
+  }
+
+  el.acc.addEventListener("change", (e) => {
+    const box = e.target.closest("input[data-id]");
+    if (!box) return;
+    if (box.checked) enabled.add(box.dataset.id);
+    else enabled.delete(box.dataset.id);
+    syncMotifs();
+    layout();
+  });
+
+  el.acc.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-group]");
+    if (!btn) return;
+    const g = GROUPS.find((x) => x.id === btn.dataset.group);
+    setMotifs(g.items, btn.dataset.set === "on");
+  });
+
+  el.all.addEventListener("click", () => setMotifs(ALL_ITEMS, true));
+  el.none.addEventListener("click", () => setMotifs(ALL_ITEMS, false));
+
+  /* ---------- Geometrie ---------- */
+
+  function geometry() {
+    const f = FORMATS[sheetState.orient];
+    const panelW = f.w;
+    const panelH = f.h / 2;
+    const bandX = Math.min(sheetState.band, panelW * 0.36);
+    const bandY = Math.min(
+      Math.max(sheetState.band * (panelH / panelW) * 1.35, 7),
+      panelH * 0.32
+    );
+    return {
+      f, panelW, panelH,
+      card: { x: bandX, y: bandY, w: panelW - 2 * bandX, h: panelH - 2 * bandY }
+    };
+  }
+
+  function layout() {
+    const g = geometry();
+
+    el.sheet.style.setProperty("--sw", g.f.w + "mm");
+    el.sheet.style.setProperty("--sh", g.f.h + "mm");
+    el.pageRule.textContent = `@page { size: ${g.f.page}; margin: 0; }`;
+
+    [el.cardFront, el.cardBack].forEach((card) => {
+      card.style.left = (g.card.x / g.panelW * 100) + "%";
+      card.style.top = (g.card.y / g.panelH * 100) + "%";
+      card.style.width = (g.card.w / g.panelW * 100) + "%";
+      card.style.height = (g.card.h / g.panelH * 100) + "%";
+    });
+
+    const pick = (filler) => GROUPS
+      .filter((g) => (g.role === "filler") === filler)
+      .flatMap((g) => g.items)
+      .filter((m) => enabled.has(m.id))
+      .map((m) => m.id);
+
+    const iconIds = pick(false);
+    const fillerIds = pick(true);
+    const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
+      sheetState.motif, sheetState.gap, iconIds, fillerIds);
+
+    draw(el.sceneFront, sheetState.seed);
+    draw(el.sceneBack, sheetState.seed + 977);
+
+    el.lblBand.textContent = sheetState.band + " ";
+    el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
+    el.lblGap.textContent = sheetState.gap.toFixed(1).replace(".", ",") + " mm";
+  }
+
+  /* ---------- Vorschau auf die verfuegbare Breite skalieren ---------- */
+
+  let lastFitWidth = -1;
+
+  function fitSheet(force) {
+    const avail = el.fit.clientWidth;
+    if (!avail) return;
+    if (!force && avail === lastFitWidth) return;
+    lastFitWidth = avail;
+
+    const natural = el.sheet.offsetWidth;   // echte Blattbreite in px (transform zaehlt nicht mit)
+    if (!natural) return;
+
+    const k = avail / natural;
+    el.sheet.style.transform = "scale(" + k + ")";
+    el.fit.style.height = (el.sheet.offsetHeight * k) + "px";
+  }
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => fitSheet(false)).observe(el.fit);
+  }
+
+  /* ---------- Text ---------- */
+
+  function overflows(span, box) {
+    return span.scrollHeight > box.clientHeight + 1 || span.scrollWidth > box.clientWidth + 1;
+  }
+
+  function applyText(key) {
+    const s = text[key];
+    const p = parts(key);
+    const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
+
+    p.span.textContent = p.src.value.trim() ? p.src.value : p.fallback;
+    p.span.style.fontFamily = font.css;
+    p.span.style.fontWeight = font.weight;
+    p.span.style.color = s.color;
+    p.span.style.lineHeight = s.lh;
+    p.span.style.textAlign = s.align;
+    p.span.style.textTransform = s.upper ? "uppercase" : "none";
+    p.span.style.textShadow = s.shadow
+      ? "0.55mm 0.75mm 0 " + (s.color === "#1a1a1a" ? "#f5c518" : "#1a1a1a")
+      : "none";
+    p.box.style.justifyContent =
+      s.align === "left" ? "flex-start" : s.align === "right" ? "flex-end" : "center";
+
+    if (s.auto) {
+      let v = s.max;
+      p.span.style.fontSize = v + "cqh";
+      while (v > s.min && overflows(p.span, p.box)) {
+        v -= 0.4;
+        p.span.style.fontSize = v + "cqh";
+      }
+      s.size = Math.round(v * 5) / 5;
+    } else {
+      p.span.style.fontSize = s.size + "cqh";
+    }
+
+    return overflows(p.span, p.box);
+  }
+
+  function syncControls() {
+    const s = text[side];
+    const panelH = FORMATS[sheetState.orient].h / 2;
+
+    el.font.value = s.font;
+    el.auto.checked = s.auto;
+    el.size.value = s.size;
+    el.lh.value = s.lh;
+    el.band.value = sheetState.band;
+    el.scale.value = Math.round(sheetState.motif * 100);
+    el.gap.value = sheetState.gap;
+
+    el.lblSize.textContent = (s.size * panelH / 100).toFixed(1).replace(".", ",") + " mm"
+      + (s.auto ? " (auto)" : "");
+    el.lblLh.textContent = s.lh.toFixed(2).replace(".", ",");
+
+    el.swatches.querySelectorAll(".swatch").forEach((b) =>
+      b.classList.toggle("is-on", b.dataset.color === s.color));
+    el.aligns.querySelectorAll(".chip").forEach((b) =>
+      b.classList.toggle("is-on", b.dataset.align === s.align));
+
+    el.upper.classList.toggle("is-on", s.upper);
+    el.upper.setAttribute("aria-pressed", String(s.upper));
+    el.shadow.classList.toggle("is-on", s.shadow);
+    el.shadow.setAttribute("aria-pressed", String(s.shadow));
+
+    document.querySelectorAll("[data-only]").forEach((n) => {
+      n.hidden = n.dataset.only !== side;
+    });
+  }
+
+  function renderText() {
+    const over = { front: applyText("front"), back: applyText("back") };
+    el.warn.hidden = !(over[side] && !text[side].auto);
+    syncControls();
+  }
+
+  function renderAll() {
+    layout();
+    fitSheet(true);
+    renderText();
+  }
+
+  /* ---------- Ereignisse ---------- */
+
+  document.querySelectorAll("[data-orient]").forEach((b) => {
+    b.addEventListener("click", () => {
+      sheetState.orient = b.dataset.orient;
+      document.querySelectorAll("[data-orient]").forEach((o) =>
+        o.classList.toggle("is-on", o === b));
+      renderAll();
+    });
+  });
+
+  document.querySelectorAll("[data-side]").forEach((b) => {
+    b.addEventListener("click", () => {
+      side = b.dataset.side;
+      document.querySelectorAll("[data-side]").forEach((o) => {
+        const on = o === b;
+        o.classList.toggle("is-on", on);
+        o.setAttribute("aria-selected", String(on));
+      });
+      renderText();
+    });
+  });
+
+  el.band.addEventListener("input", () => {
+    sheetState.band = parseInt(el.band.value, 10);
+    renderAll();
+  });
+
+  el.scale.addEventListener("input", () => {
+    sheetState.motif = parseInt(el.scale.value, 10) / 100;
+    renderAll();
+  });
+
+  el.gap.addEventListener("input", () => {
+    sheetState.gap = parseFloat(el.gap.value);
+    layout();
+  });
+
+  el.shuffle.addEventListener("click", () => {
+    sheetState.seed = Math.floor(Math.random() * 1e9);
+    renderAll();
+  });
+
+  el.name.addEventListener("input", renderText);
+  el.text.addEventListener("input", renderText);
+  el.font.addEventListener("change", () => { text[side].font = el.font.value; renderText(); });
+  el.auto.addEventListener("change", () => { text[side].auto = el.auto.checked; renderText(); });
+  el.size.addEventListener("input", () => {
+    text[side].auto = false;
+    text[side].size = parseFloat(el.size.value);
+    renderText();
+  });
+  el.lh.addEventListener("input", () => { text[side].lh = parseFloat(el.lh.value); renderText(); });
+
+  el.swatches.addEventListener("click", (e) => {
+    const b = e.target.closest(".swatch");
+    if (!b) return;
+    text[side].color = b.dataset.color;
+    renderText();
+  });
+
+  el.aligns.addEventListener("click", (e) => {
+    const b = e.target.closest(".chip");
+    if (!b) return;
+    text[side].align = b.dataset.align;
+    renderText();
+  });
+
+  el.upper.addEventListener("click", () => { text[side].upper = !text[side].upper; renderText(); });
+  el.shadow.addEventListener("click", () => { text[side].shadow = !text[side].shadow; renderText(); });
+
+  window.addEventListener("resize", () => { fitSheet(false); renderText(); });
+  window.addEventListener("beforeprint", renderText);
+  document.fonts.ready.then(() => { fitSheet(true); renderText(); });
+  document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+  syncMotifs();
+  renderAll();
+</script>
