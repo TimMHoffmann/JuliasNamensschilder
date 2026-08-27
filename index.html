@@ -17,6 +17,7 @@
 
     --paper: #ffffff;
     --paper-ink: #1a1a1a;
+    --frame-color: #1a1a1a;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -376,7 +377,7 @@
   .card {
     position: absolute;
     background: var(--paper);
-    border: 0.9mm solid var(--paper-ink);
+    border: 0.9mm solid var(--frame-color);
     display: flex;
     padding: 4cqh 4cqw;
     overflow: hidden;
@@ -586,7 +587,7 @@
       transform: none !important;
       box-shadow: none;
       break-inside: avoid; page-break-inside: avoid;
-      break-after: avoid;  page-break-after: avoid;
+      break-after: avoid; page-break-after: avoid;
     }
 
     /* Farben, Flaechen und Rahmen des Blattes nicht vom Browser wegoptimieren */
@@ -601,6 +602,7 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
+
     <g id="d-suitcase">
       <rect x="3.6" y="7" width="16.8" height="12.6" rx="1.8"/>
       <path d="M9 7V5.3a1.4 1.4 0 0 1 1.4-1.4h3.2A1.4 1.4 0 0 1 15 5.3V7"/>
@@ -620,9 +622,10 @@
     </g>
 
     <g id="d-palm">
-      <path d="M3.8 21.2C7 14 12 7.4 19.8 2.8"/>
-      <path d="M5.8 19.2c-.9-1.9-.3-3.4 1.7-4.3M8.4 15.6c-.7-2 .2-3.4 2.3-4M11 12c-.5-2.1.5-3.4 2.6-3.9M13.8 8.6c-.3-2.1.8-3.3 2.9-3.6"/>
-      <path d="M9.6 15.4c1.9.9 2.6 2.4 2.1 4.4M12.2 11.8c1.9.8 2.7 2.2 2.3 4.3M14.9 8.6c1.9.7 2.8 2.1 2.5 4.2M17.6 5.8c1.9.6 2.9 1.9 2.7 4"/>
+      <path d="M12 20.8c-.6-3.2-.7-6.8 0-10.8"/>
+      <path d="M9.2 20.8h5.6M12 10C9.6 8.8 6.6 8.8 3.2 10M12 10c2.4-1.2 5.4-1.2 8.8 0"/>
+      <path d="M12 9.8c-1.8-2.8-4-4.5-6.8-5.2M12 9.8c1.8-2.8 4-4.5 6.8-5.2"/>
+      <path d="M12 9.8c-.4-3.2.1-5.6 1.8-7.4M12 9.8c.4-3.2-.1-5.6-1.8-7.4"/>
     </g>
 
     <g id="d-icecream">
@@ -820,11 +823,6 @@
       <path d="M9.6 17.6c2.4-3.4 4.2-3.4 5.4-.4 1.4-3 3.2-3 5.4.4"/>
     </g>
 
-    <g id="d-dolphin">
-      <path d="M3 13.4c2.6-5 7-7.6 13.2-7.8-.6 2.2-.2 3.8 1.2 4.8 2 1.4 3 3 3 4.8-3.4-.4-5.6.4-6.6 2.4-1 2-2.6 3-4.8 3 .8-1.6.8-3 0-4.2-2-.6-4-1.6-6-3Z"/>
-      <circle cx="14.4" cy="10.4" r="0.7" fill="currentColor"/>
-    </g>
-
     <g id="d-fish">
       <path d="M4.6 12c2.8-3.8 6-5.6 9.6-5.6 3.2 0 5.4 1.9 6.4 5.6-1 3.7-3.2 5.6-6.4 5.6-3.6 0-6.8-1.8-9.6-5.6Z"/>
       <path d="M4.6 12 1.6 8.2v7.6Z"/>
@@ -859,8 +857,8 @@
     </g>
 
     <g id="d-wave">
-      <path d="M2.4 16.6c2.2-3.6 4.8-3.6 7 0 2.2-3.6 4.8-3.6 7 0M2.4 20.4c2.2-3.6 4.8-3.6 7 0 2.2-3.6 4.8-3.6 7 0"/>
-      <path d="M16.4 16.6c-1-5.6 1.2-9.4 5.2-9.6-1.8 1.4-2.6 3.2-2.4 5.4"/>
+      <path d="M2.4 15.2c4.2 0 5.2-6.6 9-6.6 3.2 0 2.4 5.2 5.2 5.2 1.8 0 3.4-1.2 5-3"/>
+      <path d="M2.4 19.2c4.8 1.8 9.6 1.8 14.2.2 2.2-.8 3.8-.6 5 .2"/>
     </g>
 
     <!-- ===== Natur & Wetter ===== -->
@@ -1148,6 +1146,36 @@
                aria-label="Abstand der Motive zur Papierkante in Millimetern">
       </div>
 
+      <div class="field-group">
+        <label for="in-style">Rahmenstil</label>
+        <select id="in-style" aria-label="Rahmenstil">
+          <option value="doodle">Kritzelmotive</option>
+          <option value="confetti">Konfetti</option>
+          <option value="stars">Sterne &amp; Formen</option>
+          <option value="minimal">Minimal</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="in-frame-color">Rahmenfarbe</label>
+        <select id="in-frame-color" aria-label="Farbe des Rahmens">
+          <option value="#1a1a1a">Schwarz</option>
+          <option value="#e8402a">Rot</option>
+          <option value="#1f7ae0">Blau</option>
+          <option value="#2fb457">Grün</option>
+          <option value="#e5459b">Pink</option>
+          <option value="#f58220">Orange</option>
+          <option value="#35785f">Waldgrün</option>
+          <option value="#6b4f9b">Violett</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <span class="lbl">Linienstärke <span class="val" id="lbl-line">–</span></span>
+        <input type="range" id="in-line" min="0.6" max="2" step="0.1" value="1"
+               aria-label="Linienstärke des Rahmens">
+      </div>
+
       <div class="field-group span-all">
         <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
       </div>
@@ -1252,8 +1280,11 @@ Schuljahr 2026/27</textarea>
       <div class="project-tools">
         <button type="button" class="chip" id="btn-export">Exportieren</button>
         <button type="button" class="chip" id="btn-import">Importieren</button>
-        <input type="file" id="file-import" accept="application/json,.json" hidden>
+        <button type="button" class="chip" id="btn-reset">Zurücksetzen</button>
+        <button type="button" class="chip" id="btn-undo" disabled>Rückgängig</button>
+        <button type="button" class="chip" id="btn-redo" disabled>Wiederholen</button>
       </div>
+      <input type="file" id="file-import" accept="application/json,.json" hidden>
     </div>
   </details>
 
@@ -1385,12 +1416,12 @@ Schuljahr 2026/27</span></div>
     },
     {
       id: "beach", label: "Strand & Meer", items: [
-        { id: "palm", label: "Palmwedel" }, { id: "flipflop", label: "Flip-Flop" },
+        { id: "palm", label: "Palme" }, { id: "flipflop", label: "Flip-Flop" },
         { id: "starfish", label: "Seestern" }, { id: "shell", label: "Muschel" },
         { id: "ball", label: "Wasserball" }, { id: "sunscreen", label: "Sonnencreme" },
         { id: "cocktail", label: "Cocktail" }, { id: "sunglasses", label: "Sonnenbrille" },
         { id: "pillow", label: "Nackenkissen" }, { id: "bottle", label: "Trinkflasche" },
-        { id: "seagull", label: "Möwe" }, { id: "dolphin", label: "Delfin" },
+        { id: "seagull", label: "Möwe" },
         { id: "fish", label: "Fisch" }, { id: "crab", label: "Krabbe" },
         { id: "sandcastle", label: "Sandburg" }, { id: "beachumbrella", label: "Sonnenschirm" },
         { id: "snorkel", label: "Taucherbrille" }, { id: "wave", label: "Welle" }
@@ -1459,7 +1490,7 @@ Schuljahr 2026/27</span></div>
    * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
    * bleibt mindestens `gap` Millimeter Luft.
    */
-  function buildScene(svg, W, H, card, seed, motifScale, gap, edge, iconIds, fillerIds, whole) {
+  function buildScene(svg, W, H, card, seed, motifScale, gap, edge, frameStyle, frameColor, lineWidth, iconIds, fillerIds, whole) {
     const rnd = mulberry32(seed);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -1467,7 +1498,7 @@ Schuljahr 2026/27</span></div>
     const root = document.createElementNS(SVG_NS, "g");
     root.setAttribute("fill", "none");
     root.setAttribute("stroke", "currentColor");
-    root.setAttribute("color", "#1a1a1a");
+    root.setAttribute("color", frameColor);
     root.setAttribute("stroke-linecap", "round");
     root.setAttribute("stroke-linejoin", "round");
     svg.append(root);
@@ -1506,15 +1537,27 @@ Schuljahr 2026/27</span></div>
       use.setAttribute("transform",
         `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
         `scale(${s.toFixed(4)}) translate(-12 -12)`);
-      use.setAttribute("stroke-width", (0.42 / s).toFixed(2));
+      use.setAttribute("stroke-width", (0.42 * lineWidth / s).toFixed(2));
       root.append(use);
     };
 
-    const passes = [
-      { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
-      { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
-      { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
-    ];
+    const passesByStyle = {
+      doodle: [
+        { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
+        { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
+        { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
+      ],
+      confetti: [
+        { ids: fillerIds, from: 2.8, to: 5.4, tries: 4200, turn: 70 }
+      ],
+      stars: [
+        { ids: fillerIds.filter((id) => ["star", "triangle", "dot"].includes(id)), from: 4, to: 8, tries: 3000, turn: 45 }
+      ],
+      minimal: [
+        { ids: iconIds, from: 9.4, to: 12.6, tries: 800, turn: 25 }
+      ]
+    };
+    const passes = passesByStyle[frameStyle] || passesByStyle.doodle;
 
     for (const pass of passes) {
       if (!pass.ids.length) continue;
@@ -1557,7 +1600,11 @@ Schuljahr 2026/27</span></div>
     portrait:  { w: 148, h: 210, page: "A5 portrait" }
   };
 
-  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false, seed: 20260827 };
+  const sheetState = {
+    orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
+    frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
+    seed: 20260827
+  };
 
   const text = {
     front: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
@@ -1567,6 +1614,8 @@ Schuljahr 2026/27</span></div>
   };
 
   let side = "front";
+  const STORAGE_KEY = "namensschild-entwurf-v1";
+  const history = { undo: [], redo: [], applying: false };
 
   const el = {
     sheet: document.getElementById("sheet"),
@@ -1583,11 +1632,15 @@ Schuljahr 2026/27</span></div>
     scale: document.getElementById("in-scale"),
     gap: document.getElementById("in-gap"),
     edge: document.getElementById("in-edge"),
+    style: document.getElementById("in-style"),
+    frameColor: document.getElementById("in-frame-color"),
+    line: document.getElementById("in-line"),
     whole: document.getElementById("in-whole"),
     lblBand: document.getElementById("lbl-band"),
     lblScale: document.getElementById("lbl-scale"),
     lblGap: document.getElementById("lbl-gap"),
     lblEdge: document.getElementById("lbl-edge"),
+    lblLine: document.getElementById("lbl-line"),
     lblCount: document.getElementById("lbl-count"),
     acc: document.getElementById("acc"),
     shuffle: document.getElementById("btn-shuffle"),
@@ -1612,7 +1665,10 @@ Schuljahr 2026/27</span></div>
     warn: document.getElementById("warn"),
     export: document.getElementById("btn-export"),
     import: document.getElementById("btn-import"),
-    importFile: document.getElementById("file-import")
+    importFile: document.getElementById("file-import"),
+    reset: document.getElementById("btn-reset"),
+    undo: document.getElementById("btn-undo"),
+    redo: document.getElementById("btn-redo")
   };
 
   const parts = (key) => key === "front"
@@ -1753,7 +1809,8 @@ Schuljahr 2026/27</span></div>
     const iconIds = pick(false);
     const fillerIds = pick(true);
     const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
-      sheetState.motif, sheetState.gap, sheetState.edge, iconIds, fillerIds, sheetState.whole);
+      sheetState.motif, sheetState.gap, sheetState.edge, sheetState.frameStyle,
+      sheetState.frameColor, sheetState.lineWidth, iconIds, fillerIds, sheetState.whole);
 
     draw(el.sceneFront, sheetState.seed);
     draw(el.sceneBack, sheetState.seed + 977);
@@ -1764,6 +1821,9 @@ Schuljahr 2026/27</span></div>
     el.lblEdge.textContent = sheetState.edge === 0
       ? "Kante"
       : (sheetState.edge > 0 ? "+" : "") + sheetState.edge.toFixed(1).replace(".", ",") + " mm";
+    el.lblLine.textContent = sheetState.lineWidth.toFixed(1).replace(".", ",") + "x";
+    el.sheet.style.setProperty("--frame-color", sheetState.frameColor);
+    saveDraft();
   }
 
   /* ---------- Vorschau auf die verfuegbare Breite skalieren ---------- */
@@ -1852,6 +1912,12 @@ Schuljahr 2026/27</span></div>
     el.scale.value = Math.round(sheetState.motif * 100);
     el.gap.value = sheetState.gap;
     el.edge.value = sheetState.edge;
+    el.style.value = sheetState.frameStyle;
+    el.frameColor.value = sheetState.frameColor;
+    if (el.frameColor.value !== sheetState.frameColor) {
+      el.frameColor.value = "#1a1a1a";
+    }
+    el.line.value = sheetState.lineWidth;
     el.edge.disabled = sheetState.whole;
     el.whole.checked = sheetState.whole;
 
@@ -1890,6 +1956,7 @@ Schuljahr 2026/27</span></div>
     const over = { front: applyText("front"), back: applyText("back") };
     el.warn.hidden = !(over[side] && !text[side].auto);
     syncControls();
+    saveDraft();
   }
 
   function renderAll() {
@@ -1898,15 +1965,66 @@ Schuljahr 2026/27</span></div>
     renderText();
   }
 
-  function exportProject() {
-    const project = {
+  function projectData() {
+    return {
       version: 1,
       sheetState: { ...sheetState },
       text: structuredClone(text),
+      values: { name: el.name.value, text: el.text.value },
       enabled: [...enabled],
       side,
       previewTurn
     };
+  }
+
+  function updateHistoryButtons() {
+    el.undo.disabled = history.undo.length === 0;
+    el.redo.disabled = history.redo.length === 0;
+  }
+
+  function rememberHistory() {
+    if (history.applying) return;
+    history.undo.push(projectData());
+    if (history.undo.length > 40) history.undo.shift();
+    history.redo.length = 0;
+    updateHistoryButtons();
+  }
+
+  function moveHistory(direction) {
+    const source = direction === "undo" ? history.undo : history.redo;
+    const target = direction === "undo" ? history.redo : history.undo;
+    if (!source.length) return;
+    target.push(projectData());
+    history.applying = true;
+    const project = source.pop();
+    Object.assign(sheetState, project.sheetState);
+    Object.assign(text.front, project.text.front);
+    Object.assign(text.back, project.text.back);
+    if (project.values) {
+      el.name.value = project.values.name || "";
+      el.text.value = project.values.text || "";
+    }
+    enabled.clear();
+    project.enabled.forEach((id) => { if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id); });
+    side = project.side === "back" ? "back" : "front";
+    previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
+    el.lblTurn.textContent = previewTurn + "°";
+    syncMotifs();
+    renderAll();
+    history.applying = false;
+    updateHistoryButtons();
+  }
+
+  function saveDraft() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(projectData()));
+    } catch (error) {
+      // Local storage can be disabled by the browser.
+    }
+  }
+
+  function exportProject() {
+    const project = projectData();
     const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -1914,7 +2032,7 @@ Schuljahr 2026/27</span></div>
     const exportName = el.name.value.trim()
       .replace(/\s+/g, "-")
       .replace(/[<>:"/\\|?*]/g, "");
-    link.download = ("namensschild-" + exportName || "namensschild-projekt") + ".json";
+    link.download = (exportName ? "namensschild-" + exportName : "namensschild-projekt") + ".json";
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -1927,11 +2045,19 @@ Schuljahr 2026/27</span></div>
       }
 
       const importedIds = project.enabled.filter((id) => ALL_ITEMS.some((item) => item.id === id));
+      rememberHistory();
       Object.assign(sheetState, project.sheetState);
       if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
       if (sheetState.whole) sheetState.edge = 0;
+      if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
+      if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
+      if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
       Object.assign(text.front, project.text.front);
       Object.assign(text.back, project.text.back);
+      if (project.values) {
+        el.name.value = project.values.name || "";
+        el.text.value = project.values.text || "";
+      }
       enabled.clear();
       importedIds.forEach((id) => enabled.add(id));
       side = project.side === "back" ? "back" : "front";
@@ -1991,6 +2117,21 @@ Schuljahr 2026/27</span></div>
     layout();
   });
 
+  el.style.addEventListener("change", () => {
+    sheetState.frameStyle = el.style.value;
+    layout();
+  });
+
+  el.frameColor.addEventListener("change", () => {
+    sheetState.frameColor = el.frameColor.value;
+    layout();
+  });
+
+  el.line.addEventListener("input", () => {
+    sheetState.lineWidth = parseFloat(el.line.value);
+    layout();
+  });
+
   el.whole.addEventListener("change", () => {
     sheetState.whole = el.whole.checked;
     if (sheetState.whole) sheetState.edge = 0;
@@ -2039,6 +2180,29 @@ Schuljahr 2026/27</span></div>
     if (el.importFile.files[0]) importProject(el.importFile.files[0]);
   });
 
+  el.undo.addEventListener("click", () => moveHistory("undo"));
+  el.redo.addEventListener("click", () => moveHistory("redo"));
+
+  el.reset.addEventListener("click", () => {
+    rememberHistory();
+    Object.assign(sheetState, {
+      orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
+      frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
+      seed: 20260827
+    });
+    Object.assign(text.front, { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true, shadow: false, max: 26, min: 3 });
+    Object.assign(text.back, { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 17, min: 3 });
+    el.name.value = "Mia";
+    el.text.value = "Klasse 5b\nSchuljahr 2026/27";
+    enabled.clear();
+    ALL_ITEMS.forEach((item) => enabled.add(item.id));
+    side = "front";
+    previewTurn = 0;
+    el.lblTurn.textContent = "0°";
+    syncMotifs();
+    renderAll();
+  });
+
   window.addEventListener("resize", () => { fitSheet(false); renderText(); });
   window.addEventListener("beforeprint", renderText);
   document.fonts.ready.then(() => { fitSheet(true); renderText(); });
@@ -2069,6 +2233,28 @@ Schuljahr 2026/27</span></div>
   });
 
   document.getElementById("btn-legal").addEventListener("click", () => legal.showModal());
+
+  try {
+    const draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (draft && draft.version === 1 && draft.sheetState && draft.text) {
+      Object.assign(sheetState, draft.sheetState);
+      Object.assign(text.front, draft.text.front);
+      Object.assign(text.back, draft.text.back);
+      if (draft.values) {
+        el.name.value = draft.values.name || "";
+        el.text.value = draft.values.text || "";
+      }
+      enabled.clear();
+      (draft.enabled || []).forEach((id) => {
+        if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id);
+      });
+      side = draft.side === "back" ? "back" : "front";
+      previewTurn = [0, 90, 180, 270].includes(draft.previewTurn) ? draft.previewTurn : 0;
+      el.lblTurn.textContent = previewTurn + "°";
+    }
+  } catch (error) {
+    // Ignore an invalid or unavailable local draft.
+  }
 
   syncMotifs();
   renderAll();
