@@ -2009,8 +2009,8 @@ Schuljahr 2026/27</span></div>
   el.upper.addEventListener("click", () => { text[side].upper = !text[side].upper; renderText(); });
   el.shadow.addEventListener("click", () => { text[side].shadow = !text[side].shadow; renderText(); });
 
-  el.turnLeft.addEventListener("click", () => turnPreview(-180));
-  el.turnRight.addEventListener("click", () => turnPreview(180));
+  el.turnLeft.addEventListener("click", () => turnPreview(180));
+  el.turnRight.addEventListener("click", () => turnPreview(-180));
   el.export.addEventListener("click", exportProject);
   el.import.addEventListener("click", () => el.importFile.click());
   el.importFile.addEventListener("change", () => {
