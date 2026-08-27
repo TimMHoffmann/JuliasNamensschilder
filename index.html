@@ -114,6 +114,16 @@
     color: var(--ui-accent); margin: 0;
   }
 
+  details.controls > summary { list-style: none; cursor: pointer; }
+
+  details.controls > summary:focus-visible {
+    outline: 2.5px solid var(--ui-accent); outline-offset: 4px; border-radius: 8px;
+  }
+
+  details.controls:not([open]) { padding-bottom: 18px; }
+
+  .controls-body { display: flex; flex-direction: column; gap: 16px; }
+
   .seg {
     display: inline-flex;
     background: var(--ui-bg);
@@ -150,6 +160,7 @@
   .span-all { grid-column: 1 / -1; }
 
   .field-group { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+  .field-group[data-only][hidden] { display: none !important; }
 
   .field-group > label, .field-group > .lbl {
     font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em;
@@ -235,7 +246,8 @@
     font-size: 13.5px; font-weight: 600; color: var(--ui-ink);
   }
 
-  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary::-webkit-details-marker,
+  details.controls > summary::-webkit-details-marker { display: none; }
   details.group > summary:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -2px; }
 
   .group-name { display: flex; align-items: center; gap: 10px; }
@@ -248,7 +260,7 @@
     transition: transform 0.15s ease;
   }
 
-  details.group[open] > summary .group-caret { transform: rotate(45deg); }
+  details[open] > summary .group-caret { transform: rotate(45deg); }
 
   @media (prefers-reduced-motion: reduce) { .group-caret { transition: none; } }
 
@@ -323,14 +335,22 @@
   .sheet-wrap { width: 100%; }
 
   /* Haelt den skalierten Platzbedarf des Blattes im Fluss */
-  .sheet-fit { position: relative; width: 100%; }
+  .sheet-fit { 
+    position: relative; 
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Verhindert, dass gedrehte Ecken den Container vergrößern */
+  }
 
   .sheet {
     --sw: 210mm; --sh: 148mm;
     position: relative;
     width: var(--sw);
     height: var(--sh);
-    transform-origin: top left;
+    transform-origin: center center; /* <-- AUF CENTER CENTER SETZEN */
+    transition: transform 0.3s ease;  /* Optional: Macht die Drehung geschmeidig */
     background: var(--paper);
     overflow: hidden;
     box-shadow: 0 20px 44px rgba(20, 16, 12, 0.26);
@@ -344,7 +364,11 @@
     overflow: hidden;
   }
 
-  .panel--back { top: 0; transform: rotate(180deg); }
+  .panel--back { 
+    top: 0; 
+    transform: rotate(180deg); 
+    transform-origin: center center; /* Stellt sicher, dass es exakt auf dem Kopf steht */
+  }
   .panel--front { bottom: 0; }
 
   .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -397,6 +421,27 @@
     letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--paper-ink);
   }
+
+  /* ---------- Vorschau drehen ---------- */
+
+  .preview-tools {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; padding-top: 14px;
+  }
+
+  .preview-turn {
+    font-size: 12.5px; font-weight: 600; color: var(--ui-muted);
+    font-variant-numeric: tabular-nums;
+    min-width: 42px; text-align: center;
+  }
+
+  .preview-tools .chip { font-size: 14px; line-height: 1; padding: 8px 14px; }
+
+  .project-tools {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+
+  .project-tools .chip { flex: 1 1 140px; }
 
   /* ---------- Hinweise ---------- */
 
@@ -1065,15 +1110,19 @@
   <div class="stage">
   <div class="stage-right ui">
 
-  <section class="controls">
-    <div class="controls-head">
-      <h2 class="controls-title">Blatt &amp; Rahmen</h2>
+  <details class="controls" open>
+    <summary class="controls-head">
+      <span class="group-name">
+        <span class="group-caret" aria-hidden="true"></span>
+        <h2 class="controls-title">Blatt &amp; Rahmen</h2>
+      </span>
       <div class="seg" role="group" aria-label="Papierformat">
         <button type="button" class="seg-btn is-on" data-orient="landscape">Querformat</button>
         <button type="button" class="seg-btn" data-orient="portrait">Hochformat</button>
       </div>
-    </div>
+    </summary>
 
+    <div class="controls-body">
     <div class="grid">
       <div class="field-group">
         <span class="lbl">Rahmenbreite <span class="val" id="lbl-band">–</span></span>
@@ -1094,6 +1143,10 @@
       </div>
 
       <div class="field-group span-all">
+        <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
+      </div>
+
+      <div class="field-group span-all">
         <span class="lbl">Motive <span class="val" id="lbl-count">–</span></span>
         <div class="acc" id="acc"></div>
       </div>
@@ -1106,17 +1159,22 @@
       </div>
       <button class="print" type="button" id="btn-shuffle">Rahmen neu würfeln</button>
     </div>
-  </section>
+    </div>
+  </details>
 
-  <section class="controls">
-    <div class="controls-head">
-      <h2 class="controls-title">Beschriftung</h2>
+  <details class="controls" open>
+    <summary class="controls-head">
+      <span class="group-name">
+        <span class="group-caret" aria-hidden="true"></span>
+        <h2 class="controls-title">Beschriftung</h2>
+      </span>
       <div class="seg" role="tablist" aria-label="Seite auswählen">
         <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite · Name</button>
         <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">Rückseite · Text</button>
       </div>
-    </div>
+    </summary>
 
+    <div class="controls-body">
     <div class="grid">
       <div class="field-group span-all" data-only="front">
         <label for="in-name">Name</label>
@@ -1174,7 +1232,24 @@ Schuljahr 2026/27</textarea>
       <p class="warn" id="warn" hidden>Der Text ragt über das Feld hinaus – Größe verkleinern oder „automatisch“ aktivieren.</p>
       <button class="print" type="button" id="btn-print">Drucken</button>
     </div>
-  </section>
+    </div>
+  </details>
+
+  <details class="controls" open>
+    <summary class="controls-head">
+      <span class="group-name">
+        <span class="group-caret" aria-hidden="true"></span>
+        <h2 class="controls-title">Projekt</h2>
+      </span>
+    </summary>
+    <div class="controls-body">
+      <div class="project-tools">
+        <button type="button" class="chip" id="btn-export">Exportieren</button>
+        <button type="button" class="chip" id="btn-import">Importieren</button>
+        <input type="file" id="file-import" accept="application/json,.json" hidden>
+      </div>
+    </div>
+  </details>
 
   </div><!-- /stage-right -->
 
@@ -1201,6 +1276,14 @@ Schuljahr 2026/27</span></div>
       </div>
 
     </div>
+   </div>
+
+   <div class="preview-tools ui">
+     <button type="button" class="chip" id="btn-turn-left"
+             aria-label="Vorschau nach links drehen" title="Nach links drehen">↺</button>
+     <span class="preview-turn" id="lbl-turn">0°</span>
+     <button type="button" class="chip" id="btn-turn-right"
+             aria-label="Vorschau nach rechts drehen" title="Nach rechts drehen">↻</button>
    </div>
   </div>
 
@@ -1370,7 +1453,7 @@ Schuljahr 2026/27</span></div>
    * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
    * bleibt mindestens `gap` Millimeter Luft.
    */
-  function buildScene(svg, W, H, card, seed, motifScale, gap, iconIds, fillerIds) {
+  function buildScene(svg, W, H, card, seed, motifScale, gap, iconIds, fillerIds, whole) {
     const rnd = mulberry32(seed);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -1383,7 +1466,10 @@ Schuljahr 2026/27</span></div>
     root.setAttribute("stroke-linejoin", "round");
     svg.append(root);
 
-    const bleed = 3;
+    // "whole": kein Ueberstand ueber die Blattkante - jedes Motiv ist ganz zu sehen.
+    // Sonst duerfen Motive wie bisher am Rand angeschnitten werden.
+    const bleed = whole ? 0 : 3;
+    const edgePad = 1.5;   // Sicherheitsabstand zur Papierkante
     const pad = 1.6;
     const foldPad = 1.6;   // Streifen an der Faltkante (lokal y = 0) bleibt frei
     const placed = [];
@@ -1394,6 +1480,7 @@ Schuljahr 2026/27</span></div>
 
     const free = (x, y, r) => {
       if (y - r < foldPad) return false;
+      if (whole && (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad)) return false;
       if (!clearOfCard(x, y, r)) return false;
       for (let i = 0; i < placed.length; i++) {
         const p = placed[i];
@@ -1464,7 +1551,7 @@ Schuljahr 2026/27</span></div>
     portrait:  { w: 148, h: 210, page: "A5 portrait" }
   };
 
-  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, seed: 20260827 };
+  const sheetState = { orient: "landscape", band: 30, motif: 1, gap: 1.2, whole: false, seed: 20260827 };
 
   const text = {
     front: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
@@ -1478,6 +1565,9 @@ Schuljahr 2026/27</span></div>
   const el = {
     sheet: document.getElementById("sheet"),
     fit: document.getElementById("sheet-fit"),
+    turnLeft: document.getElementById("btn-turn-left"),
+    turnRight: document.getElementById("btn-turn-right"),
+    lblTurn: document.getElementById("lbl-turn"),
     pageRule: document.getElementById("page-rule"),
     sceneFront: document.getElementById("scene-front"),
     sceneBack: document.getElementById("scene-back"),
@@ -1486,6 +1576,7 @@ Schuljahr 2026/27</span></div>
     band: document.getElementById("in-band"),
     scale: document.getElementById("in-scale"),
     gap: document.getElementById("in-gap"),
+    whole: document.getElementById("in-whole"),
     lblBand: document.getElementById("lbl-band"),
     lblScale: document.getElementById("lbl-scale"),
     lblGap: document.getElementById("lbl-gap"),
@@ -1510,11 +1601,14 @@ Schuljahr 2026/27</span></div>
     aligns: document.getElementById("aligns"),
     upper: document.getElementById("tg-upper"),
     shadow: document.getElementById("tg-shadow"),
-    warn: document.getElementById("warn")
+    warn: document.getElementById("warn"),
+    export: document.getElementById("btn-export"),
+    import: document.getElementById("btn-import"),
+    importFile: document.getElementById("file-import")
   };
 
   const parts = (key) => key === "front"
-    ? { span: el.outName, box: el.boxFront, src: el.name, fallback: "Name" }
+    ? { span: el.outName, box: el.boxFront, src: el.name, fallback: "" }
     : { span: el.outText, box: el.boxBack,  src: el.text, fallback: "Text" };
 
   FONTS.forEach((f) => {
@@ -1651,7 +1745,7 @@ Schuljahr 2026/27</span></div>
     const iconIds = pick(false);
     const fillerIds = pick(true);
     const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
-      sheetState.motif, sheetState.gap, iconIds, fillerIds);
+      sheetState.motif, sheetState.gap, iconIds, fillerIds, sheetState.whole);
 
     draw(el.sceneFront, sheetState.seed);
     draw(el.sceneBack, sheetState.seed + 977);
@@ -1664,6 +1758,7 @@ Schuljahr 2026/27</span></div>
   /* ---------- Vorschau auf die verfuegbare Breite skalieren ---------- */
 
   let lastFitWidth = -1;
+  let previewTurn = 0;   // reine Ansichtssache: 0, 90, 180 oder 270 Grad
 
   function fitSheet(force) {
     const avail = el.fit.clientWidth;
@@ -1671,12 +1766,24 @@ Schuljahr 2026/27</span></div>
     if (!force && avail === lastFitWidth) return;
     lastFitWidth = avail;
 
-    const natural = el.sheet.offsetWidth;   // echte Blattbreite in px (transform zaehlt nicht mit)
-    if (!natural) return;
+    // echte Blattmasse in px (transform zaehlt hier nicht mit)
+    const w = el.sheet.offsetWidth;
+    const h = el.sheet.offsetHeight;
+    if (!w) return;
 
-    const k = avail / natural;
-    el.sheet.style.transform = "scale(" + k + ")";
-    el.fit.style.height = (el.sheet.offsetHeight * k) + "px";
+    // Quer gedreht tauschen Breite und Hoehe die Rollen
+    const turned = previewTurn % 180 !== 0;
+    const k = avail / (turned ? h : w);
+
+    el.sheet.style.transform =
+      "rotate(" + previewTurn + "deg) scale(" + k + ")";
+    el.fit.style.height = ((turned ? w : h) * k) + "px";
+  }
+
+  function turnPreview(delta) {
+    previewTurn = (previewTurn + delta + 360) % 360;
+    el.lblTurn.textContent = previewTurn + "°";
+    fitSheet(true);
   }
 
   if (window.ResizeObserver) {
@@ -1733,6 +1840,7 @@ Schuljahr 2026/27</span></div>
     el.band.value = sheetState.band;
     el.scale.value = Math.round(sheetState.motif * 100);
     el.gap.value = sheetState.gap;
+    el.whole.checked = sheetState.whole;
 
     el.lblSize.textContent = (s.size * panelH / 100).toFixed(1).replace(".", ",") + " mm"
       + (s.auto ? " (auto)" : "");
@@ -1748,8 +1856,20 @@ Schuljahr 2026/27</span></div>
     el.shadow.classList.toggle("is-on", s.shadow);
     el.shadow.setAttribute("aria-pressed", String(s.shadow));
 
-    document.querySelectorAll("[data-only]").forEach((n) => {
-      n.hidden = n.dataset.only !== side;
+    syncSideFields();
+  }
+
+  function syncSideFields() {
+    document.querySelectorAll("[data-only]").forEach((field) => {
+      const visible = field.dataset.only === side;
+      field.hidden = !visible;
+      field.setAttribute("aria-hidden", String(!visible));
+    });
+
+    document.querySelectorAll("[data-side]").forEach((button) => {
+      const selected = button.dataset.side === side;
+      button.classList.toggle("is-on", selected);
+      button.setAttribute("aria-selected", String(selected));
     });
   }
 
@@ -1765,7 +1885,59 @@ Schuljahr 2026/27</span></div>
     renderText();
   }
 
+  function exportProject() {
+    const project = {
+      version: 1,
+      sheetState: { ...sheetState },
+      text: structuredClone(text),
+      enabled: [...enabled],
+      side,
+      previewTurn
+    };
+    const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const exportName = el.name.value.trim()
+      .replace(/\s+/g, "-")
+      .replace(/[<>:"/\\|?*]/g, "");
+    link.download = ("namensschild-" + exportName || "namensschild-projekt") + ".json";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function importProject(file) {
+    try {
+      const project = JSON.parse(await file.text());
+      if (!project || project.version !== 1 || !project.sheetState || !project.text || !Array.isArray(project.enabled)) {
+        throw new Error("Dieses Format wird nicht unterstützt.");
+      }
+
+      const importedIds = project.enabled.filter((id) => ALL_ITEMS.some((item) => item.id === id));
+      Object.assign(sheetState, project.sheetState);
+      Object.assign(text.front, project.text.front);
+      Object.assign(text.back, project.text.back);
+      enabled.clear();
+      importedIds.forEach((id) => enabled.add(id));
+      side = project.side === "back" ? "back" : "front";
+      previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
+      el.lblTurn.textContent = previewTurn + "°";
+      syncMotifs();
+      renderAll();
+    } catch (error) {
+      window.alert("Die Datei konnte nicht geladen werden: " + error.message);
+    } finally {
+      el.importFile.value = "";
+    }
+  }
+
   /* ---------- Ereignisse ---------- */
+
+  // Die Umschalter sitzen in der <summary>. Ein Klick darauf soll nur schalten
+  // und nicht zusaetzlich das Bedienfeld zuklappen.
+  document.querySelectorAll("details.controls > summary .seg").forEach((seg) => {
+    seg.addEventListener("click", (e) => e.preventDefault());
+  });
 
   document.querySelectorAll("[data-orient]").forEach((b) => {
     b.addEventListener("click", () => {
@@ -1779,11 +1951,7 @@ Schuljahr 2026/27</span></div>
   document.querySelectorAll("[data-side]").forEach((b) => {
     b.addEventListener("click", () => {
       side = b.dataset.side;
-      document.querySelectorAll("[data-side]").forEach((o) => {
-        const on = o === b;
-        o.classList.toggle("is-on", on);
-        o.setAttribute("aria-selected", String(on));
-      });
+      syncSideFields();
       renderText();
     });
   });
@@ -1800,6 +1968,11 @@ Schuljahr 2026/27</span></div>
 
   el.gap.addEventListener("input", () => {
     sheetState.gap = parseFloat(el.gap.value);
+    layout();
+  });
+
+  el.whole.addEventListener("change", () => {
+    sheetState.whole = el.whole.checked;
     layout();
   });
 
@@ -1835,6 +2008,14 @@ Schuljahr 2026/27</span></div>
 
   el.upper.addEventListener("click", () => { text[side].upper = !text[side].upper; renderText(); });
   el.shadow.addEventListener("click", () => { text[side].shadow = !text[side].shadow; renderText(); });
+
+  el.turnLeft.addEventListener("click", () => turnPreview(-180));
+  el.turnRight.addEventListener("click", () => turnPreview(180));
+  el.export.addEventListener("click", exportProject);
+  el.import.addEventListener("click", () => el.importFile.click());
+  el.importFile.addEventListener("change", () => {
+    if (el.importFile.files[0]) importProject(el.importFile.files[0]);
+  });
 
   window.addEventListener("resize", () => { fitSheet(false); renderText(); });
   window.addEventListener("beforeprint", renderText);
