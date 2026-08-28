@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Namensschild</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -132,6 +137,8 @@
     border-radius: 11px;
     padding: 3px; gap: 3px;
   }
+
+  .seg[hidden] { display: none; }
 
   .seg-btn {
     font-family: "Work Sans", sans-serif;
@@ -348,6 +355,13 @@
   .sheet {
     --sw: 210mm; --sh: 148mm;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Das Blatt behaelt seine echten Masse - verkleinert wird nur ueber
+       transform (siehe fitSheet). Ohne dies staucht der Flex-Container ein
+       Blatt, das breiter ist als die Vorschau, und das Seitenverhaeltnis
+       stimmt nicht mehr. */
+    flex: none;
     width: var(--sw);
     height: var(--sh);
     transform-origin: center center; /* <-- AUF CENTER CENTER SETZEN */
@@ -359,9 +373,22 @@
     print-color-adjust: exact;
   }
 
+  /* Auf A4 liegen zwei Schilder auf einem Blatt: quer untereinander,
+     hoch nebeneinander. Nach dem Schneiden ist jedes davon ein A5-Schild. */
+  .sheet[data-dir="row"] { flex-direction: row; }
+
+  .badge {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0; min-height: 0;
+    background: var(--paper);
+    overflow: hidden;
+  }
+
+  .badge[hidden] { display: none; }
+
   .panel {
     position: absolute; left: 0; width: 100%; height: 50%;
-    container-type: size;
     overflow: hidden;
   }
 
@@ -379,7 +406,8 @@
     background: var(--paper);
     border: 0.9mm solid var(--frame-color);
     display: flex;
-    padding: 4cqh 4cqw;
+    /* Nur ein Startwert - den echten Abstand setzt layout() in Millimetern. */
+    padding: 2mm;
     overflow: hidden;
   }
 
@@ -422,6 +450,44 @@
     letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--paper-ink);
   }
+
+  /* Schnittkante zwischen den beiden Schildern eines A4-Blattes */
+  .cut {
+    position: absolute;
+    z-index: 5;
+    display: flex; align-items: center;
+    gap: 1.6mm;
+    background: var(--paper);
+    color: var(--paper-ink);
+  }
+
+  .cut[hidden] { display: none; }
+
+  .cut--h {
+    left: 0; right: 0; top: 50%;
+    height: 2.6mm; transform: translateY(-1.3mm);
+    flex-direction: row; padding: 0 4mm;
+  }
+
+  .cut--h::after { content: ""; flex: 1; height: 0; border-top: 0.4mm dashed currentColor; }
+
+  .cut--v {
+    top: 0; bottom: 0; left: 50%;
+    width: 2.6mm; transform: translateX(-1.3mm);
+    flex-direction: column; padding: 4mm 0;
+  }
+
+  .cut--v::after { content: ""; flex: 1; width: 0; border-left: 0.4mm dashed currentColor; }
+
+  .cut-label {
+    flex: none;
+    font-family: "Work Sans", sans-serif;
+    font-size: 2.2mm; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--paper-ink);
+  }
+
+  .cut--v .cut-label { writing-mode: vertical-rl; }
 
   /* ---------- Vorschau drehen ---------- */
 
@@ -590,6 +656,10 @@
       break-after: avoid; page-break-after: avoid;
     }
 
+    /* Gedruckt wird immer auf A4. Ein A5-Schild sitzt mittig auf der Seite -
+       die gestrichelte Linie zeigt, wo geschnitten wird. */
+    .sheet--trim { outline: 0.3mm dashed rgba(0, 0, 0, 0.55); }
+
     /* Farben, Flaechen und Rahmen des Blattes nicht vom Browser wegoptimieren */
     .sheet, .sheet * {
       -webkit-print-color-adjust: exact;
@@ -597,6 +667,8 @@
     }
   }
 </style>
+
+</head>
 
 <style id="page-rule">@page { size: A5 landscape; margin: 0; }</style>
 
@@ -1099,9 +1171,9 @@
   <header class="masthead ui">
     <h1>Namensschild</h1>
     <p>
-      Ein DIN-A5-Blatt, in der Mitte gefaltet: Es steht als kleines Zelt auf dem Tisch.
+      Ein Blatt, in der Mitte gefaltet: Es steht als kleines Zelt auf dem Tisch.
       Rundherum ein Rahmen aus gekritzelten Motiven, in der Mitte bleibt Platz
-      für Name und Text.
+      für Name und Text. Auf <b>A5</b> entsteht ein Schild, auf <b>A4</b> zwei zum Auseinanderschneiden.
     </p>
   </header>
 
@@ -1114,6 +1186,10 @@
         <span class="group-caret" aria-hidden="true"></span>
         <h2 class="controls-title">Blatt &amp; Rahmen</h2>
       </span>
+      <div class="seg" role="group" aria-label="Papiergröße">
+        <button type="button" class="seg-btn is-on" data-paper="a5">A5 · 1 Schild</button>
+        <button type="button" class="seg-btn" data-paper="a4">A4 · 2 Schilder</button>
+      </div>
       <div class="seg" role="group" aria-label="Papierformat">
         <button type="button" class="seg-btn is-on" data-orient="landscape">Querformat</button>
         <button type="button" class="seg-btn" data-orient="portrait">Hochformat</button>
@@ -1141,9 +1217,9 @@
       </div>
 
       <div class="field-group">
-        <span class="lbl">Abstand zur Papierkante <span class="val" id="lbl-edge">–</span></span>
+         <span class="lbl">Abstand zum Außenrand <span class="val" id="lbl-edge">–</span></span>
         <input type="range" id="in-edge" min="-5" max="8" step="0.5" value="0"
-               aria-label="Abstand der Motive zur Papierkante in Millimetern">
+           aria-label="Abstand der Motive zum äußeren Papierrand in Millimetern">
       </div>
 
       <div class="field-group">
@@ -1202,6 +1278,10 @@
         <span class="group-caret" aria-hidden="true"></span>
         <h2 class="controls-title">Beschriftung</h2>
       </span>
+      <div class="seg" role="tablist" aria-label="Schild auswählen" id="seg-card" hidden>
+        <button type="button" role="tab" class="seg-btn is-on" data-card-tab="1" aria-selected="true">Schild 1</button>
+        <button type="button" role="tab" class="seg-btn" data-card-tab="2" aria-selected="false">Schild 2</button>
+      </div>
       <div class="seg" role="tablist" aria-label="Seite auswählen">
         <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite · Name</button>
         <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">Rückseite · Text</button>
@@ -1210,14 +1290,25 @@
 
     <div class="controls-body">
     <div class="grid">
-      <div class="field-group span-all" data-only="front">
+      <div class="field-group span-all" data-only="front" data-card="1">
         <label for="in-name">Name</label>
         <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
       </div>
 
-      <div class="field-group span-all" data-only="back" hidden>
+      <div class="field-group span-all" data-only="back" data-card="1" hidden>
         <label for="in-text">Text</label>
         <textarea id="in-text" rows="2" spellcheck="false">Klasse 5b
+Schuljahr 2026/27</textarea>
+      </div>
+
+      <div class="field-group span-all" data-only="front" data-card="2" hidden>
+        <label for="in-name2">Name · Schild 2</label>
+        <input id="in-name2" type="text" value="Tom" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="field-group span-all" data-only="back" data-card="2" hidden>
+        <label for="in-text2">Text · Schild 2</label>
+        <textarea id="in-text2" rows="2" spellcheck="false">Klasse 5b
 Schuljahr 2026/27</textarea>
       </div>
 
@@ -1229,7 +1320,7 @@ Schuljahr 2026/27</textarea>
       <div class="field-group">
         <label for="in-size">Schriftgröße <span class="val" id="lbl-size">–</span></label>
         <div class="size-row">
-          <input type="range" id="in-size" min="3" max="26" step="0.2" value="15">
+          <input type="range" id="in-size" min="3" max="46" step="0.2" value="15">
           <label class="check"><input type="checkbox" id="in-auto" checked> automatisch</label>
         </div>
       </div>
@@ -1293,22 +1384,45 @@ Schuljahr 2026/27</textarea>
   <div class="stage-left">
   <div class="sheet-wrap">
    <div class="sheet-fit" id="sheet-fit">
-    <div class="sheet" id="sheet">
+    <div class="sheet" id="sheet" data-dir="column">
 
-      <div class="panel panel--back">
-        <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
-        <div class="card card--text" id="card-back">
-          <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
+      <div class="badge" id="badge-1">
+        <div class="panel panel--back">
+          <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
+          <div class="card card--text" id="card-back">
+            <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
 Schuljahr 2026/27</span></div>
+          </div>
+        </div>
+
+        <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
+
+        <div class="panel panel--front">
+          <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
+          <div class="card card--name" id="card-front">
+            <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
+          </div>
         </div>
       </div>
 
-      <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
+      <div class="cut cut--h" id="cut" aria-hidden="true" hidden><span class="cut-label">Schnittkante</span></div>
 
-      <div class="panel panel--front">
-        <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
-        <div class="card card--name" id="card-front">
-          <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
+      <div class="badge" id="badge-2" hidden>
+        <div class="panel panel--back">
+          <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
+          <div class="card card--text" id="card-back2">
+            <div class="card-inner" id="box-back2"><span class="card-text" id="out-text2">Klasse 5b
+Schuljahr 2026/27</span></div>
+          </div>
+        </div>
+
+        <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
+
+        <div class="panel panel--front">
+          <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
+          <div class="card card--name" id="card-front2">
+            <div class="card-inner" id="box-front2"><span class="card-text" id="out-name2">Tom</span></div>
+          </div>
         </div>
       </div>
 
@@ -1330,7 +1444,7 @@ Schuljahr 2026/27</span></div>
   <section class="tips ui">
     <div class="tip">
       <h2>Drucken</h2>
-      <p>Im Druckdialog <b>Ränder: keine</b> und Skalierung <b>100 %</b> wählen – das Blatt wird dann exakt so gedruckt, wie es hier aussieht. Liegt <b>A4</b> im Drucker, landet es mittig auf der Seite und wird einfach ausgeschnitten.</p>
+      <p>Gedruckt wird immer auf <b>A4</b> – im Druckdialog <b>Ränder: keine</b> und Skalierung <b>100 %</b> wählen. Ein A5-Schild sitzt dabei mittig auf der Seite und wird entlang der gestrichelten Außenlinie ausgeschnitten. Bei <b>A4 · 2 Schilder</b> füllt das Blatt die Seite: erst an der <b>Schnittkante</b> teilen, dann jedes Schild für sich falten.</p>
     </div>
     <div class="tip">
       <h2>Falten</h2>
@@ -1515,7 +1629,7 @@ Schuljahr 2026/27</span></div>
       y + r < card.y - pad || y - r > card.y + card.h + pad;
 
     const free = (x, y, r) => {
-      if (y - r < edgePad) return false;
+      if (y - r < 0) return false;
       if (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad) return false;
       if (whole && (x - r < 0 || x + r > W || y + r > H)) return false;
       if (!clearOfCard(x, y, r)) return false;
@@ -1595,25 +1709,57 @@ Schuljahr 2026/27</span></div>
 
   /* ---------- Zustand ---------- */
 
+  /* `w`/`h` ist das Blatt, `bw`/`bh` ein einzelnes Schild darauf.
+     Auf A4 liegen zwei Schilder auf einem Blatt: quer untereinander (Blatt hoch),
+     hoch nebeneinander (Blatt quer).
+
+     `page` ist immer A4: das liegt in jedem Drucker. Ein A5-Blatt wird dort
+     mittig platziert und in Originalgroesse gedruckt - so muss der Druckdialog
+     nichts skalieren oder verschieben. */
   const FORMATS = {
-    landscape: { w: 210, h: 148, page: "A5 landscape" },
-    portrait:  { w: 148, h: 210, page: "A5 portrait" }
+    a5: {
+      landscape: { w: 210, h: 148, bw: 210,   bh: 148,   page: "A4 portrait",  dir: "column" },
+      portrait:  { w: 148, h: 210, bw: 148,   bh: 210,   page: "A4 portrait",  dir: "column" }
+    },
+    a4: {
+      landscape: { w: 210, h: 297, bw: 210,   bh: 148.5, page: "A4 portrait",  dir: "column" },
+      portrait:  { w: 297, h: 210, bw: 148.5, bh: 210,   page: "A4 landscape", dir: "row" }
+    }
   };
 
   const sheetState = {
+    paper: "a5",
     orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
     frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
     seed: 20260827
   };
 
-  const text = {
-    front: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
-             align: "center", upper: true, shadow: false, max: 26, min: 3 },
-    back:  { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
-             align: "center", upper: false, shadow: false, max: 17, min: 3 }
+  const DEFAULT_TEXT = {
+    front:  { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
+              align: "center", upper: true, shadow: false, max: 46, min: 3 },
+    back:   { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
+              align: "center", upper: false, shadow: false, max: 30, min: 3 },
+    front2: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
+              align: "center", upper: true, shadow: false, max: 46, min: 3 },
+    back2:  { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
+              align: "center", upper: false, shadow: false, max: 30, min: 3 }
   };
 
+  const DEFAULT_VALUES = {
+    name: "Mia",  text: "Klasse 5b\nSchuljahr 2026/27",
+    name2: "Tom", text2: "Klasse 5b\nSchuljahr 2026/27"
+  };
+
+  const TEXT_KEYS = ["front", "back", "front2", "back2"];
+  const text = structuredClone(DEFAULT_TEXT);
+
   let side = "front";
+  let cardIndex = 1;
+
+  // Welcher der vier Textbloecke gerade bearbeitet wird
+  const textKey = () => side + (cardIndex === 2 ? "2" : "");
+  const cur = () => text[textKey()];
+
   const STORAGE_KEY = "namensschild-entwurf-v1";
   const history = { undo: [], redo: [], applying: false };
 
@@ -1628,6 +1774,13 @@ Schuljahr 2026/27</span></div>
     sceneBack: document.getElementById("scene-back"),
     cardFront: document.getElementById("card-front"),
     cardBack: document.getElementById("card-back"),
+    sceneFront2: document.getElementById("scene-front2"),
+    sceneBack2: document.getElementById("scene-back2"),
+    cardFront2: document.getElementById("card-front2"),
+    cardBack2: document.getElementById("card-back2"),
+    badge2: document.getElementById("badge-2"),
+    cut: document.getElementById("cut"),
+    segCard: document.getElementById("seg-card"),
     band: document.getElementById("in-band"),
     scale: document.getElementById("in-scale"),
     gap: document.getElementById("in-gap"),
@@ -1648,10 +1801,16 @@ Schuljahr 2026/27</span></div>
     none: document.getElementById("btn-none"),
     name: document.getElementById("in-name"),
     text: document.getElementById("in-text"),
+    name2: document.getElementById("in-name2"),
+    text2: document.getElementById("in-text2"),
     outName: document.getElementById("out-name"),
     outText: document.getElementById("out-text"),
+    outName2: document.getElementById("out-name2"),
+    outText2: document.getElementById("out-text2"),
     boxFront: document.getElementById("box-front"),
     boxBack: document.getElementById("box-back"),
+    boxFront2: document.getElementById("box-front2"),
+    boxBack2: document.getElementById("box-back2"),
     font: document.getElementById("in-font"),
     size: document.getElementById("in-size"),
     auto: document.getElementById("in-auto"),
@@ -1671,9 +1830,12 @@ Schuljahr 2026/27</span></div>
     redo: document.getElementById("btn-redo")
   };
 
-  const parts = (key) => key === "front"
-    ? { span: el.outName, box: el.boxFront, src: el.name, fallback: "" }
-    : { span: el.outText, box: el.boxBack,  src: el.text, fallback: "Text" };
+  const parts = (key) => ({
+    front:  { span: el.outName,  box: el.boxFront,  src: el.name,  fallback: "" },
+    back:   { span: el.outText,  box: el.boxBack,   src: el.text,  fallback: "Text" },
+    front2: { span: el.outName2, box: el.boxFront2, src: el.name2, fallback: "" },
+    back2:  { span: el.outText2, box: el.boxBack2,  src: el.text2, fallback: "Text" }
+  }[key]);
 
   FONTS.forEach((f) => {
     const opt = document.createElement("option");
@@ -1772,9 +1934,9 @@ Schuljahr 2026/27</span></div>
   /* ---------- Geometrie ---------- */
 
   function geometry() {
-    const f = FORMATS[sheetState.orient];
-    const panelW = f.w;
-    const panelH = f.h / 2;
+    const f = FORMATS[sheetState.paper][sheetState.orient];
+    const panelW = f.bw;
+    const panelH = f.bh / 2;
     const bandX = Math.min(sheetState.band, panelW * 0.36);
     const bandY = Math.min(
       Math.max(sheetState.band * (panelH / panelW) * 1.35, 7),
@@ -1788,16 +1950,33 @@ Schuljahr 2026/27</span></div>
 
   function layout() {
     const g = geometry();
+    const twin = sheetState.paper === "a4";
 
     el.sheet.style.setProperty("--sw", g.f.w + "mm");
     el.sheet.style.setProperty("--sh", g.f.h + "mm");
+    el.sheet.dataset.dir = g.f.dir;
+
+    el.badge2.hidden = !twin;
+    el.cut.hidden = !twin;
+    el.cut.classList.toggle("cut--v", g.f.dir === "row");
+    el.cut.classList.toggle("cut--h", g.f.dir !== "row");
     el.pageRule.textContent = `@page { size: ${g.f.page}; margin: 0; }`;
 
-    [el.cardFront, el.cardBack].forEach((card) => {
+    // Nur auf A5 bleibt Rand auf der A4-Seite frei - dort zeigt eine
+    // gestrichelte Linie im Ausdruck, wo geschnitten wird.
+    el.sheet.classList.toggle("sheet--trim", !twin);
+
+    // Abstand vom Text zum Rahmen: waagerecht wie senkrecht gleich viel,
+    // gerechnet aus der Panelhoehe und in Millimetern gesetzt.
+    const padY = (g.panelH * 0.024).toFixed(2) + "mm";
+    const padX = (g.panelH * 0.03).toFixed(2) + "mm";
+
+    [el.cardFront, el.cardBack, el.cardFront2, el.cardBack2].forEach((card) => {
       card.style.left = (g.card.x / g.panelW * 100) + "%";
       card.style.top = (g.card.y / g.panelH * 100) + "%";
       card.style.width = (g.card.w / g.panelW * 100) + "%";
       card.style.height = (g.card.h / g.panelH * 100) + "%";
+      card.style.padding = padY + " " + padX;
     });
 
     const pick = (filler) => GROUPS
@@ -1814,6 +1993,10 @@ Schuljahr 2026/27</span></div>
 
     draw(el.sceneFront, sheetState.seed);
     draw(el.sceneBack, sheetState.seed + 977);
+    if (twin) {
+      draw(el.sceneFront2, sheetState.seed + 3319);
+      draw(el.sceneBack2, sheetState.seed + 4507);
+    }
 
     el.lblBand.textContent = sheetState.band + " ";
     el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
@@ -1870,6 +2053,15 @@ Schuljahr 2026/27</span></div>
   function applyText(key) {
     const s = text[key];
     const p = parts(key);
+
+    // Auf A5 ist das zweite Schild ausgeblendet - dann gibt es nichts zu messen.
+    if (!p.box.clientHeight) return false;
+
+    // `size` ist ein Prozentwert der Panelhoehe, gesetzt wird er aber in
+    // Millimetern: Container-Einheiten (cqh) loest nicht jeder Browser beim
+    // Drucken gleich auf, Millimeter schon.
+    const mm = (v) => (v * geometry().panelH / 100).toFixed(3) + "mm";
+
     const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
 
     p.span.textContent = p.src.value.trim() ? p.src.value : p.fallback;
@@ -1887,22 +2079,27 @@ Schuljahr 2026/27</span></div>
 
     if (s.auto) {
       let v = s.max;
-      p.span.style.fontSize = v + "cqh";
+      p.span.style.fontSize = mm(v);
       while (v > s.min && overflows(p.span, p.box)) {
         v -= 0.4;
-        p.span.style.fontSize = v + "cqh";
+        p.span.style.fontSize = mm(v);
       }
       s.size = Math.round(v * 5) / 5;
     } else {
-      p.span.style.fontSize = s.size + "cqh";
+      p.span.style.fontSize = mm(s.size);
     }
 
     return overflows(p.span, p.box);
   }
 
   function syncControls() {
-    const s = text[side];
-    const panelH = FORMATS[sheetState.orient].h / 2;
+    const s = cur();
+    const panelH = geometry().panelH;
+
+    document.querySelectorAll("[data-paper]").forEach((b) =>
+      b.classList.toggle("is-on", b.dataset.paper === sheetState.paper));
+    document.querySelectorAll("[data-orient]").forEach((b) =>
+      b.classList.toggle("is-on", b.dataset.orient === sheetState.orient));
 
     el.font.value = s.font;
     el.auto.checked = s.auto;
@@ -1939,8 +2136,13 @@ Schuljahr 2026/27</span></div>
   }
 
   function syncSideFields() {
+    const twin = sheetState.paper === "a4";
+    if (!twin) cardIndex = 1;
+    el.segCard.hidden = !twin;
+
     document.querySelectorAll("[data-only]").forEach((field) => {
-      const visible = field.dataset.only === side;
+      const visible = field.dataset.only === side
+        && Number(field.dataset.card || 1) === cardIndex;
       field.hidden = !visible;
       field.setAttribute("aria-hidden", String(!visible));
     });
@@ -1950,11 +2152,18 @@ Schuljahr 2026/27</span></div>
       button.classList.toggle("is-on", selected);
       button.setAttribute("aria-selected", String(selected));
     });
+
+    document.querySelectorAll("[data-card-tab]").forEach((button) => {
+      const selected = Number(button.dataset.cardTab) === cardIndex;
+      button.classList.toggle("is-on", selected);
+      button.setAttribute("aria-selected", String(selected));
+    });
   }
 
   function renderText() {
-    const over = { front: applyText("front"), back: applyText("back") };
-    el.warn.hidden = !(over[side] && !text[side].auto);
+    const over = {};
+    TEXT_KEYS.forEach((key) => { over[key] = applyText(key); });
+    el.warn.hidden = !(over[textKey()] && !cur().auto);
     syncControls();
     saveDraft();
   }
@@ -1970,11 +2179,61 @@ Schuljahr 2026/27</span></div>
       version: 1,
       sheetState: { ...sheetState },
       text: structuredClone(text),
-      values: { name: el.name.value, text: el.text.value },
+      values: {
+        name: el.name.value, text: el.text.value,
+        name2: el.name2.value, text2: el.text2.value
+      },
       enabled: [...enabled],
       side,
+      cardIndex,
       previewTurn
     };
+  }
+
+  /**
+   * Uebernimmt ein Projekt (Entwurf, Import oder Schritt aus der Historie).
+   * Aeltere Dateien kennen weder A4 noch das zweite Schild - fehlende Angaben
+   * werden hier auf sinnvolle Werte gesetzt.
+   */
+  function applyProject(project) {
+    Object.assign(sheetState, project.sheetState);
+    sheetState.paper = sheetState.paper === "a4" ? "a4" : "a5";
+    sheetState.orient = sheetState.orient === "portrait" ? "portrait" : "landscape";
+    if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
+    if (sheetState.whole) sheetState.edge = 0;
+    if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
+    if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
+    if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
+
+    TEXT_KEYS.forEach((key) => {
+      if (project.text && project.text[key]) Object.assign(text[key], project.text[key]);
+
+      // Die Groessengrenzen sind Programmvorgaben und keine Projekteinstellung:
+      // aeltere Dateien wuerden sonst die alte, niedrigere Obergrenze mitbringen.
+      text[key].max = DEFAULT_TEXT[key].max;
+      text[key].min = DEFAULT_TEXT[key].min;
+      text[key].size = Number.isFinite(text[key].size)
+        ? Math.min(Math.max(text[key].size, Number(el.size.min)), Number(el.size.max))
+        : DEFAULT_TEXT[key].size;
+    });
+
+    const values = project.values;
+    if (values) {
+      el.name.value = values.name || "";
+      el.text.value = values.text || "";
+      if ("name2" in values) el.name2.value = values.name2 || "";
+      if ("text2" in values) el.text2.value = values.text2 || "";
+    }
+
+    enabled.clear();
+    (project.enabled || []).forEach((id) => {
+      if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id);
+    });
+
+    side = project.side === "back" ? "back" : "front";
+    cardIndex = (project.cardIndex === 2 && sheetState.paper === "a4") ? 2 : 1;
+    previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
+    el.lblTurn.textContent = previewTurn + "°";
   }
 
   function updateHistoryButtons() {
@@ -1996,19 +2255,7 @@ Schuljahr 2026/27</span></div>
     if (!source.length) return;
     target.push(projectData());
     history.applying = true;
-    const project = source.pop();
-    Object.assign(sheetState, project.sheetState);
-    Object.assign(text.front, project.text.front);
-    Object.assign(text.back, project.text.back);
-    if (project.values) {
-      el.name.value = project.values.name || "";
-      el.text.value = project.values.text || "";
-    }
-    enabled.clear();
-    project.enabled.forEach((id) => { if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id); });
-    side = project.side === "back" ? "back" : "front";
-    previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
-    el.lblTurn.textContent = previewTurn + "°";
+    applyProject(source.pop());
     syncMotifs();
     renderAll();
     history.applying = false;
@@ -2044,25 +2291,8 @@ Schuljahr 2026/27</span></div>
         throw new Error("Dieses Format wird nicht unterstützt.");
       }
 
-      const importedIds = project.enabled.filter((id) => ALL_ITEMS.some((item) => item.id === id));
       rememberHistory();
-      Object.assign(sheetState, project.sheetState);
-      if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
-      if (sheetState.whole) sheetState.edge = 0;
-      if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
-      if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
-      if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
-      Object.assign(text.front, project.text.front);
-      Object.assign(text.back, project.text.back);
-      if (project.values) {
-        el.name.value = project.values.name || "";
-        el.text.value = project.values.text || "";
-      }
-      enabled.clear();
-      importedIds.forEach((id) => enabled.add(id));
-      side = project.side === "back" ? "back" : "front";
-      previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
-      el.lblTurn.textContent = previewTurn + "°";
+      applyProject(project);
       syncMotifs();
       renderAll();
     } catch (error) {
@@ -2080,11 +2310,19 @@ Schuljahr 2026/27</span></div>
     seg.addEventListener("click", (e) => e.preventDefault());
   });
 
+  document.querySelectorAll("[data-paper]").forEach((b) => {
+    b.addEventListener("click", () => {
+      if (sheetState.paper === b.dataset.paper) return;
+      sheetState.paper = b.dataset.paper;
+      if (sheetState.paper === "a5") cardIndex = 1;
+      syncSideFields();
+      renderAll();
+    });
+  });
+
   document.querySelectorAll("[data-orient]").forEach((b) => {
     b.addEventListener("click", () => {
       sheetState.orient = b.dataset.orient;
-      document.querySelectorAll("[data-orient]").forEach((o) =>
-        o.classList.toggle("is-on", o === b));
       renderAll();
     });
   });
@@ -2092,6 +2330,14 @@ Schuljahr 2026/27</span></div>
   document.querySelectorAll("[data-side]").forEach((b) => {
     b.addEventListener("click", () => {
       side = b.dataset.side;
+      syncSideFields();
+      renderText();
+    });
+  });
+
+  document.querySelectorAll("[data-card-tab]").forEach((b) => {
+    b.addEventListener("click", () => {
+      cardIndex = Number(b.dataset.cardTab);
       syncSideFields();
       renderText();
     });
@@ -2146,31 +2392,33 @@ Schuljahr 2026/27</span></div>
 
   el.name.addEventListener("input", renderText);
   el.text.addEventListener("input", renderText);
-  el.font.addEventListener("change", () => { text[side].font = el.font.value; renderText(); });
-  el.auto.addEventListener("change", () => { text[side].auto = el.auto.checked; renderText(); });
+  el.name2.addEventListener("input", renderText);
+  el.text2.addEventListener("input", renderText);
+  el.font.addEventListener("change", () => { cur().font = el.font.value; renderText(); });
+  el.auto.addEventListener("change", () => { cur().auto = el.auto.checked; renderText(); });
   el.size.addEventListener("input", () => {
-    text[side].auto = false;
-    text[side].size = parseFloat(el.size.value);
+    cur().auto = false;
+    cur().size = parseFloat(el.size.value);
     renderText();
   });
-  el.lh.addEventListener("input", () => { text[side].lh = parseFloat(el.lh.value); renderText(); });
+  el.lh.addEventListener("input", () => { cur().lh = parseFloat(el.lh.value); renderText(); });
 
   el.swatches.addEventListener("click", (e) => {
     const b = e.target.closest(".swatch");
     if (!b) return;
-    text[side].color = b.dataset.color;
+    cur().color = b.dataset.color;
     renderText();
   });
 
   el.aligns.addEventListener("click", (e) => {
     const b = e.target.closest(".chip");
     if (!b) return;
-    text[side].align = b.dataset.align;
+    cur().align = b.dataset.align;
     renderText();
   });
 
-  el.upper.addEventListener("click", () => { text[side].upper = !text[side].upper; renderText(); });
-  el.shadow.addEventListener("click", () => { text[side].shadow = !text[side].shadow; renderText(); });
+  el.upper.addEventListener("click", () => { cur().upper = !cur().upper; renderText(); });
+  el.shadow.addEventListener("click", () => { cur().shadow = !cur().shadow; renderText(); });
 
   el.turnLeft.addEventListener("click", () => turnPreview(180));
   el.turnRight.addEventListener("click", () => turnPreview(-180));
@@ -2186,17 +2434,20 @@ Schuljahr 2026/27</span></div>
   el.reset.addEventListener("click", () => {
     rememberHistory();
     Object.assign(sheetState, {
+      paper: "a5",
       orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
       frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
       seed: 20260827
     });
-    Object.assign(text.front, { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true, shadow: false, max: 26, min: 3 });
-    Object.assign(text.back, { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 17, min: 3 });
-    el.name.value = "Mia";
-    el.text.value = "Klasse 5b\nSchuljahr 2026/27";
+    TEXT_KEYS.forEach((key) => Object.assign(text[key], DEFAULT_TEXT[key]));
+    el.name.value = DEFAULT_VALUES.name;
+    el.text.value = DEFAULT_VALUES.text;
+    el.name2.value = DEFAULT_VALUES.name2;
+    el.text2.value = DEFAULT_VALUES.text2;
     enabled.clear();
     ALL_ITEMS.forEach((item) => enabled.add(item.id));
     side = "front";
+    cardIndex = 1;
     previewTurn = 0;
     el.lblTurn.textContent = "0°";
     syncMotifs();
@@ -2237,20 +2488,7 @@ Schuljahr 2026/27</span></div>
   try {
     const draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (draft && draft.version === 1 && draft.sheetState && draft.text) {
-      Object.assign(sheetState, draft.sheetState);
-      Object.assign(text.front, draft.text.front);
-      Object.assign(text.back, draft.text.back);
-      if (draft.values) {
-        el.name.value = draft.values.name || "";
-        el.text.value = draft.values.text || "";
-      }
-      enabled.clear();
-      (draft.enabled || []).forEach((id) => {
-        if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id);
-      });
-      side = draft.side === "back" ? "back" : "front";
-      previewTurn = [0, 90, 180, 270].includes(draft.previewTurn) ? draft.previewTurn : 0;
-      el.lblTurn.textContent = previewTurn + "°";
+      applyProject(draft);
     }
   } catch (error) {
     // Ignore an invalid or unavailable local draft.
@@ -2261,3 +2499,5 @@ Schuljahr 2026/27</span></div>
 
   legal.showModal();
 </script>
+</body>
+</html>
