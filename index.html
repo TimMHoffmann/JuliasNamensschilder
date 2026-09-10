@@ -3,372 +3,273 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Namensschilder zum Falten selbst gestalten - A5 oder A4, mit gekritzeltem Motivrahmen. Drucken oder als PNG bzw. PDF exportieren.">
 <title>Namensschild</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Baloo+2:wght@600;800&family=Bungee&family=Lora:wght@600;700&family=Patrick+Hand&family=Work+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
 
 <style>
+  /* =====================================================================
+     Namensschild - Oberflaeche
+
+     Grundsatz fuer den Druck: Auf dem Papier landet ausschliesslich das
+     Blatt. Es behaelt dabei exakt die Masse, die die Vorschau zeigt, und
+     bekommt vom Programm keinerlei zusaetzliche Rahmen, Raender oder
+     Schnittlinien. Die Seitengroesse ist immer das gewaehlte Papier.
+     ===================================================================== */
+
   :root {
-    --ui-bg: #f0eadb;
-    --ui-panel: #fbf7ec;
-    --ui-ink: #22201a;
-    --ui-muted: #6d685a;
-    --ui-line: rgba(34, 32, 26, 0.13);
-    --ui-accent: #35785f;
-    --ui-accent-dark: #24523f;
-    --ui-accent-ink: #f7fbf7;
-    --ui-warn: #b4552c;
+    --ui-bg: #f2ece0;
+    --ui-panel: #fbf8f1;
+    --ui-panel-2: #f6f1e6;
+    --ui-ink: #21201b;
+    --ui-muted: #6b6659;
+    --ui-line: rgba(33, 32, 27, 0.12);
+    --ui-line-strong: rgba(33, 32, 27, 0.22);
+    --ui-accent: #2f6f57;
+    --ui-accent-soft: rgba(47, 111, 87, 0.12);
+    --ui-accent-dark: #22523f;
+    --ui-accent-ink: #f7fbf8;
+    --ui-warn: #a84a24;
+    --ui-shadow: 0 1px 2px rgba(24, 20, 14, 0.06), 0 8px 24px rgba(24, 20, 14, 0.07);
+    --ui-shadow-lg: 0 18px 48px rgba(24, 20, 14, 0.18);
+    --radius: 14px;
+    --radius-sm: 10px;
+    --tap: 40px;
 
     --paper: #ffffff;
     --paper-ink: #1a1a1a;
     --frame-color: #1a1a1a;
+    --frame-width: 0.9mm;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ui-bg: #161a17;
-      --ui-panel: #1f2420;
-      --ui-ink: #eee8da;
-      --ui-muted: #9aa396;
-      --ui-line: rgba(238, 232, 218, 0.14);
-      --ui-accent: #86ceac;
-      --ui-accent-dark: #4b8e70;
-      --ui-accent-ink: #12241c;
+      --ui-bg: #141815;
+      --ui-panel: #1d221e;
+      --ui-panel-2: #232925;
+      --ui-ink: #ece7db;
+      --ui-muted: #9aa295;
+      --ui-line: rgba(236, 231, 219, 0.13);
+      --ui-line-strong: rgba(236, 231, 219, 0.26);
+      --ui-accent: #7fc9a6;
+      --ui-accent-soft: rgba(127, 201, 166, 0.16);
+      --ui-accent-dark: #3f7c61;
+      --ui-accent-ink: #10231a;
       --ui-warn: #e0a06f;
+      --ui-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+      --ui-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.5);
     }
   }
 
   :root[data-theme="dark"] {
-    --ui-bg: #161a17;
-    --ui-panel: #1f2420;
-    --ui-ink: #eee8da;
-    --ui-muted: #9aa396;
-    --ui-line: rgba(238, 232, 218, 0.14);
-    --ui-accent: #86ceac;
-    --ui-accent-dark: #4b8e70;
-    --ui-accent-ink: #12241c;
+    --ui-bg: #141815;
+    --ui-panel: #1d221e;
+    --ui-panel-2: #232925;
+    --ui-ink: #ece7db;
+    --ui-muted: #9aa295;
+    --ui-line: rgba(236, 231, 219, 0.13);
+    --ui-line-strong: rgba(236, 231, 219, 0.26);
+    --ui-accent: #7fc9a6;
+    --ui-accent-soft: rgba(127, 201, 166, 0.16);
+    --ui-accent-dark: #3f7c61;
+    --ui-accent-ink: #10231a;
     --ui-warn: #e0a06f;
+    --ui-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.28);
+    --ui-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.5);
   }
 
   * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
 
   body {
     margin: 0;
     background: var(--ui-bg);
     color: var(--ui-ink);
     font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
-    padding: 40px 20px 64px;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100dvh;
   }
 
-  .app { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  h1, h2, h3 { margin: 0; }
 
-  /* Desktop: links das Schild, rechts die Werkzeuge */
-  .stage {
+  :where(button, select, input, textarea) { font: inherit; color: inherit; }
+
+  :where(button, a, select, input, textarea, summary, label):focus-visible {
+    outline: 2.5px solid var(--ui-accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* ---------- Kopfleiste ---------- */
+
+  .topbar {
+    position: sticky; top: 0; z-index: 30;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px clamp(12px, 3vw, 28px);
+    background: color-mix(in srgb, var(--ui-bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--ui-line);
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+  .brand-mark {
+    width: 30px; height: 30px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 9px;
+    background: var(--ui-accent); color: var(--ui-accent-ink);
+    font-family: "Archivo Black", sans-serif; font-size: 15px;
+  }
+
+  .brand h1 {
+    font-family: "Archivo Black", "Work Sans", sans-serif;
+    font-size: 17px; letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .brand small {
+    display: block;
+    font-family: "Work Sans", sans-serif;
+    font-size: 11.5px; font-weight: 500; color: var(--ui-muted);
+    letter-spacing: 0;
+  }
+
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+  /* ---------- Knoepfe ---------- */
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    min-height: var(--tap);
+    padding: 9px 15px;
+    font-size: 14px; font-weight: 600;
+    color: var(--ui-ink);
+    background: var(--ui-panel);
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
+  }
+
+  .btn:hover { background: var(--ui-panel-2); border-color: var(--ui-accent); }
+  .btn:active { transform: translateY(1px); }
+  .btn[disabled] { opacity: 0.42; cursor: not-allowed; transform: none; }
+  .btn[disabled]:hover { background: var(--ui-panel); border-color: var(--ui-line-strong); }
+
+  .btn--primary {
+    background: var(--ui-accent); color: var(--ui-accent-ink);
+    border-color: var(--ui-accent);
+  }
+  .btn--primary:hover { background: var(--ui-accent-dark); border-color: var(--ui-accent-dark); }
+
+  .btn--ghost { background: transparent; border-color: transparent; }
+  .btn--ghost:hover { background: var(--ui-panel-2); border-color: var(--ui-line); }
+
+  .btn--icon { padding: 9px; width: var(--tap); }
+
+  .btn svg {
+    width: 17px; height: 17px; flex: none;
+    fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ---------- Grundraster ---------- */
+
+  .app {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: clamp(14px, 2.4vw, 26px) clamp(12px, 3vw, 28px) 40px;
     display: grid;
-    grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
-    grid-template-areas: "sheet panel";
-    gap: 28px;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+    gap: clamp(16px, 2vw, 26px);
     align-items: start;
   }
 
-  .stage-left { grid-area: sheet; position: sticky; top: 24px; }
-  .stage-right { grid-area: panel; display: flex; flex-direction: column; gap: 20px; }
-
-  @media (max-width: 1080px) {
-    .stage { grid-template-columns: 1fr; grid-template-areas: "sheet" "panel"; }
-    .stage-left { position: static; }
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: minmax(0, 1fr); }
   }
 
-  header.masthead { text-align: center; max-width: 620px; margin: 0 auto; }
+  /* Die Spalte fuellt die ganze Zeilenhoehe, das Blatt darin klebt. So bleibt
+     der Klebebereich auf die Zeile begrenzt und laeuft nicht ueber die
+     Hinweise und die Fusszeile darunter. */
+  .col-preview { min-width: 0; align-self: stretch; }
+  .col-controls { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 
-  .eyebrow {
-    font-size: 11.5px; font-weight: 600; letter-spacing: 0.16em;
+  /* ---------- Vorschau ---------- */
+
+  .preview {
+    position: sticky; top: 66px;
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius);
+    box-shadow: var(--ui-shadow);
+    overflow: hidden;
+  }
+
+  /* Einspaltig steht die Vorschau ganz normal im Fluss. */
+  @media (max-width: 1100px) {
+    .preview { position: static; }
+  }
+
+  .preview-head {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--ui-line);
+  }
+
+  .preview-title {
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--ui-accent);
   }
 
-  h1 {
-    font-family: "Archivo Black", "Work Sans", sans-serif;
-    font-size: clamp(28px, 4.4vw, 42px);
-    line-height: 1.02; margin: 10px 0 10px;
-    text-transform: uppercase; letter-spacing: -0.015em;
-    text-wrap: balance;
+  .preview-meta {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+    font-size: 12.5px; color: var(--ui-muted);
+    font-variant-numeric: tabular-nums;
   }
 
-  header.masthead p { margin: 0; color: var(--ui-muted); font-size: 15px; line-height: 1.6; }
-
-  /* ---------- Bedienfelder ---------- */
-
-  .controls {
-    background: var(--ui-panel);
+  .pill {
+    padding: 3px 9px;
     border: 1px solid var(--ui-line);
-    border-radius: 16px;
-    padding: 18px 22px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .controls-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 14px; flex-wrap: wrap;
-  }
-
-  .controls-title {
-    font-family: "Archivo Black", sans-serif;
-    font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--ui-accent); margin: 0;
-  }
-
-  details.controls > summary { list-style: none; cursor: pointer; }
-
-  details.controls > summary:focus-visible {
-    outline: 2.5px solid var(--ui-accent); outline-offset: 4px; border-radius: 8px;
-  }
-
-  details.controls:not([open]) { padding-bottom: 18px; }
-
-  .controls-body { display: flex; flex-direction: column; gap: 16px; }
-
-  .seg {
-    display: inline-flex;
-    background: var(--ui-bg);
-    border: 1.5px solid var(--ui-line);
-    border-radius: 11px;
-    padding: 3px; gap: 3px;
-  }
-
-  .seg[hidden] { display: none; }
-
-  .seg-btn {
-    font-family: "Work Sans", sans-serif;
-    font-size: 13px; font-weight: 600;
-    color: var(--ui-muted);
-    background: none; border: none; cursor: pointer;
-    padding: 8px 15px; border-radius: 8px;
+    border-radius: 999px;
+    background: var(--ui-panel-2);
     white-space: nowrap;
   }
 
-  .seg-btn:hover { color: var(--ui-ink); }
-
-  .seg-btn.is-on,
-  .seg-btn.is-on:hover {
-    background: var(--ui-accent);
-    color: var(--ui-accent-ink);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
-  }
-  .seg-btn:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
-    gap: 16px 20px;
+  .preview-stage {
+    padding: clamp(14px, 2.4vw, 26px);
+    background:
+      linear-gradient(45deg, var(--ui-panel-2) 25%, transparent 25%) 0 0 / 18px 18px,
+      linear-gradient(-45deg, var(--ui-panel-2) 25%, transparent 25%) 0 9px / 18px 18px,
+      linear-gradient(45deg, transparent 75%, var(--ui-panel-2) 75%) 9px -9px / 18px 18px,
+      linear-gradient(-45deg, transparent 75%, var(--ui-panel-2) 75%) -9px 0 / 18px 18px;
   }
 
-  .span-all { grid-column: 1 / -1; }
-
-  .field-group { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-  .field-group[data-only][hidden] { display: none !important; }
-
-  .field-group > label, .field-group > .lbl {
-    font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--ui-muted);
-  }
-
-  .field-group .val { color: var(--ui-ink); font-weight: 600; letter-spacing: 0; text-transform: none; }
-
-  input[type="text"], textarea, select {
-    font-family: "Work Sans", sans-serif;
-    font-size: 14.5px; color: var(--ui-ink);
-    background: var(--ui-bg);
-    border: 1.5px solid var(--ui-line);
-    border-radius: 9px;
-    padding: 10px 12px;
-    width: 100%;
-  }
-
-  textarea { min-height: 46px; line-height: 1.4; resize: vertical; }
-  select { cursor: pointer; }
-
-  input[type="text"]:focus-visible, textarea:focus-visible, select:focus-visible {
-    outline: 2.5px solid var(--ui-accent); outline-offset: 1px; border-color: transparent;
-  }
-
-  input[type="range"] { width: 100%; accent-color: var(--ui-accent); cursor: pointer; margin: 6px 0 0; }
-  input[type="range"]:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 4px; border-radius: 4px; }
-
-  .size-row { display: flex; align-items: center; gap: 12px; }
-  .size-row input[type="range"] { flex: 1; }
-
-  .check {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 12.5px; color: var(--ui-muted); cursor: pointer; white-space: nowrap;
-  }
-
-  .check input { accent-color: var(--ui-accent); cursor: pointer; }
-
-  .swatch-row { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 2px; }
-
-  .swatch {
-    width: 27px; height: 27px; border-radius: 8px;
-    border: 2px solid transparent; cursor: pointer; padding: 0;
-    box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.22);
-  }
-
-  .swatch.is-on { border-color: var(--ui-ink); }
-  .swatch:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
-
-  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 2px; }
-
-  .chip {
-    font-family: "Work Sans", sans-serif;
-    font-size: 12.5px; font-weight: 600; color: var(--ui-muted);
-    background: var(--ui-bg);
-    border: 1.5px solid var(--ui-line); border-radius: 8px;
-    padding: 8px 12px; cursor: pointer;
-  }
-
-  .chip:hover { color: var(--ui-ink); }
-
-  .chip.is-on, .chip.is-on:hover {
-    background: var(--ui-accent);
-    color: var(--ui-accent-ink);
-    border-color: var(--ui-accent);
-  }
-  .chip:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
-
-  /* Akkordeon mit Motivgruppen */
-  .acc { display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
-
-  details.group {
-    border: 1.5px solid var(--ui-line);
-    border-radius: 11px;
-    background: var(--ui-bg);
-    overflow: hidden;
-  }
-
-  details.group > summary {
-    list-style: none; cursor: pointer;
-    padding: 11px 14px;
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    font-size: 13.5px; font-weight: 600; color: var(--ui-ink);
-  }
-
-  details.group > summary::-webkit-details-marker,
-  details.controls > summary::-webkit-details-marker { display: none; }
-  details.group > summary:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -2px; }
-
-  .group-name { display: flex; align-items: center; gap: 10px; }
-
-  .group-caret {
-    width: 8px; height: 8px; flex: none;
-    border-right: 2px solid var(--ui-muted);
-    border-bottom: 2px solid var(--ui-muted);
-    transform: rotate(-45deg);
-    transition: transform 0.15s ease;
-  }
-
-  details[open] > summary .group-caret { transform: rotate(45deg); }
-
-  @media (prefers-reduced-motion: reduce) { .group-caret { transition: none; } }
-
-  .group-count {
-    font-size: 12px; font-weight: 600; color: var(--ui-muted);
-    font-variant-numeric: tabular-nums; white-space: nowrap;
-  }
-
-  .group-body {
-    padding: 0 12px 12px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-
-  .chip.mini { padding: 5px 11px; font-size: 11.5px; }
-
-  .motif-list { display: flex; flex-wrap: wrap; gap: 7px; }
-
-  .motif {
-    position: relative;
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 5px 11px 5px 8px;
-    border: 1.5px solid var(--ui-line); border-radius: 9px;
-    background: var(--ui-bg);
-    font-size: 12.5px; font-weight: 500; color: var(--ui-muted);
-    cursor: pointer; user-select: none;
-  }
-
-  .motif svg {
-    width: 20px; height: 20px; flex: none;
-    fill: none; stroke: currentColor;
-    stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
-  }
-
-  .motif input { position: absolute; opacity: 0; width: 0; height: 0; }
-
-  .motif.is-on {
-    color: var(--ui-accent);
-    border-color: var(--ui-accent);
-    background: color-mix(in srgb, var(--ui-accent) 9%, var(--ui-panel));
-  }
-
-  .motif:not(.is-on) { opacity: 0.55; }
-  .motif:not(.is-on) svg { stroke-dasharray: 2 2; }
-
-  .motif:has(input:focus-visible) { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
-
-  .foot {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; flex-wrap: wrap;
-    border-top: 1px solid var(--ui-line); padding-top: 16px;
-  }
-
-  .warn { margin: 0; font-size: 13px; color: var(--ui-warn); font-weight: 600; }
-  .warn[hidden] { display: none; }
-
-  button.print, button.confirm {
-    font-family: "Archivo Black", sans-serif;
-    text-transform: uppercase; letter-spacing: 0.04em; font-size: 14px;
-    background: var(--ui-accent); color: var(--ui-accent-ink);
-    border: none; border-radius: 10px;
-    padding: 14px 22px; cursor: pointer;
-    box-shadow: 0 3px 0 var(--ui-accent-dark);
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
-  }
-
-  button.print:hover, button.confirm:hover { transform: translateY(1px); box-shadow: 0 2px 0 var(--ui-accent-dark); }
-  button.print:active, button.confirm:active { transform: translateY(3px); box-shadow: 0 0 0 var(--ui-accent-dark); }
-  button.print:focus-visible, button.confirm:focus-visible { outline: 2.5px solid var(--ui-ink); outline-offset: 3px; }
-
-  /* ---------- Blatt ---------- */
-
-  .sheet-wrap { width: 100%; }
-
-  /* Haelt den skalierten Platzbedarf des Blattes im Fluss */
-  .sheet-fit { 
-    position: relative; 
-    width: 100%; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Verhindert, dass gedrehte Ecken den Container vergrößern */
-  }
+  .sheet-fit { position: relative; width: 100%; }
 
   .sheet {
     --sw: 210mm; --sh: 148mm;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    /* Das Blatt behaelt seine echten Masse - verkleinert wird nur ueber
-       transform (siehe fitSheet). Ohne dies staucht der Flex-Container ein
-       Blatt, das breiter ist als die Vorschau, und das Seitenverhaeltnis
-       stimmt nicht mehr. */
-    flex: none;
+    position: absolute; top: 0; left: 50%;
+    transform-origin: top center;
     width: var(--sw);
     height: var(--sh);
-    transform-origin: center center; /* <-- AUF CENTER CENTER SETZEN */
-    transition: transform 0.3s ease;  /* Optional: Macht die Drehung geschmeidig */
+    display: flex; flex-direction: column;
     background: var(--paper);
     overflow: hidden;
-    box-shadow: 0 20px 44px rgba(20, 16, 12, 0.26);
+    box-shadow: var(--ui-shadow-lg);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -387,26 +288,18 @@
 
   .badge[hidden] { display: none; }
 
-  .panel {
-    position: absolute; left: 0; width: 100%; height: 50%;
-    overflow: hidden;
-  }
+  .panel { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; }
 
-  .panel--back { 
-    top: 0; 
-    transform: rotate(180deg); 
-    transform-origin: center center; /* Stellt sicher, dass es exakt auf dem Kopf steht */
-  }
+  .panel--back { top: 0; transform: rotate(180deg); transform-origin: center center; }
   .panel--front { bottom: 0; }
 
   .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
   .card {
     position: absolute;
-    background: var(--paper);
-    border: 0.9mm solid var(--frame-color);
+    background: transparent;
+    border: var(--frame-width) solid var(--frame-color);
     display: flex;
-    /* Nur ein Startwert - den echten Abstand setzt layout() in Millimetern. */
     padding: 2mm;
     overflow: hidden;
   }
@@ -422,124 +315,329 @@
     color: var(--paper-ink);
     text-align: center;
     white-space: pre-wrap;
-    word-break: break-word;
-    hyphens: auto;
+    overflow-wrap: break-word;
     letter-spacing: -0.005em;
   }
 
-  .fold {
-    position: absolute; left: 0; right: 0; top: 50%;
-    height: 2.6mm; transform: translateY(-1.3mm);
-    background: var(--paper);
-    z-index: 4;
-    display: flex; align-items: center; gap: 1.6mm;
-    padding: 0 4mm;
-  }
-
-  /* Der Strich ist ein eigenes Flex-Element und laeuft daher nie unter die
-     Beschriftung - so bleibt beides lesbar, auch ohne Hintergrundgrafiken. */
-  .fold::after {
-    content: ""; flex: 1; height: 0;
-    border-top: 0.4mm dashed var(--paper-ink);
-  }
-
-  .fold-label {
-    flex: none;
-    font-family: "Work Sans", sans-serif;
-    font-size: 2.2mm; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--paper-ink);
-  }
-
-  /* Schnittkante zwischen den beiden Schildern eines A4-Blattes */
-  .cut {
+  /* Falt- und Schnittmarken. Abschaltbar - und wenn sie an sind, in
+     Vorschau, Druck und Export voellig gleich gezeichnet. */
+  .fold, .cut {
     position: absolute;
-    z-index: 5;
-    display: flex; align-items: center;
-    gap: 1.6mm;
+    display: flex; align-items: center; gap: 1.6mm;
     background: var(--paper);
     color: var(--paper-ink);
   }
 
-  .cut[hidden] { display: none; }
+  .fold { z-index: 4; }
+  .cut { z-index: 5; }
 
-  .cut--h {
+  .fold[hidden], .cut[hidden] { display: none; }
+
+  .fold, .cut--h {
     left: 0; right: 0; top: 50%;
     height: 2.6mm; transform: translateY(-1.3mm);
     flex-direction: row; padding: 0 4mm;
   }
 
-  .cut--h::after { content: ""; flex: 1; height: 0; border-top: 0.4mm dashed currentColor; }
+  .fold::after, .cut--h::after {
+    content: ""; flex: 1; height: 0;
+    border-top: 0.4mm dashed currentColor;
+  }
 
   .cut--v {
-    top: 0; bottom: 0; left: 50%;
-    width: 2.6mm; transform: translateX(-1.3mm);
+    top: 0; bottom: 0; left: 50%; right: auto;
+    width: 2.6mm; height: auto; transform: translateX(-1.3mm);
     flex-direction: column; padding: 4mm 0;
   }
 
-  .cut--v::after { content: ""; flex: 1; width: 0; border-left: 0.4mm dashed currentColor; }
+  .cut--v::after {
+    content: ""; flex: 1; width: 0; height: auto;
+    border-top: 0; border-left: 0.4mm dashed currentColor;
+  }
 
-  .cut-label {
+  .mark-label {
     flex: none;
     font-family: "Work Sans", sans-serif;
     font-size: 2.2mm; font-weight: 600;
     letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--paper-ink);
+    color: currentColor;
   }
 
-  .cut--v .cut-label { writing-mode: vertical-rl; }
+  .cut--v .mark-label { writing-mode: vertical-rl; }
 
-  /* ---------- Vorschau drehen ---------- */
-
-  .preview-tools {
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; padding-top: 14px;
+  .preview-foot {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 11px 16px;
+    border-top: 1px solid var(--ui-line);
+    font-size: 12.5px; color: var(--ui-muted);
   }
 
-  .preview-turn {
-    font-size: 12.5px; font-weight: 600; color: var(--ui-muted);
+  .preview-foot .warn { color: var(--ui-warn); font-weight: 600; }
+  .preview-foot .warn[hidden] { display: none; }
+  .preview-foot .spacer { margin-left: auto; }
+
+  /* ---------- Bedienfelder ---------- */
+
+  details.panel-card {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius);
+    box-shadow: var(--ui-shadow);
+    overflow: hidden;
+  }
+
+  details.panel-card > summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 16px;
+    min-height: var(--tap);
+    user-select: none;
+  }
+
+  details.panel-card > summary::-webkit-details-marker { display: none; }
+  details.panel-card > summary:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -3px; }
+  details.panel-card > summary:hover { background: var(--ui-panel-2); }
+
+  .panel-title {
+    font-family: "Archivo Black", sans-serif;
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--ui-accent);
+  }
+
+  .panel-hint {
+    margin-left: auto;
+    font-size: 12px; color: var(--ui-muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .caret {
+    width: 8px; height: 8px; flex: none;
+    border-right: 2px solid var(--ui-muted);
+    border-bottom: 2px solid var(--ui-muted);
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+
+  details[open] > summary .caret { transform: rotate(45deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .caret { transition: none; }
+  }
+
+  .panel-body {
+    padding: 14px 16px 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    border-top: 1px solid var(--ui-line);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+    gap: 14px 16px;
+  }
+
+  .span-all { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field[hidden] { display: none !important; }
+
+  .field > label, .field > .lbl {
+    display: flex; align-items: baseline; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--ui-muted);
+  }
+
+  .field .val {
+    margin-left: auto;
+    color: var(--ui-ink); font-weight: 600;
+    letter-spacing: 0; text-transform: none;
     font-variant-numeric: tabular-nums;
-    min-width: 42px; text-align: center;
   }
 
-  .preview-tools .chip { font-size: 14px; line-height: 1; padding: 8px 14px; }
-
-  .project-tools {
-    display: flex; flex-wrap: wrap; gap: 8px;
+  input[type="text"], textarea, select {
+    font-size: 14.5px;
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    width: 100%;
+    min-height: var(--tap);
   }
 
-  .project-tools .chip { flex: 1 1 140px; }
+  textarea { min-height: 64px; line-height: 1.4; resize: vertical; }
 
-  /* ---------- Hinweise ---------- */
+  select {
+    cursor: pointer; appearance: none; padding-right: 32px;
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 17px) calc(50% + 1px), calc(100% - 12px) calc(50% + 1px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
 
-  .tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  input[type="range"] {
+    width: 100%; accent-color: var(--ui-accent);
+    cursor: pointer; margin: 4px 0 0; min-height: 24px;
+  }
 
-  @media (max-width: 760px) { .tips { grid-template-columns: 1fr; } }
+  .size-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .size-row input[type="range"] { flex: 1 1 120px; }
+
+  .check {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 34px;
+    font-size: 13.5px; color: var(--ui-ink); cursor: pointer;
+  }
+
+  .check input { accent-color: var(--ui-accent); cursor: pointer; width: 17px; height: 17px; }
+
+  .checks { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+
+  /* Segmentierte Umschalter */
+  .seg {
+    display: flex;
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: 11px;
+    padding: 3px; gap: 3px;
+  }
+
+  .seg[hidden] { display: none; }
+
+  .seg-btn {
+    flex: 1 1 0;
+    min-height: 34px;
+    font-size: 13px; font-weight: 600;
+    color: var(--ui-muted);
+    background: none; border: none; cursor: pointer;
+    padding: 7px 10px; border-radius: 8px;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .seg-btn:hover { color: var(--ui-ink); }
+  .seg-btn.is-on, .seg-btn.is-on:hover { background: var(--ui-accent); color: var(--ui-accent-ink); }
+  .seg-btn:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 2px; }
+
+  .swatch {
+    width: 30px; height: 30px; border-radius: 9px;
+    border: 2.5px solid transparent; cursor: pointer; padding: 0;
+    box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.2);
+  }
+
+  .swatch.is-on { border-color: var(--ui-ink); }
+  .swatch:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    font-size: 13px; font-weight: 600; color: var(--ui-muted);
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-line-strong); border-radius: 9px;
+    padding: 8px 12px; min-height: 36px; cursor: pointer;
+  }
+
+  .chip:hover { color: var(--ui-ink); border-color: var(--ui-accent); }
+  .chip.is-on, .chip.is-on:hover { background: var(--ui-accent); color: var(--ui-accent-ink); border-color: var(--ui-accent); }
+  .chip.mini { padding: 5px 10px; min-height: 30px; font-size: 12px; }
+
+  .panel-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    border-top: 1px solid var(--ui-line); padding-top: 13px;
+  }
+
+  /* Motivgruppen */
+  .acc { display: flex; flex-direction: column; gap: 8px; }
+
+  details.group {
+    border: 1.5px solid var(--ui-line);
+    border-radius: 11px;
+    background: var(--ui-bg);
+    overflow: hidden;
+  }
+
+  details.group > summary {
+    list-style: none; cursor: pointer;
+    padding: 10px 13px; min-height: 38px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font-size: 13.5px; font-weight: 600;
+  }
+
+  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -2px; }
+
+  .group-name { display: flex; align-items: center; gap: 9px; }
+
+  .group-count {
+    font-size: 12px; font-weight: 600; color: var(--ui-muted);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+
+  .group-body { padding: 0 11px 11px; display: flex; flex-direction: column; gap: 10px; }
+
+  .motif-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .motif {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 10px 5px 7px; min-height: 32px;
+    border: 1.5px solid var(--ui-line); border-radius: 9px;
+    background: var(--ui-panel);
+    font-size: 12.5px; font-weight: 500; color: var(--ui-muted);
+    cursor: pointer; user-select: none;
+  }
+
+  .motif svg {
+    width: 19px; height: 19px; flex: none;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .motif input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  .motif.is-on {
+    color: var(--ui-accent);
+    border-color: var(--ui-accent);
+    background: var(--ui-accent-soft);
+  }
+
+  .motif:not(.is-on) { opacity: 0.5; }
+  .motif:not(.is-on) svg { stroke-dasharray: 2 2; }
+  .motif:has(input:focus-visible) { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  /* ---------- Hinweise & Fusszeile ---------- */
+
+  .tips, .colophon { grid-column: 1 / -1; }
+
+  .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
 
   .tip {
     background: var(--ui-panel);
     border: 1px solid var(--ui-line);
-    border-radius: 13px;
-    padding: 15px 17px;
+    border-radius: 12px;
+    padding: 13px 15px;
   }
 
-  .tip h2 {
+  .tip h3 {
     font-family: "Archivo Black", sans-serif;
-    font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
-    margin: 0 0 7px; color: var(--ui-accent);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 6px; color: var(--ui-accent);
   }
 
-  .tip p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--ui-muted); }
+  .tip p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--ui-muted); }
   .tip b { color: var(--ui-ink); font-weight: 600; }
-
-  /* ---------- Fusszeile & Rechtliches ---------- */
 
   .colophon {
     display: flex; flex-wrap: wrap;
     align-items: center; justify-content: center;
     gap: 6px 12px;
-    font-size: 12.5px; line-height: 1.5;
-    color: var(--ui-muted); text-align: center;
+    font-size: 12.5px; color: var(--ui-muted); text-align: center;
+    padding: 6px 0 2px;
   }
 
   .colophon .sep { opacity: 0.45; }
@@ -552,115 +650,187 @@
     text-decoration: underline; text-underline-offset: 2px;
   }
 
-  .colophon a:focus-visible, .linkish:focus-visible {
-    outline: 2.5px solid var(--ui-accent); outline-offset: 3px; border-radius: 3px;
-  }
+  /* ---------- Dialoge ---------- */
 
-  dialog.legal {
-    width: min(640px, calc(100vw - 28px));
-    max-height: min(82vh, 780px);
+  dialog {
+    width: min(640px, calc(100vw - 24px));
+    max-height: min(84dvh, 800px);
     padding: 0; overflow: hidden;
     border: 1px solid var(--ui-line);
-    border-radius: 16px;
+    border-radius: var(--radius);
     background: var(--ui-panel);
     color: var(--ui-ink);
-    box-shadow: 0 24px 60px rgba(20, 16, 12, 0.34);
+    box-shadow: var(--ui-shadow-lg);
   }
 
-  dialog.legal[open] { display: flex; flex-direction: column; }
-  dialog.legal::backdrop { background: rgba(18, 16, 12, 0.55); }
+  dialog[open] { display: flex; flex-direction: column; }
+  dialog::backdrop { background: rgba(16, 14, 10, 0.55); }
 
-  .legal-head {
+  dialog.narrow { width: min(460px, calc(100vw - 24px)); }
+
+  .dlg-head {
     flex: none;
     display: flex; align-items: center; justify-content: space-between; gap: 14px;
-    padding: 16px 20px;
+    padding: 15px 18px;
     border-bottom: 1px solid var(--ui-line);
   }
 
-  .legal-head h2 {
+  .dlg-head h2 {
     font-family: "Archivo Black", sans-serif;
     font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
-    color: var(--ui-accent); margin: 0;
+    color: var(--ui-accent);
   }
 
-  .legal-body { overflow-y: auto; padding: 6px 20px 20px; }
+  .dlg-body { overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 13px; }
 
-  .legal-body h3 {
-    font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em;
+  .dlg-body h3 {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--ui-muted);
-    margin: 18px 0 6px;
+    margin-top: 4px;
   }
 
-  .legal-body p { margin: 0 0 9px; font-size: 13.5px; line-height: 1.62; }
-  .legal-body a { color: var(--ui-accent); }
-  .legal-body b { font-weight: 600; }
+  .dlg-body p { margin: 0; font-size: 13.5px; line-height: 1.62; }
+  .dlg-body a { color: var(--ui-accent); }
+  .dlg-body b { font-weight: 600; }
 
-  .legal-note {
-    margin-top: 18px; padding-top: 12px;
+  .dlg-note {
+    margin-top: 4px; padding-top: 12px;
     border-top: 1px solid var(--ui-line);
     font-size: 12px; color: var(--ui-muted);
   }
 
-  .legal-foot {
+  .dlg-foot {
     flex: none;
     display: flex; flex-wrap: wrap;
     align-items: center; justify-content: flex-end; gap: 10px;
-    padding: 14px 20px;
+    padding: 13px 18px;
     border-top: 1px solid var(--ui-line);
-    background: var(--ui-panel);
   }
 
-  .legal-foot button.confirm { padding: 12px 22px; }
+  .dlg-foot .spacer { margin-right: auto; }
 
-  /* ---------- Druck ---------- */
+  .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .radio-card {
+    position: relative;
+    flex: 1 1 160px;
+    display: flex; flex-direction: column; gap: 3px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: 11px;
+    background: var(--ui-bg);
+    cursor: pointer;
+  }
+
+  .radio-card input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .radio-card b { font-size: 14px; }
+  .radio-card span { font-size: 12px; color: var(--ui-muted); line-height: 1.45; }
+  .radio-card:has(input:checked) { border-color: var(--ui-accent); background: var(--ui-accent-soft); }
+  .radio-card:has(input:focus-visible) { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  /* ---------- Meldungen ---------- */
+
+  .toast-host {
+    position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+    z-index: 60; display: flex; flex-direction: column; gap: 8px;
+    pointer-events: none; width: min(420px, calc(100vw - 24px));
+  }
+
+  .toast {
+    background: var(--ui-ink); color: var(--ui-bg);
+    padding: 11px 15px; border-radius: 11px;
+    font-size: 13.5px; font-weight: 500;
+    box-shadow: var(--ui-shadow-lg);
+    animation: toast-in 0.18s ease;
+  }
+
+  .toast.is-error { background: var(--ui-warn); color: #fff; }
+
+  @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+
+  @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+  /* ---------- Mobile Aktionsleiste ---------- */
+
+  .actionbar { display: none; }
+
+  @media (max-width: 720px) {
+    .topbar-actions .btn-label { display: none; }
+    .topbar-actions .btn { padding: 9px; width: var(--tap); }
+
+    .actionbar {
+      position: sticky; bottom: 0; z-index: 25;
+      display: flex; gap: 8px;
+      padding: 10px clamp(12px, 3vw, 28px) calc(10px + env(safe-area-inset-bottom));
+      background: color-mix(in srgb, var(--ui-bg) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--ui-line);
+    }
+
+    /* Auf schmalen Schirmen zaehlen die Knoepfe, nicht der Hinweistext. */
+    #preview-note { display: none; }
+
+    .actionbar .btn { flex: 1 1 0; }
+    .app { padding-bottom: 18px; }
+  }
+
+  /* =====================================================================
+     Druck
+
+     Auf das Papier kommt nur das Blatt: in Originalgroesse, ohne Rahmen,
+     ohne Schatten, ohne Rand. Die Seitengroesse setzt layout() dynamisch
+     in <style id="page-rule"> - immer exakt auf das gewaehlte Papier.
+     ===================================================================== */
 
   @media print {
-    /* Gedruckt wird ausschliesslich das Blatt - in Originalgroesse und
-       genau so, wie die Vorschau es zeigt. */
+    :root { color-scheme: light; }
 
+    /* Der Seitenkoerper traegt im Druck keinerlei Inhalt mehr: Das Blatt wird
+       unten aus dem Fluss genommen. Damit gibt es nichts, was umbrechen oder
+       eine zweite Seite anstossen koennte - unabhaengig von Rundungen,
+       Skalierung oder Randeinstellungen im Druckdialog. */
     html, body {
-      width: 100%; height: 100%;
-      margin: 0; padding: 0;
-      background: #fff;
-      overflow: hidden;            /* verhindert eine zweite, leere Seite */
+      margin: 0 !important; padding: 0 !important;
+      background: #fff !important;
+      width: auto !important; height: auto !important;
+      min-height: 0 !important; max-height: none !important;
+      overflow: hidden !important;
     }
 
-    .ui { display: none !important; }
+    .no-print, .toast-host { display: none !important; }
 
-    .app, .stage, .stage-left {
-      display: block;
-      max-width: none;
-      width: 100%; height: 100%;
-      margin: 0; padding: 0; gap: 0;
-      position: static;
-    }
-
-    /* Mittig auf dem Papier: passt damit auch, wenn auf A4 gedruckt wird. */
-    .sheet-wrap {
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; height: 100%;
-    }
-
-    .sheet-fit {
-      position: static;
-      width: auto !important;
-      height: auto !important;
-    }
-
-    .sheet {
-      width: var(--sw); height: var(--sh);
-      flex: none;
+    /* Alle Huellen um das Blatt herum verlieren jede Wirkung und jede Hoehe. */
+    .app, .col-preview, .preview, .preview-stage, .sheet-fit {
+      display: block !important;
+      position: static !important;
+      width: auto !important; height: 0 !important;
+      max-width: none !important; min-width: 0 !important;
+      min-height: 0 !important;
+      margin: 0 !important; padding: 0 !important;
+      gap: 0 !important;
+      background: none !important;
+      border: 0 !important; border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: visible !important;
       transform: none !important;
-      box-shadow: none;
-      break-inside: avoid; page-break-inside: avoid;
-      break-after: avoid; page-break-after: avoid;
     }
 
-    /* Gedruckt wird immer auf A4. Ein A5-Schild sitzt mittig auf der Seite -
-       die gestrichelte Linie zeigt, wo geschnitten wird. */
-    .sheet--trim { outline: 0.3mm dashed rgba(0, 0, 0, 0.55); }
+    /* Das Blatt sitzt fest auf der Seite. Ein Element ausserhalb des Flusses
+       belegt keine Hoehe, also bleibt es bei genau einer Seite. Die Masse
+       setzt layout() - immer exakt das gewaehlte Papier. */
+    .sheet {
+      position: fixed !important;
+      top: 0 !important; left: 0 !important; right: auto !important; bottom: auto !important;
+      transform: none !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: 0 !important; outline: 0 !important;
+      break-inside: auto; page-break-inside: auto;
+      break-before: auto; page-break-before: auto;
+      break-after: auto; page-break-after: auto;
+    }
 
-    /* Farben, Flaechen und Rahmen des Blattes nicht vom Browser wegoptimieren */
+    /* Farben, Flaechen und Linien des Blattes nicht wegoptimieren. */
     .sheet, .sheet * {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -668,9 +838,11 @@
   }
 </style>
 
+<!-- Seitengroesse und Blattmasse setzt layout() - immer das gewaehlte Papier. -->
+<style id="page-rule">@page { size: 210mm 148mm; margin: 0; }</style>
 </head>
 
-<style id="page-rule">@page { size: A5 landscape; margin: 0; }</style>
+<body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
@@ -1167,327 +1339,419 @@
   </defs>
 </svg>
 
-<div class="app">
-  <header class="masthead ui">
-    <h1>Namensschild</h1>
-    <p>
-      Ein Blatt, in der Mitte gefaltet: Es steht als kleines Zelt auf dem Tisch.
-      Rundherum ein Rahmen aus gekritzelten Motiven, in der Mitte bleibt Platz
-      für Name und Text. Auf <b>A5</b> entsteht ein Schild, auf <b>A4</b> zwei zum Auseinanderschneiden.
-    </p>
-  </header>
-
-  <div class="stage">
-  <div class="stage-right ui">
-
-  <details class="controls" open>
-    <summary class="controls-head">
-      <span class="group-name">
-        <span class="group-caret" aria-hidden="true"></span>
-        <h2 class="controls-title">Blatt &amp; Rahmen</h2>
-      </span>
-      <div class="seg" role="group" aria-label="Papiergröße">
-        <button type="button" class="seg-btn is-on" data-paper="a5">A5 · 1 Schild</button>
-        <button type="button" class="seg-btn" data-paper="a4">A4 · 2 Schilder</button>
-      </div>
-      <div class="seg" role="group" aria-label="Papierformat">
-        <button type="button" class="seg-btn is-on" data-orient="landscape">Querformat</button>
-        <button type="button" class="seg-btn" data-orient="portrait">Hochformat</button>
-      </div>
-    </summary>
-
-    <div class="controls-body">
-    <div class="grid">
-      <div class="field-group">
-        <span class="lbl">Rahmenbreite <span class="val" id="lbl-band">–</span></span>
-        <input type="range" id="in-band" min="14" max="46" step="1" value="30"
-               aria-label="Rahmenbreite in Millimetern">
-      </div>
-
-      <div class="field-group">
-        <span class="lbl">Motivgröße <span class="val" id="lbl-scale">–</span></span>
-        <input type="range" id="in-scale" min="70" max="145" step="5" value="100"
-               aria-label="Größe der Doodle-Motive">
-      </div>
-
-      <div class="field-group">
-        <span class="lbl">Mindestabstand <span class="val" id="lbl-gap">–</span></span>
-        <input type="range" id="in-gap" min="0" max="5" step="0.2" value="1.2"
-               aria-label="Mindestabstand zwischen den Motiven in Millimetern">
-      </div>
-
-      <div class="field-group">
-         <span class="lbl">Abstand zum Außenrand <span class="val" id="lbl-edge">–</span></span>
-        <input type="range" id="in-edge" min="-5" max="8" step="0.5" value="0"
-           aria-label="Abstand der Motive zum äußeren Papierrand in Millimetern">
-      </div>
-
-      <div class="field-group">
-        <label for="in-style">Rahmenstil</label>
-        <select id="in-style" aria-label="Rahmenstil">
-          <option value="doodle">Kritzelmotive</option>
-          <option value="confetti">Konfetti</option>
-          <option value="stars">Sterne &amp; Formen</option>
-          <option value="minimal">Minimal</option>
-        </select>
-      </div>
-
-      <div class="field-group">
-        <label for="in-frame-color">Rahmenfarbe</label>
-        <select id="in-frame-color" aria-label="Farbe des Rahmens">
-          <option value="#1a1a1a">Schwarz</option>
-          <option value="#e8402a">Rot</option>
-          <option value="#1f7ae0">Blau</option>
-          <option value="#2fb457">Grün</option>
-          <option value="#e5459b">Pink</option>
-          <option value="#f58220">Orange</option>
-          <option value="#35785f">Waldgrün</option>
-          <option value="#6b4f9b">Violett</option>
-        </select>
-      </div>
-
-      <div class="field-group">
-        <span class="lbl">Linienstärke <span class="val" id="lbl-line">–</span></span>
-        <input type="range" id="in-line" min="0.6" max="2" step="0.1" value="1"
-               aria-label="Linienstärke des Rahmens">
-      </div>
-
-      <div class="field-group span-all">
-        <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
-      </div>
-
-      <div class="field-group span-all">
-        <span class="lbl">Motive <span class="val" id="lbl-count">–</span></span>
-        <div class="acc" id="acc"></div>
-      </div>
+<header class="topbar no-print">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">N</span>
+    <div>
+      <h1>Namensschild</h1>
+      <small id="brand-sub">A5 quer &middot; 1 Schild</small>
     </div>
-
-    <div class="foot">
-      <div class="btn-row">
-        <button type="button" class="chip" id="btn-all">Alle auswählen</button>
-        <button type="button" class="chip" id="btn-none">Alle abwählen</button>
-      </div>
-      <button class="print" type="button" id="btn-shuffle">Rahmen neu würfeln</button>
-    </div>
-    </div>
-  </details>
-
-  <details class="controls" open>
-    <summary class="controls-head">
-      <span class="group-name">
-        <span class="group-caret" aria-hidden="true"></span>
-        <h2 class="controls-title">Beschriftung</h2>
-      </span>
-      <div class="seg" role="tablist" aria-label="Schild auswählen" id="seg-card" hidden>
-        <button type="button" role="tab" class="seg-btn is-on" data-card-tab="1" aria-selected="true">Schild 1</button>
-        <button type="button" role="tab" class="seg-btn" data-card-tab="2" aria-selected="false">Schild 2</button>
-      </div>
-      <div class="seg" role="tablist" aria-label="Seite auswählen">
-        <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite · Name</button>
-        <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">Rückseite · Text</button>
-      </div>
-    </summary>
-
-    <div class="controls-body">
-    <div class="grid">
-      <div class="field-group span-all" data-only="front" data-card="1">
-        <label for="in-name">Name</label>
-        <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
-      </div>
-
-      <div class="field-group span-all" data-only="back" data-card="1" hidden>
-        <label for="in-text">Text</label>
-        <textarea id="in-text" rows="2" spellcheck="false">Klasse 5b
-Schuljahr 2026/27</textarea>
-      </div>
-
-      <div class="field-group span-all" data-only="front" data-card="2" hidden>
-        <label for="in-name2">Name · Schild 2</label>
-        <input id="in-name2" type="text" value="Tom" autocomplete="off" spellcheck="false">
-      </div>
-
-      <div class="field-group span-all" data-only="back" data-card="2" hidden>
-        <label for="in-text2">Text · Schild 2</label>
-        <textarea id="in-text2" rows="2" spellcheck="false">Klasse 5b
-Schuljahr 2026/27</textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="in-font">Schriftart</label>
-        <select id="in-font"></select>
-      </div>
-
-      <div class="field-group">
-        <label for="in-size">Schriftgröße <span class="val" id="lbl-size">–</span></label>
-        <div class="size-row">
-          <input type="range" id="in-size" min="3" max="46" step="0.2" value="15">
-          <label class="check"><input type="checkbox" id="in-auto" checked> automatisch</label>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label for="in-lh">Zeilenabstand <span class="val" id="lbl-lh">–</span></label>
-        <input type="range" id="in-lh" min="0.85" max="1.9" step="0.05" value="1.1">
-      </div>
-
-      <div class="field-group">
-        <span class="lbl" id="lbl-color">Schriftfarbe</span>
-        <div class="swatch-row" id="swatches" role="group" aria-labelledby="lbl-color"></div>
-      </div>
-
-      <div class="field-group">
-        <span class="lbl" id="lbl-align">Ausrichtung</span>
-        <div class="btn-row" id="aligns" role="group" aria-labelledby="lbl-align">
-          <button type="button" class="chip" data-align="left">Links</button>
-          <button type="button" class="chip" data-align="center">Mittig</button>
-          <button type="button" class="chip" data-align="right">Rechts</button>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <span class="lbl" id="lbl-style">Stil</span>
-        <div class="btn-row" role="group" aria-labelledby="lbl-style">
-          <button type="button" class="chip" id="tg-upper" aria-pressed="false">GROSSBUCHSTABEN</button>
-          <button type="button" class="chip" id="tg-shadow" aria-pressed="false">Schatten</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="foot">
-      <p class="warn" id="warn" hidden>Der Text ragt über das Feld hinaus – Größe verkleinern oder „automatisch“ aktivieren.</p>
-      <button class="print" type="button" id="btn-print">Drucken</button>
-    </div>
-    </div>
-  </details>
-
-  <details class="controls" open>
-    <summary class="controls-head">
-      <span class="group-name">
-        <span class="group-caret" aria-hidden="true"></span>
-        <h2 class="controls-title">Projekt</h2>
-      </span>
-    </summary>
-    <div class="controls-body">
-      <div class="project-tools">
-        <button type="button" class="chip" id="btn-export">Exportieren</button>
-        <button type="button" class="chip" id="btn-import">Importieren</button>
-        <button type="button" class="chip" id="btn-reset">Zurücksetzen</button>
-        <button type="button" class="chip" id="btn-undo" disabled>Rückgängig</button>
-        <button type="button" class="chip" id="btn-redo" disabled>Wiederholen</button>
-      </div>
-      <input type="file" id="file-import" accept="application/json,.json" hidden>
-    </div>
-  </details>
-
-  </div><!-- /stage-right -->
-
-  <div class="stage-left">
-  <div class="sheet-wrap">
-   <div class="sheet-fit" id="sheet-fit">
-    <div class="sheet" id="sheet" data-dir="column">
-
-      <div class="badge" id="badge-1">
-        <div class="panel panel--back">
-          <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
-          <div class="card card--text" id="card-back">
-            <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
-Schuljahr 2026/27</span></div>
-          </div>
-        </div>
-
-        <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
-
-        <div class="panel panel--front">
-          <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
-          <div class="card card--name" id="card-front">
-            <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cut cut--h" id="cut" aria-hidden="true" hidden><span class="cut-label">Schnittkante</span></div>
-
-      <div class="badge" id="badge-2" hidden>
-        <div class="panel panel--back">
-          <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
-          <div class="card card--text" id="card-back2">
-            <div class="card-inner" id="box-back2"><span class="card-text" id="out-text2">Klasse 5b
-Schuljahr 2026/27</span></div>
-          </div>
-        </div>
-
-        <div class="fold" aria-hidden="true"><span class="fold-label">Faltkante</span></div>
-
-        <div class="panel panel--front">
-          <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
-          <div class="card card--name" id="card-front2">
-            <div class="card-inner" id="box-front2"><span class="card-text" id="out-name2">Tom</span></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-   </div>
-
-   <div class="preview-tools ui">
-     <button type="button" class="chip" id="btn-turn-left"
-             aria-label="Vorschau nach links drehen" title="Nach links drehen">↺</button>
-     <span class="preview-turn" id="lbl-turn">0°</span>
-     <button type="button" class="chip" id="btn-turn-right"
-             aria-label="Vorschau nach rechts drehen" title="Nach rechts drehen">↻</button>
-   </div>
   </div>
 
-  </div><!-- /stage-left -->
-  </div><!-- /stage -->
+  <div class="topbar-actions">
+    <button type="button" class="btn btn--icon btn--ghost" id="btn-theme"
+            aria-label="Helles oder dunkles Design" title="Design wechseln">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.3 6.3 4.8 4.8M19.2 19.2l-1.5-1.5M17.7 6.3l1.5-1.5M4.8 19.2l1.5-1.5"/></svg>
+    </button>
 
-  <section class="tips ui">
+    <button type="button" class="btn" id="btn-export-open">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11M8 10.8 12 14.8l4-4M4.5 16.5v2.2a1.8 1.8 0 0 0 1.8 1.8h11.4a1.8 1.8 0 0 0 1.8-1.8v-2.2"/></svg>
+      <span class="btn-label">Exportieren</span>
+    </button>
+
+    <button type="button" class="btn btn--primary" id="btn-print">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3.8h10V9M7 18.5H5.3A1.8 1.8 0 0 1 3.5 16.7v-5A1.8 1.8 0 0 1 5.3 9.9h13.4a1.8 1.8 0 0 1 1.8 1.8v5a1.8 1.8 0 0 1-1.8 1.8H17M7 14.5h10v5.7H7z"/></svg>
+      <span class="btn-label">Drucken</span>
+    </button>
+  </div>
+</header>
+
+<main class="app">
+
+  <!-- ============ Vorschau ============ -->
+  <div class="col-preview">
+    <section class="preview" aria-label="Vorschau">
+      <div class="preview-head no-print">
+        <span class="preview-title">Vorschau &equals; Druck</span>
+        <div class="preview-meta">
+          <span class="pill" id="pill-format">210 &times; 148 mm</span>
+          <span class="pill" id="pill-zoom">100 %</span>
+        </div>
+      </div>
+
+      <div class="preview-stage">
+        <div class="sheet-fit" id="sheet-fit">
+          <div class="sheet" id="sheet" data-dir="column">
+
+            <div class="badge" id="badge-1">
+              <div class="panel panel--back">
+                <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
+                <div class="card" id="card-back">
+                  <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
+Schuljahr 2026/27</span></div>
+                </div>
+              </div>
+
+              <div class="fold" id="fold-1" aria-hidden="true"><span class="mark-label">Faltkante</span></div>
+
+              <div class="panel panel--front">
+                <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
+                <div class="card" id="card-front">
+                  <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cut cut--h" id="cut" aria-hidden="true" hidden><span class="mark-label">Schnittkante</span></div>
+
+            <div class="badge" id="badge-2" hidden>
+              <div class="panel panel--back">
+                <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
+                <div class="card" id="card-back2">
+                  <div class="card-inner" id="box-back2"><span class="card-text" id="out-text2">Klasse 5b
+Schuljahr 2026/27</span></div>
+                </div>
+              </div>
+
+              <div class="fold" id="fold-2" aria-hidden="true"><span class="mark-label">Faltkante</span></div>
+
+              <div class="panel panel--front">
+                <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
+                <div class="card" id="card-front2">
+                  <div class="card-inner" id="box-front2"><span class="card-text" id="out-name2">Tom</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-foot no-print">
+        <span id="preview-note">Die Vorschau zeigt das Blatt in Originalgr&ouml;&szlig;e.</span>
+        <p class="warn" id="warn" hidden role="status">Der Text ragt &uuml;ber das Feld hinaus.</p>
+        <span class="spacer"></span>
+        <button type="button" class="chip" id="btn-undo" disabled>R&uuml;ckg&auml;ngig</button>
+        <button type="button" class="chip" id="btn-redo" disabled>Wiederholen</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ============ Bedienung ============ -->
+  <div class="col-controls no-print">
+
+    <details class="panel-card" id="pc-sheet" open>
+      <summary>
+        <span class="caret" aria-hidden="true"></span>
+        <h2 class="panel-title">Blatt</h2>
+        <span class="panel-hint" id="hint-sheet">A5 &middot; quer</span>
+      </summary>
+      <div class="panel-body">
+        <div class="grid">
+          <div class="field span-all">
+            <span class="lbl" id="lbl-paper">Papier</span>
+            <div class="seg" role="group" aria-labelledby="lbl-paper">
+              <button type="button" class="seg-btn is-on" data-paper="a5">A5 &middot; 1 Schild</button>
+              <button type="button" class="seg-btn" data-paper="a4">A4 &middot; 2 Schilder</button>
+            </div>
+          </div>
+
+          <div class="field span-all">
+            <span class="lbl" id="lbl-orient">Format des Schildes <span class="val" id="lbl-sheetsize">&ndash;</span></span>
+            <div class="seg" role="group" aria-labelledby="lbl-orient">
+              <button type="button" class="seg-btn is-on" data-orient="landscape">Quer</button>
+              <button type="button" class="seg-btn" data-orient="portrait">Hoch</button>
+            </div>
+          </div>
+
+          <div class="field span-all">
+            <span class="lbl">Auf dem Blatt</span>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="in-marks" checked> Falt- und Schnittkanten zeigen</label>
+              <label class="check"><input type="checkbox" id="in-cardframe" checked> Rahmen um das Textfeld</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel-card" id="pc-text" open>
+      <summary>
+        <span class="caret" aria-hidden="true"></span>
+        <h2 class="panel-title">Beschriftung</h2>
+        <span class="panel-hint" id="hint-text">Vorderseite</span>
+      </summary>
+      <div class="panel-body">
+        <div class="seg" role="tablist" aria-label="Schild ausw&auml;hlen" id="seg-card" hidden>
+          <button type="button" role="tab" class="seg-btn is-on" data-card-tab="1" aria-selected="true">Schild 1</button>
+          <button type="button" role="tab" class="seg-btn" data-card-tab="2" aria-selected="false">Schild 2</button>
+        </div>
+
+        <div class="seg" role="tablist" aria-label="Seite ausw&auml;hlen">
+          <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite &middot; Name</button>
+          <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">R&uuml;ckseite &middot; Text</button>
+        </div>
+
+        <div class="grid">
+          <div class="field span-all" data-only="front" data-card="1">
+            <label for="in-name">Name</label>
+            <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
+          </div>
+
+          <div class="field span-all" data-only="back" data-card="1" hidden>
+            <label for="in-text">Text</label>
+            <textarea id="in-text" rows="2" spellcheck="false">Klasse 5b
+Schuljahr 2026/27</textarea>
+          </div>
+
+          <div class="field span-all" data-only="front" data-card="2" hidden>
+            <label for="in-name2">Name &middot; Schild 2</label>
+            <input id="in-name2" type="text" value="Tom" autocomplete="off" spellcheck="false">
+          </div>
+
+          <div class="field span-all" data-only="back" data-card="2" hidden>
+            <label for="in-text2">Text &middot; Schild 2</label>
+            <textarea id="in-text2" rows="2" spellcheck="false">Klasse 5b
+Schuljahr 2026/27</textarea>
+          </div>
+
+          <div class="field span-all">
+            <label for="in-font">Schriftart</label>
+            <select id="in-font"></select>
+          </div>
+
+          <div class="field span-all">
+            <label for="in-size">Schriftgr&ouml;&szlig;e <span class="val" id="lbl-size">&ndash;</span></label>
+            <div class="size-row">
+              <input type="range" id="in-size" min="3" max="46" step="0.2" value="15">
+              <label class="check"><input type="checkbox" id="in-auto" checked> automatisch</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="in-lh">Zeilenabstand <span class="val" id="lbl-lh">&ndash;</span></label>
+            <input type="range" id="in-lh" min="0.85" max="1.9" step="0.05" value="1.1">
+          </div>
+
+          <div class="field">
+            <span class="lbl" id="lbl-color">Schriftfarbe</span>
+            <div class="swatch-row" id="swatches" role="group" aria-labelledby="lbl-color"></div>
+          </div>
+
+          <div class="field">
+            <span class="lbl" id="lbl-align">Ausrichtung</span>
+            <div class="btn-row" id="aligns" role="group" aria-labelledby="lbl-align">
+              <button type="button" class="chip" data-align="left">Links</button>
+              <button type="button" class="chip" data-align="center">Mittig</button>
+              <button type="button" class="chip" data-align="right">Rechts</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="lbl" id="lbl-style">Stil</span>
+            <div class="btn-row" role="group" aria-labelledby="lbl-style">
+              <button type="button" class="chip" id="tg-upper" aria-pressed="false">GROSS</button>
+              <button type="button" class="chip" id="tg-shadow" aria-pressed="false">Schatten</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel-card" id="pc-frame">
+      <summary>
+        <span class="caret" aria-hidden="true"></span>
+        <h2 class="panel-title">Motivrahmen</h2>
+        <span class="panel-hint" id="hint-frame">Kritzelmotive</span>
+      </summary>
+      <div class="panel-body">
+        <div class="grid">
+          <div class="field">
+            <label for="in-style">Rahmenstil</label>
+            <select id="in-style">
+              <option value="doodle">Kritzelmotive</option>
+              <option value="confetti">Konfetti</option>
+              <option value="stars">Sterne &amp; Formen</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="in-frame-color">Rahmenfarbe</label>
+            <select id="in-frame-color">
+              <option value="#1a1a1a">Schwarz</option>
+              <option value="#e8402a">Rot</option>
+              <option value="#1f7ae0">Blau</option>
+              <option value="#2fb457">Gr&uuml;n</option>
+              <option value="#e5459b">Pink</option>
+              <option value="#f58220">Orange</option>
+              <option value="#2f6f57">Waldgr&uuml;n</option>
+              <option value="#6b4f9b">Violett</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <span class="lbl">Rahmenbreite <span class="val" id="lbl-band">&ndash;</span></span>
+            <input type="range" id="in-band" min="14" max="46" step="1" value="30"
+                   aria-label="Rahmenbreite in Millimetern">
+          </div>
+
+          <div class="field">
+            <span class="lbl">Motivgr&ouml;&szlig;e <span class="val" id="lbl-scale">&ndash;</span></span>
+            <input type="range" id="in-scale" min="70" max="145" step="5" value="100"
+                   aria-label="Groesse der Motive in Prozent">
+          </div>
+
+          <div class="field">
+            <span class="lbl">Mindestabstand <span class="val" id="lbl-gap">&ndash;</span></span>
+            <input type="range" id="in-gap" min="0" max="5" step="0.2" value="1.2"
+                   aria-label="Mindestabstand zwischen den Motiven in Millimetern">
+          </div>
+
+          <div class="field">
+            <span class="lbl">Abstand zum Rand <span class="val" id="lbl-edge">&ndash;</span></span>
+            <input type="range" id="in-edge" min="-5" max="8" step="0.5" value="0"
+                   aria-label="Abstand der Motive zum Papierrand in Millimetern">
+          </div>
+
+          <div class="field">
+            <span class="lbl">Linienst&auml;rke <span class="val" id="lbl-line">&ndash;</span></span>
+            <input type="range" id="in-line" min="0.6" max="2" step="0.1" value="1"
+                   aria-label="Linienstaerke der Motive">
+          </div>
+
+          <div class="field span-all">
+            <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
+          </div>
+        </div>
+
+        <div class="panel-foot">
+          <span class="panel-hint" style="margin:0" id="lbl-count">&ndash;</span>
+          <button type="button" class="btn" id="btn-shuffle">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 7.2h3.2l2.6 3.4M3.6 16.8h3.2l9.4-12.2h4.2M20.4 4.6l-2.2-1.8M20.4 4.6l-2.2 1.8M14.8 13.4l1.6 2.1h4M20.4 15.5l-2.2-1.8M20.4 15.5l-2.2 1.8"/></svg>
+            Neu w&uuml;rfeln
+          </button>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel-card" id="pc-motifs">
+      <summary>
+        <span class="caret" aria-hidden="true"></span>
+        <h2 class="panel-title">Motive</h2>
+        <span class="panel-hint" id="hint-motifs">&ndash;</span>
+      </summary>
+      <div class="panel-body">
+        <div class="acc" id="acc"></div>
+        <div class="panel-foot">
+          <div class="btn-row">
+            <button type="button" class="chip" id="btn-all">Alle ausw&auml;hlen</button>
+            <button type="button" class="chip" id="btn-none">Alle abw&auml;hlen</button>
+          </div>
+          <button type="button" class="chip" id="btn-reset">Alles zur&uuml;cksetzen</button>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <section class="tips no-print" aria-label="Hinweise">
     <div class="tip">
-      <h2>Drucken</h2>
-      <p>Gedruckt wird immer auf <b>A4</b> – im Druckdialog <b>Ränder: keine</b> und Skalierung <b>100 %</b> wählen. Ein A5-Schild sitzt dabei mittig auf der Seite und wird entlang der gestrichelten Außenlinie ausgeschnitten. Bei <b>A4 · 2 Schilder</b> füllt das Blatt die Seite: erst an der <b>Schnittkante</b> teilen, dann jedes Schild für sich falten.</p>
+      <h3>Drucken</h3>
+      <p>Der Druckdialog bekommt automatisch <b>genau das gew&auml;hlte Papier</b> und keine R&auml;nder. Dort bitte <b>Skalierung 100&nbsp;%</b> und <b>Ma&szlig;stab: Standard</b> lassen, dann kommt das Blatt so aus dem Drucker, wie es die Vorschau zeigt.</p>
     </div>
     <div class="tip">
-      <h2>Falten</h2>
-      <p>Entlang der gestrichelten Linie knicken. Die obere Hälfte steht kopf – nach dem Falten liest sich die Rückseite richtig herum.</p>
+      <h3>Falten</h3>
+      <p>Entlang der Faltkante knicken. Die obere H&auml;lfte steht kopf &ndash; nach dem Falten liest sich die R&uuml;ckseite richtig herum. Auf A4 vorher an der Schnittkante teilen.</p>
     </div>
     <div class="tip">
-      <h2>Anpassen</h2>
-      <p>In der Motivliste lässt sich jedes Motiv <b>an- und abwählen</b>. „Rahmen neu würfeln“ ordnet alles neu an – Motive überlappen dabei nie und halten den eingestellten Mindestabstand.</p>
+      <h3>Exportieren</h3>
+      <p><b>PNG</b> f&uuml;r die Weitergabe als Bild, <b>PDF</b> zum Drucken anderswo. Beides entsteht aus derselben Vorlage wie die Vorschau &ndash; randlos und in Originalgr&ouml;&szlig;e.</p>
     </div>
   </section>
 
-  <footer class="colophon ui">
-    <span>Ein privates Hobbyprojekt – Nutzung auf eigene Verantwortung.</span>
-    <span class="sep" aria-hidden="true">·</span>
-    <button type="button" class="linkish" id="btn-legal">Rechtliches &amp; Hinweise</button>
-    <span class="sep" aria-hidden="true">·</span>
-    <a href="https://github.com/TimMHoffmann/JuliasNamensschilder" target="_blank" rel="noopener">Quellcode auf GitHub</a>
-  </footer>
+  <footer class="colophon no-print">
+    <span>Ein privates Hobbyprojekt &ndash; Nutzung auf eigene Verantwortung.</span>
+    <span class="sep" aria-hidden="true">&middot;</span>
+    <button type="button" class="linkish" id="btn-legal">Rechtliches</button>
+    <span class="sep" aria-hidden="true">&middot;</span>
+    <a href="https://github.com/TimMHoffmann/JuliasNamensschilder" target="_blank" rel="noopener">Quellcode</a>
+    </footer>
+</main>
+
+<div class="actionbar no-print">
+  <button type="button" class="btn" id="btn-export-open-m">Exportieren</button>
+  <button type="button" class="btn btn--primary" id="btn-print-m">Drucken</button>
 </div>
 
-<dialog class="legal ui" id="legal" aria-labelledby="legal-title">
-  <div class="legal-head">
+<div class="toast-host" id="toasts" aria-live="polite"></div>
+
+<!-- ============ Export ============ -->
+<dialog class="narrow no-print" id="dlg-export" aria-labelledby="dlg-export-title">
+  <div class="dlg-head">
+    <h2 id="dlg-export-title">Exportieren</h2>
+    <button type="button" class="btn btn--icon btn--ghost" data-close="dlg-export" aria-label="Schlie&szlig;en">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <div class="dlg-body">
+    <div class="radio-row">
+      <label class="radio-card">
+        <input type="radio" name="exp-format" value="png" checked>
+        <b>PNG</b>
+        <span>Bilddatei &ndash; zum Verschicken oder Weiterverarbeiten.</span>
+      </label>
+      <label class="radio-card">
+        <input type="radio" name="exp-format" value="pdf">
+        <b>PDF</b>
+        <span>Druckfertig in Originalgr&ouml;&szlig;e, ohne Rand.</span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label for="exp-dpi">Aufl&ouml;sung</label>
+      <select id="exp-dpi">
+        <option value="150">150 dpi &ndash; klein</option>
+        <option value="300" selected>300 dpi &ndash; Druckqualit&auml;t</option>
+        <option value="600">600 dpi &ndash; sehr fein</option>
+      </select>
+    </div>
+
+    <p class="dlg-note" id="exp-note">&ndash;</p>
+  </div>
+
+  <div class="dlg-foot">
+    <button type="button" class="btn" data-close="dlg-export">Abbrechen</button>
+    <button type="button" class="btn btn--primary" id="btn-export-run">Datei erstellen</button>
+  </div>
+</dialog>
+
+<!-- ============ Rechtliches ============ -->
+<dialog class="no-print" id="legal" aria-labelledby="legal-title">
+  <div class="dlg-head">
     <h2 id="legal-title">Rechtliches &amp; Hinweise</h2>
   </div>
 
-  <div class="legal-body">
+  <div class="dlg-body">
     <h3>Was das hier ist</h3>
-    <p>Ein privates, nicht kommerzielles Hobbyprojekt – entstanden als kleines Werkzeug für den
+    <p>Ein privates, nicht kommerzielles Hobbyprojekt &ndash; entstanden als kleines Werkzeug f&uuml;r den
        Schulalltag. Es wird in der Freizeit gepflegt, ohne Anspruch auf Fehlerfreiheit,
-       Vollständigkeit oder dauerhafte Verfügbarkeit.</p>
+       Vollst&auml;ndigkeit oder dauerhafte Verf&uuml;gbarkeit.</p>
 
     <h3>Nutzung</h3>
-    <p>Wer möchte, darf das Namensschild kostenlos nutzen – privat wie im Unterricht.
+    <p>Wer m&ouml;chte, darf das Namensschild kostenlos nutzen &ndash; privat wie im Unterricht.
        Der Quellcode steht unter der <b>MIT-Lizenz</b> auf
        <a href="https://github.com/TimMHoffmann/JuliasNamensschilder" target="_blank" rel="noopener">GitHub</a>
-       und darf entsprechend verwendet, verändert und weitergegeben werden.</p>
+       und darf entsprechend verwendet, ver&auml;ndert und weitergegeben werden.</p>
 
     <h3>Haftungsausschluss</h3>
-    <p>Die Bereitstellung erfolgt <b>ohne jede Gewähr</b> und „wie besehen“. Für Schäden, die aus der
-       Nutzung oder der Nichtnutzbarkeit entstehen – etwa fehlerhafte Ausdrucke, verbrauchtes Papier
-       oder Toner –, wird keine Haftung übernommen.</p>
-    <p>Unberührt bleibt die Haftung für Vorsatz und grobe Fahrlässigkeit sowie für Schäden aus der
-       Verletzung des Lebens, des Körpers oder der Gesundheit.</p>
+    <p>Die Bereitstellung erfolgt <b>ohne jede Gew&auml;hr</b> und &bdquo;wie besehen&ldquo;. F&uuml;r Sch&auml;den, die aus der
+       Nutzung oder der Nichtnutzbarkeit entstehen &ndash; etwa fehlerhafte Ausdrucke, verbrauchtes Papier
+       oder Toner &ndash;, wird keine Haftung &uuml;bernommen.</p>
+    <p>Unber&uuml;hrt bleibt die Haftung f&uuml;r Vorsatz und grobe Fahrl&auml;ssigkeit sowie f&uuml;r Sch&auml;den aus der
+       Verletzung des Lebens, des K&ouml;rpers oder der Gesundheit.</p>
 
     <h3>Motive</h3>
     <p>Die gezeichneten Motive wurden mit <b>Claude Code</b> (Anthropic) generiert und sind Teil
@@ -1495,1009 +1759,1447 @@ Schuljahr 2026/27</span></div>
        die die Seite benutzt.</p>
 
     <h3>Daten</h3>
-    <p>Die Seite läuft vollständig im Browser. Eingegebene Namen und Texte werden
-       <b>nicht gespeichert und nirgendwohin übertragen</b> – es gibt weder einen Server im
-       Hintergrund noch Cookies oder Tracking.</p>
+    <p>Die Seite l&auml;uft vollst&auml;ndig im Browser. Eingegebene Namen und Texte werden
+       <b>nicht &uuml;bertragen</b> &ndash; es gibt weder einen Server im Hintergrund noch Cookies oder Tracking.
+       Der zuletzt bearbeitete Entwurf bleibt nur lokal im Browser gespeichert.</p>
     <p>Einzige Ausnahme: Die Schriftarten werden von <b>Google Fonts</b> nachgeladen. Der Browser
-       baut dafür eine Verbindung zu Google auf und übermittelt dabei die IP-Adresse.</p>
+       baut dafür eine Verbindung zu Google auf und &uuml;bermittelt dabei die IP-Adresse.</p>
 
-    <p class="legal-note">Rückmeldungen und Fehlerberichte gerne als Issue auf GitHub.</p>
+    <p class="dlg-note">R&uuml;ckmeldungen und Fehlerberichte gerne als Issue auf GitHub.</p>
   </div>
 
-  <div class="legal-foot">
-    <button type="button" class="chip" id="btn-legal-leave">Seite verlassen</button>
-    <button type="button" class="confirm" id="btn-legal-ok" autofocus>Verstanden</button>
+  <div class="dlg-foot">
+    <button type="button" class="btn" id="btn-legal-leave">Seite verlassen</button>
+    <button type="button" class="btn btn--primary" id="btn-legal-ok" autofocus>Verstanden</button>
   </div>
 </dialog>
 
+
 <script>
-  /* ---------- Motive ---------- */
+"use strict";
 
-  const GROUPS = [
-    {
-      id: "travel", label: "Reisen & Transport", items: [
-        { id: "suitcase", label: "Koffer" }, { id: "plane", label: "Flugzeug" },
-        { id: "paperplane", label: "Papierflieger" }, { id: "passport", label: "Reisepass" },
-        { id: "ticket", label: "Ticket" }, { id: "map", label: "Landkarte" },
-        { id: "pin", label: "Standort" }, { id: "sign", label: "Wegweiser" },
-        { id: "tag", label: "Kofferanhänger" }, { id: "balloon", label: "Heißluftballon" },
-        { id: "train", label: "Zug" }, { id: "bus", label: "Bus" },
-        { id: "car", label: "Auto" }, { id: "bicycle", label: "Fahrrad" },
-        { id: "ship", label: "Schiff" }, { id: "rocket", label: "Rakete" },
-        { id: "globe", label: "Weltkugel" }, { id: "compass", label: "Kompass" },
-        { id: "anchor", label: "Anker" }
-      ]
-    },
-    {
-      id: "beach", label: "Strand & Meer", items: [
-        { id: "palm", label: "Palme" }, { id: "flipflop", label: "Flip-Flop" },
-        { id: "starfish", label: "Seestern" }, { id: "shell", label: "Muschel" },
-        { id: "ball", label: "Wasserball" }, { id: "sunscreen", label: "Sonnencreme" },
-        { id: "cocktail", label: "Cocktail" }, { id: "sunglasses", label: "Sonnenbrille" },
-        { id: "pillow", label: "Nackenkissen" }, { id: "bottle", label: "Trinkflasche" },
-        { id: "seagull", label: "Möwe" },
-        { id: "fish", label: "Fisch" }, { id: "crab", label: "Krabbe" },
-        { id: "sandcastle", label: "Sandburg" }, { id: "beachumbrella", label: "Sonnenschirm" },
-        { id: "snorkel", label: "Taucherbrille" }, { id: "wave", label: "Welle" }
-      ]
-    },
-    {
-      id: "nature", label: "Natur & Wetter", items: [
-        { id: "sun", label: "Sonne" }, { id: "cloud", label: "Wolke" },
-        { id: "shootingstar", label: "Sternschnuppe" }, { id: "moon", label: "Mond" },
-        { id: "rainbow", label: "Regenbogen" }, { id: "snowflake", label: "Schneeflocke" },
-        { id: "mountain", label: "Berge" }, { id: "tree", label: "Baum" },
-        { id: "flower", label: "Blume" }, { id: "cactus", label: "Kaktus" },
-        { id: "mushroom", label: "Pilz" }, { id: "butterfly", label: "Schmetterling" },
-        { id: "ladybug", label: "Marienkäfer" }, { id: "bee", label: "Biene" }
-      ]
-    },
-    {
-      id: "food", label: "Essen & Trinken", items: [
-        { id: "icecream", label: "Eis" }, { id: "pizza", label: "Pizza" },
-        { id: "burger", label: "Burger" }, { id: "fries", label: "Pommes" },
-        { id: "donut", label: "Donut" }, { id: "cupcake", label: "Cupcake" },
-        { id: "popcorn", label: "Popcorn" }, { id: "watermelon", label: "Melone" },
-        { id: "pineapple", label: "Ananas" }, { id: "strawberry", label: "Erdbeere" }
-      ]
-    },
-    {
-      id: "fun", label: "Freizeit & Schule", items: [
-        { id: "camera", label: "Kamera" }, { id: "photo", label: "Foto" },
-        { id: "envelope", label: "Brief" }, { id: "heart", label: "Herz" },
-        { id: "backpack", label: "Rucksack" }, { id: "book", label: "Buch" },
-        { id: "pencil", label: "Bleistift" }, { id: "soccer", label: "Fußball" },
-        { id: "basketball", label: "Basketball" }, { id: "skateboard", label: "Skateboard" },
-        { id: "guitar", label: "Gitarre" }, { id: "headphones", label: "Kopfhörer" },
-        { id: "musicnote", label: "Musiknote" }, { id: "tent", label: "Zelt" },
-        { id: "campfire", label: "Lagerfeuer" }, { id: "crown", label: "Krone" },
-        { id: "smiley", label: "Smiley" }, { id: "robot", label: "Roboter" }
-      ]
-    },
-    {
-      id: "fill", label: "Füllmotive", role: "filler", items: [
-        { id: "dot", label: "Punkt" }, { id: "star", label: "Funkeln" },
-        { id: "drop", label: "Tropfen" }, { id: "leaflet", label: "Blatt" },
-        { id: "triangle", label: "Dreieck" }
-      ]
+/* =======================================================================
+   Namensschild
+
+   Eine einzige Quelle der Wahrheit: der Zustand unten. Vorschau, Druck und
+   Export werden alle daraus abgeleitet und benutzen dieselbe Geometrie in
+   Millimetern. Deshalb sieht der Ausdruck aus wie die Vorschau.
+   ======================================================================= */
+
+/* ---------- Motive ---------- */
+
+const GROUPS = [
+  {
+    id: "travel", label: "Reisen & Transport", items: [
+      { id: "suitcase", label: "Koffer" }, { id: "plane", label: "Flugzeug" },
+      { id: "paperplane", label: "Papierflieger" }, { id: "passport", label: "Reisepass" },
+      { id: "ticket", label: "Ticket" }, { id: "map", label: "Landkarte" },
+      { id: "pin", label: "Standort" }, { id: "sign", label: "Wegweiser" },
+      { id: "tag", label: "Kofferanhänger" }, { id: "balloon", label: "Heißluftballon" },
+      { id: "train", label: "Zug" }, { id: "bus", label: "Bus" },
+      { id: "car", label: "Auto" }, { id: "bicycle", label: "Fahrrad" },
+      { id: "ship", label: "Schiff" }, { id: "rocket", label: "Rakete" },
+      { id: "globe", label: "Weltkugel" }, { id: "compass", label: "Kompass" },
+      { id: "anchor", label: "Anker" }
+    ]
+  },
+  {
+    id: "beach", label: "Strand & Meer", items: [
+      { id: "palm", label: "Palme" }, { id: "flipflop", label: "Flip-Flop" },
+      { id: "starfish", label: "Seestern" }, { id: "shell", label: "Muschel" },
+      { id: "ball", label: "Wasserball" }, { id: "sunscreen", label: "Sonnencreme" },
+      { id: "cocktail", label: "Cocktail" }, { id: "sunglasses", label: "Sonnenbrille" },
+      { id: "pillow", label: "Nackenkissen" }, { id: "bottle", label: "Trinkflasche" },
+      { id: "seagull", label: "Möwe" }, { id: "fish", label: "Fisch" },
+      { id: "crab", label: "Krabbe" }, { id: "sandcastle", label: "Sandburg" },
+      { id: "beachumbrella", label: "Sonnenschirm" }, { id: "snorkel", label: "Taucherbrille" },
+      { id: "wave", label: "Welle" }
+    ]
+  },
+  {
+    id: "nature", label: "Natur & Wetter", items: [
+      { id: "sun", label: "Sonne" }, { id: "cloud", label: "Wolke" },
+      { id: "shootingstar", label: "Sternschnuppe" }, { id: "moon", label: "Mond" },
+      { id: "rainbow", label: "Regenbogen" }, { id: "snowflake", label: "Schneeflocke" },
+      { id: "mountain", label: "Berge" }, { id: "tree", label: "Baum" },
+      { id: "flower", label: "Blume" }, { id: "cactus", label: "Kaktus" },
+      { id: "mushroom", label: "Pilz" }, { id: "butterfly", label: "Schmetterling" },
+      { id: "ladybug", label: "Marienkäfer" }, { id: "bee", label: "Biene" }
+    ]
+  },
+  {
+    id: "food", label: "Essen & Trinken", items: [
+      { id: "icecream", label: "Eis" }, { id: "pizza", label: "Pizza" },
+      { id: "burger", label: "Burger" }, { id: "fries", label: "Pommes" },
+      { id: "donut", label: "Donut" }, { id: "cupcake", label: "Cupcake" },
+      { id: "popcorn", label: "Popcorn" }, { id: "watermelon", label: "Melone" },
+      { id: "pineapple", label: "Ananas" }, { id: "strawberry", label: "Erdbeere" }
+    ]
+  },
+  {
+    id: "fun", label: "Freizeit & Schule", items: [
+      { id: "camera", label: "Kamera" }, { id: "photo", label: "Foto" },
+      { id: "envelope", label: "Brief" }, { id: "heart", label: "Herz" },
+      { id: "backpack", label: "Rucksack" }, { id: "book", label: "Buch" },
+      { id: "pencil", label: "Bleistift" }, { id: "soccer", label: "Fußball" },
+      { id: "basketball", label: "Basketball" }, { id: "skateboard", label: "Skateboard" },
+      { id: "guitar", label: "Gitarre" }, { id: "headphones", label: "Kopfhörer" },
+      { id: "musicnote", label: "Musiknote" }, { id: "tent", label: "Zelt" },
+      { id: "campfire", label: "Lagerfeuer" }, { id: "crown", label: "Krone" },
+      { id: "smiley", label: "Smiley" }, { id: "robot", label: "Roboter" }
+    ]
+  },
+  {
+    id: "fill", label: "Füllmotive", role: "filler", items: [
+      { id: "dot", label: "Punkt" }, { id: "star", label: "Funkeln" },
+      { id: "drop", label: "Tropfen" }, { id: "leaflet", label: "Blatt" },
+      { id: "triangle", label: "Dreieck" }
+    ]
+  }
+];
+
+const ALL_ITEMS = GROUPS.flatMap((g) => g.items);
+const enabled = new Set(ALL_ITEMS.map((m) => m.id));
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const XLINK = "http://www.w3.org/1999/xlink";
+const MM_PER_INCH = 25.4;
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Streut Motive als Rahmen um das freie Mittelfeld.
+ * Grosse Motive zuerst, kleine fuellen die Luecken. Jede Position wird gegen
+ * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
+ * bleibt mindestens `gap` Millimeter Luft.
+ */
+function buildScene(svg, W, H, card, seed, motifScale, gap, edge, frameStyle, frameColor, lineWidth, iconIds, fillerIds, whole) {
+  const rnd = mulberry32(seed);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const root = document.createElementNS(SVG_NS, "g");
+  root.setAttribute("fill", "none");
+  root.setAttribute("stroke", "currentColor");
+  root.setAttribute("color", frameColor);
+  root.setAttribute("stroke-linecap", "round");
+  root.setAttribute("stroke-linejoin", "round");
+  svg.append(root);
+
+  // "whole": kein Ueberstand ueber die Blattkante - jedes Motiv ist ganz zu
+  // sehen. Sonst duerfen Motive am Rand angeschnitten werden.
+  const bleed = whole ? 0 : Math.max(3, -edge);
+  const edgePad = edge;
+  const pad = 1.6;
+  const placed = [];
+
+  const clearOfCard = (x, y, r) =>
+    x + r < card.x - pad || x - r > card.x + card.w + pad ||
+    y + r < card.y - pad || y - r > card.y + card.h + pad;
+
+  const free = (x, y, r) => {
+    if (y - r < 0) return false;
+    if (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad) return false;
+    if (whole && (x - r < 0 || x + r > W || y + r > H)) return false;
+    if (!clearOfCard(x, y, r)) return false;
+    for (let i = 0; i < placed.length; i++) {
+      const p = placed[i];
+      const dx = x - p.x;
+      const dy = y - p.y;
+      const min = p.r + r + gap;
+      if (dx * dx + dy * dy < min * min) return false;
     }
-  ];
+    return true;
+  };
 
-  const ALL_ITEMS = GROUPS.flatMap((g) => g.items);
-  const enabled = new Set(ALL_ITEMS.map((m) => m.id));
+  const place = (id, x, y, size, rot) => {
+    const s = size / 24;
+    const use = document.createElementNS(SVG_NS, "use");
+    use.setAttributeNS(XLINK, "xlink:href", "#d-" + id);
+    use.setAttribute("href", "#d-" + id);
+    use.setAttribute("transform",
+      `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
+      `scale(${s.toFixed(4)}) translate(-12 -12)`);
+    use.setAttribute("stroke-width", (0.42 * lineWidth / s).toFixed(2));
+    root.append(use);
+  };
 
-  const SVG_NS = "http://www.w3.org/2000/svg";
-  const XLINK = "http://www.w3.org/1999/xlink";
+  const passesByStyle = {
+    doodle: [
+      { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
+      { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
+      { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
+    ],
+    confetti: [
+      { ids: fillerIds, from: 2.8, to: 5.4, tries: 4200, turn: 70 }
+    ],
+    stars: [
+      { ids: fillerIds.filter((id) => ["star", "triangle", "dot"].includes(id)), from: 4, to: 8, tries: 3000, turn: 45 }
+    ],
+    minimal: [
+      { ids: iconIds, from: 9.4, to: 12.6, tries: 800, turn: 25 }
+    ]
+  };
+  const passes = passesByStyle[frameStyle] || passesByStyle.doodle;
 
-  function mulberry32(a) {
-    return function () {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
-
-  /**
-   * Streut Doodles als Rahmen um das freie Mittelfeld.
-   * Grosse Motive zuerst, kleine fuellen die Luecken. Jede Position wird gegen
-   * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
-   * bleibt mindestens `gap` Millimeter Luft.
-   */
-  function buildScene(svg, W, H, card, seed, motifScale, gap, edge, frameStyle, frameColor, lineWidth, iconIds, fillerIds, whole) {
-    const rnd = mulberry32(seed);
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-    const root = document.createElementNS(SVG_NS, "g");
-    root.setAttribute("fill", "none");
-    root.setAttribute("stroke", "currentColor");
-    root.setAttribute("color", frameColor);
-    root.setAttribute("stroke-linecap", "round");
-    root.setAttribute("stroke-linejoin", "round");
-    svg.append(root);
-
-    // "whole": kein Ueberstand ueber die Blattkante - jedes Motiv ist ganz zu sehen.
-    // Sonst duerfen Motive wie bisher am Rand angeschnitten werden.
-    const bleed = whole ? 0 : Math.max(3, -edge);
-    const edgePad = edge;
-    const pad = 1.6;
-    const placed = [];
-
-    const clearOfCard = (x, y, r) =>
-      x + r < card.x - pad || x - r > card.x + card.w + pad ||
-      y + r < card.y - pad || y - r > card.y + card.h + pad;
-
-    const free = (x, y, r) => {
-      if (y - r < 0) return false;
-      if (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad) return false;
-      if (whole && (x - r < 0 || x + r > W || y + r > H)) return false;
-      if (!clearOfCard(x, y, r)) return false;
-      for (let i = 0; i < placed.length; i++) {
-        const p = placed[i];
-        const dx = x - p.x;
-        const dy = y - p.y;
-        const min = p.r + r + gap;
-        if (dx * dx + dy * dy < min * min) return false;
-      }
-      return true;
-    };
-
-    const place = (id, x, y, size, rot) => {
-      const s = size / 24;
-      const use = document.createElementNS(SVG_NS, "use");
-      use.setAttributeNS(XLINK, "xlink:href", "#d-" + id);
-      use.setAttribute("href", "#d-" + id);
-      use.setAttribute("transform",
-        `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
-        `scale(${s.toFixed(4)}) translate(-12 -12)`);
-      use.setAttribute("stroke-width", (0.42 * lineWidth / s).toFixed(2));
-      root.append(use);
-    };
-
-    const passesByStyle = {
-      doodle: [
-        { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
-        { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
-        { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
-      ],
-      confetti: [
-        { ids: fillerIds, from: 2.8, to: 5.4, tries: 4200, turn: 70 }
-      ],
-      stars: [
-        { ids: fillerIds.filter((id) => ["star", "triangle", "dot"].includes(id)), from: 4, to: 8, tries: 3000, turn: 45 }
-      ],
-      minimal: [
-        { ids: iconIds, from: 9.4, to: 12.6, tries: 800, turn: 25 }
-      ]
-    };
-    const passes = passesByStyle[frameStyle] || passesByStyle.doodle;
-
-    for (const pass of passes) {
-      if (!pass.ids.length) continue;
-      for (let i = 0; i < pass.tries; i++) {
-        const size = (pass.from + rnd() * (pass.to - pass.from)) * motifScale;
-        const r = size * 0.5;
-        const x = -bleed + rnd() * (W + 2 * bleed);
-        const y = -bleed + rnd() * (H + 2 * bleed);
-        if (!free(x, y, r)) continue;
-        place(pass.ids[Math.floor(rnd() * pass.ids.length)], x, y, size, (rnd() - 0.5) * pass.turn);
-        placed.push({ x, y, r });
-      }
+  for (const pass of passes) {
+    if (!pass.ids.length) continue;
+    for (let i = 0; i < pass.tries; i++) {
+      const size = (pass.from + rnd() * (pass.to - pass.from)) * motifScale;
+      const r = size * 0.5;
+      const x = -bleed + rnd() * (W + 2 * bleed);
+      const y = -bleed + rnd() * (H + 2 * bleed);
+      if (!free(x, y, r)) continue;
+      place(pass.ids[Math.floor(rnd() * pass.ids.length)], x, y, size, (rnd() - 0.5) * pass.turn);
+      placed.push({ x, y, r });
     }
   }
+}
 
-  /* ---------- Schrift ---------- */
+/* ---------- Schrift & Farben ---------- */
 
-  const FONTS = [
-    { id: "archivo", label: "Plakativ (Archivo Black)",   css: "'Archivo Black', system-ui, sans-serif", weight: 400 },
-    { id: "bungee",  label: "Pop (Bungee)",               css: "'Bungee', system-ui, sans-serif",        weight: 400 },
-    { id: "baloo",   label: "Rund (Baloo 2)",             css: "'Baloo 2', system-ui, sans-serif",       weight: 800 },
-    { id: "work",    label: "Schlicht (Work Sans)",       css: "'Work Sans', system-ui, sans-serif",     weight: 600 },
-    { id: "hand",    label: "Handschrift (Patrick Hand)", css: "'Patrick Hand', cursive",                weight: 400 },
-    { id: "lora",    label: "Klassisch (Lora)",           css: "'Lora', Georgia, serif",                 weight: 700 }
-  ];
+const FONTS = [
+  { id: "archivo", label: "Plakativ (Archivo Black)",   css: "'Archivo Black', system-ui, sans-serif", weight: 400 },
+  { id: "bungee",  label: "Pop (Bungee)",               css: "'Bungee', system-ui, sans-serif",        weight: 400 },
+  { id: "baloo",   label: "Rund (Baloo 2)",             css: "'Baloo 2', system-ui, sans-serif",       weight: 800 },
+  { id: "work",    label: "Schlicht (Work Sans)",       css: "'Work Sans', system-ui, sans-serif",     weight: 600 },
+  { id: "hand",    label: "Handschrift (Patrick Hand)", css: "'Patrick Hand', cursive",                weight: 400 },
+  { id: "lora",    label: "Klassisch (Lora)",           css: "'Lora', Georgia, serif",                 weight: 700 }
+];
 
-  const COLORS = [
-    { label: "Schwarz", v: "#1a1a1a" },
-    { label: "Rot",     v: "#e8402a" },
-    { label: "Blau",    v: "#1f7ae0" },
-    { label: "Grün",    v: "#2fb457" },
-    { label: "Pink",    v: "#e5459b" },
-    { label: "Orange",  v: "#f58220" }
-  ];
+const COLORS = [
+  { label: "Schwarz", v: "#1a1a1a" },
+  { label: "Rot",     v: "#e8402a" },
+  { label: "Blau",    v: "#1f7ae0" },
+  { label: "Grün",    v: "#2fb457" },
+  { label: "Pink",    v: "#e5459b" },
+  { label: "Orange",  v: "#f58220" }
+];
 
-  /* ---------- Zustand ---------- */
+/* ---------- Zustand ----------
 
-  /* `w`/`h` ist das Blatt, `bw`/`bh` ein einzelnes Schild darauf.
-     Auf A4 liegen zwei Schilder auf einem Blatt: quer untereinander (Blatt hoch),
-     hoch nebeneinander (Blatt quer).
+   `w`/`h` ist das Blatt, `bw`/`bh` ein einzelnes Schild darauf. Auf A4 liegen
+   zwei Schilder auf einem Blatt: quer untereinander, hoch nebeneinander.
+   Gedruckt wird immer genau dieses Blatt - die Seitengroesse im Druckdialog
+   entspricht 1:1 den Massen hier.                                           */
 
-     `page` ist immer A4: das liegt in jedem Drucker. Ein A5-Blatt wird dort
-     mittig platziert und in Originalgroesse gedruckt - so muss der Druckdialog
-     nichts skalieren oder verschieben. */
-  const FORMATS = {
-    a5: {
-      landscape: { w: 210, h: 148, bw: 210,   bh: 148,   page: "A4 portrait",  dir: "column" },
-      portrait:  { w: 148, h: 210, bw: 148,   bh: 210,   page: "A4 portrait",  dir: "column" }
-    },
-    a4: {
-      landscape: { w: 210, h: 297, bw: 210,   bh: 148.5, page: "A4 portrait",  dir: "column" },
-      portrait:  { w: 297, h: 210, bw: 148.5, bh: 210,   page: "A4 landscape", dir: "row" }
-    }
-  };
+const FORMATS = {
+  a5: {
+    landscape: { w: 210, h: 148, bw: 210, bh: 148,   dir: "column", label: "A5 quer" },
+    portrait:  { w: 148, h: 210, bw: 148, bh: 210,   dir: "column", label: "A5 hoch" }
+  },
+  a4: {
+    landscape: { w: 210, h: 297, bw: 210,   bh: 148.5, dir: "column", label: "A4 hoch · 2 Schilder quer" },
+    portrait:  { w: 297, h: 210, bw: 148.5, bh: 210,   dir: "row",    label: "A4 quer · 2 Schilder hoch" }
+  }
+};
 
-  const sheetState = {
-    paper: "a5",
-    orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
-    frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
-    seed: 20260827
-  };
+const CARD_BORDER_MM = 0.9;
 
-  const DEFAULT_TEXT = {
-    front:  { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
-              align: "center", upper: true, shadow: false, max: 46, min: 3 },
-    back:   { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
-              align: "center", upper: false, shadow: false, max: 30, min: 3 },
-    front2: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a",
-              align: "center", upper: true, shadow: false, max: 46, min: 3 },
-    back2:  { font: "work", auto: true, size: 9, lh: 1.3, color: "#1a1a1a",
-              align: "center", upper: false, shadow: false, max: 30, min: 3 }
-  };
+const DEFAULT_SHEET = {
+  paper: "a5", orient: "landscape",
+  band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
+  frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
+  marks: true, cardFrame: true,
+  seed: 20260827
+};
 
-  const DEFAULT_VALUES = {
-    name: "Mia",  text: "Klasse 5b\nSchuljahr 2026/27",
-    name2: "Tom", text2: "Klasse 5b\nSchuljahr 2026/27"
-  };
+const sheetState = { ...DEFAULT_SHEET };
 
-  const TEXT_KEYS = ["front", "back", "front2", "back2"];
-  const text = structuredClone(DEFAULT_TEXT);
+const DEFAULT_TEXT = {
+  front:  { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
+  back:   { font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 },
+  front2: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
+  back2:  { font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 }
+};
 
-  let side = "front";
-  let cardIndex = 1;
+const DEFAULT_VALUES = {
+  name: "Mia",  text: "Klasse 5b\nSchuljahr 2026/27",
+  name2: "Tom", text2: "Klasse 5b\nSchuljahr 2026/27"
+};
 
-  // Welcher der vier Textbloecke gerade bearbeitet wird
-  const textKey = () => side + (cardIndex === 2 ? "2" : "");
-  const cur = () => text[textKey()];
+const TEXT_KEYS = ["front", "back", "front2", "back2"];
+const text = structuredClone(DEFAULT_TEXT);
 
-  const STORAGE_KEY = "namensschild-entwurf-v1";
-  const history = { undo: [], redo: [], applying: false };
+let side = "front";
+let cardIndex = 1;
 
-  const el = {
-    sheet: document.getElementById("sheet"),
-    fit: document.getElementById("sheet-fit"),
-    turnLeft: document.getElementById("btn-turn-left"),
-    turnRight: document.getElementById("btn-turn-right"),
-    lblTurn: document.getElementById("lbl-turn"),
-    pageRule: document.getElementById("page-rule"),
-    sceneFront: document.getElementById("scene-front"),
-    sceneBack: document.getElementById("scene-back"),
-    cardFront: document.getElementById("card-front"),
-    cardBack: document.getElementById("card-back"),
-    sceneFront2: document.getElementById("scene-front2"),
-    sceneBack2: document.getElementById("scene-back2"),
-    cardFront2: document.getElementById("card-front2"),
-    cardBack2: document.getElementById("card-back2"),
-    badge2: document.getElementById("badge-2"),
-    cut: document.getElementById("cut"),
-    segCard: document.getElementById("seg-card"),
-    band: document.getElementById("in-band"),
-    scale: document.getElementById("in-scale"),
-    gap: document.getElementById("in-gap"),
-    edge: document.getElementById("in-edge"),
-    style: document.getElementById("in-style"),
-    frameColor: document.getElementById("in-frame-color"),
-    line: document.getElementById("in-line"),
-    whole: document.getElementById("in-whole"),
-    lblBand: document.getElementById("lbl-band"),
-    lblScale: document.getElementById("lbl-scale"),
-    lblGap: document.getElementById("lbl-gap"),
-    lblEdge: document.getElementById("lbl-edge"),
-    lblLine: document.getElementById("lbl-line"),
-    lblCount: document.getElementById("lbl-count"),
-    acc: document.getElementById("acc"),
-    shuffle: document.getElementById("btn-shuffle"),
-    all: document.getElementById("btn-all"),
-    none: document.getElementById("btn-none"),
-    name: document.getElementById("in-name"),
-    text: document.getElementById("in-text"),
-    name2: document.getElementById("in-name2"),
-    text2: document.getElementById("in-text2"),
-    outName: document.getElementById("out-name"),
-    outText: document.getElementById("out-text"),
-    outName2: document.getElementById("out-name2"),
-    outText2: document.getElementById("out-text2"),
-    boxFront: document.getElementById("box-front"),
-    boxBack: document.getElementById("box-back"),
-    boxFront2: document.getElementById("box-front2"),
-    boxBack2: document.getElementById("box-back2"),
-    font: document.getElementById("in-font"),
-    size: document.getElementById("in-size"),
-    auto: document.getElementById("in-auto"),
-    lh: document.getElementById("in-lh"),
-    lblSize: document.getElementById("lbl-size"),
-    lblLh: document.getElementById("lbl-lh"),
-    swatches: document.getElementById("swatches"),
-    aligns: document.getElementById("aligns"),
-    upper: document.getElementById("tg-upper"),
-    shadow: document.getElementById("tg-shadow"),
-    warn: document.getElementById("warn"),
-    export: document.getElementById("btn-export"),
-    import: document.getElementById("btn-import"),
-    importFile: document.getElementById("file-import"),
-    reset: document.getElementById("btn-reset"),
-    undo: document.getElementById("btn-undo"),
-    redo: document.getElementById("btn-redo")
-  };
+const textKey = () => side + (cardIndex === 2 ? "2" : "");
+const cur = () => text[textKey()];
 
-  const parts = (key) => ({
-    front:  { span: el.outName,  box: el.boxFront,  src: el.name,  fallback: "" },
-    back:   { span: el.outText,  box: el.boxBack,   src: el.text,  fallback: "Text" },
-    front2: { span: el.outName2, box: el.boxFront2, src: el.name2, fallback: "" },
-    back2:  { span: el.outText2, box: el.boxBack2,  src: el.text2, fallback: "Text" }
-  }[key]);
+const STORAGE_KEY = "namensschild-entwurf-v2";
+const THEME_KEY = "namensschild-design";
+const LEGAL_KEY = "namensschild-hinweis-gelesen";
 
-  FONTS.forEach((f) => {
-    const opt = document.createElement("option");
-    opt.value = f.id;
-    opt.textContent = f.label;
-    opt.style.fontFamily = f.css;
-    el.font.append(opt);
+const $ = (id) => document.getElementById(id);
+
+const el = {
+  sheet: $("sheet"), fit: $("sheet-fit"), pageRule: $("page-rule"),
+  pillFormat: $("pill-format"), pillZoom: $("pill-zoom"),
+  brandSub: $("brand-sub"), hintSheet: $("hint-sheet"),
+  hintText: $("hint-text"), hintFrame: $("hint-frame"), hintMotifs: $("hint-motifs"),
+  lblSheetSize: $("lbl-sheetsize"),
+
+  sceneFront: $("scene-front"),  sceneBack: $("scene-back"),
+  sceneFront2: $("scene-front2"), sceneBack2: $("scene-back2"),
+  cardFront: $("card-front"),    cardBack: $("card-back"),
+  cardFront2: $("card-front2"),  cardBack2: $("card-back2"),
+  badge2: $("badge-2"), cut: $("cut"), fold1: $("fold-1"), fold2: $("fold-2"),
+  segCard: $("seg-card"),
+
+  band: $("in-band"), scale: $("in-scale"), gap: $("in-gap"), edge: $("in-edge"),
+  style: $("in-style"), frameColor: $("in-frame-color"), line: $("in-line"),
+  whole: $("in-whole"), marks: $("in-marks"), cardFrame: $("in-cardframe"),
+  lblBand: $("lbl-band"), lblScale: $("lbl-scale"), lblGap: $("lbl-gap"),
+  lblEdge: $("lbl-edge"), lblLine: $("lbl-line"), lblCount: $("lbl-count"),
+  acc: $("acc"), shuffle: $("btn-shuffle"), all: $("btn-all"), none: $("btn-none"),
+
+  name: $("in-name"), text: $("in-text"), name2: $("in-name2"), text2: $("in-text2"),
+  outName: $("out-name"), outText: $("out-text"),
+  outName2: $("out-name2"), outText2: $("out-text2"),
+  boxFront: $("box-front"), boxBack: $("box-back"),
+  boxFront2: $("box-front2"), boxBack2: $("box-back2"),
+
+  font: $("in-font"), size: $("in-size"), auto: $("in-auto"), lh: $("in-lh"),
+  lblSize: $("lbl-size"), lblLh: $("lbl-lh"),
+  swatches: $("swatches"), aligns: $("aligns"),
+  upper: $("tg-upper"), shadow: $("tg-shadow"), warn: $("warn"),
+
+  reset: $("btn-reset"), undo: $("btn-undo"), redo: $("btn-redo"),
+  toasts: $("toasts"),
+  dlgExport: $("dlg-export"), expDpi: $("exp-dpi"), expNote: $("exp-note"),
+  expRun: $("btn-export-run")
+};
+
+const parts = (key) => ({
+  front:  { span: el.outName,  box: el.boxFront,  src: el.name,  fallback: "Name" },
+  back:   { span: el.outText,  box: el.boxBack,   src: el.text,  fallback: "Text" },
+  front2: { span: el.outName2, box: el.boxFront2, src: el.name2, fallback: "Name" },
+  back2:  { span: el.outText2, box: el.boxBack2,  src: el.text2, fallback: "Text" }
+}[key]);
+
+/* ---------- Kleine Helfer ---------- */
+
+function toast(message, isError) {
+  const box = document.createElement("div");
+  box.className = "toast" + (isError ? " is-error" : "");
+  box.textContent = message;
+  el.toasts.append(box);
+  setTimeout(() => box.remove(), isError ? 6000 : 3400);
+}
+
+const nf = (v, digits) => v.toFixed(digits).replace(".", ",");
+
+/* ---------- Auswahllisten aufbauen ---------- */
+
+FONTS.forEach((f) => {
+  const opt = document.createElement("option");
+  opt.value = f.id;
+  opt.textContent = f.label;
+  opt.style.fontFamily = f.css;
+  el.font.append(opt);
+});
+
+COLORS.forEach((c) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "swatch";
+  b.style.background = c.v;
+  b.dataset.color = c.v;
+  b.title = c.label;
+  b.setAttribute("aria-label", c.label);
+  el.swatches.append(b);
+});
+
+GROUPS.forEach((g, i) => {
+  const box = document.createElement("details");
+  box.className = "group";
+  box.open = i === 0;
+
+  const sum = document.createElement("summary");
+  sum.innerHTML =
+    `<span class="group-name"><span class="caret"></span>${g.label}</span>` +
+    `<span class="group-count" data-count="${g.id}"></span>`;
+
+  const list = document.createElement("div");
+  list.className = "motif-list";
+  g.items.forEach((m) => {
+    const lab = document.createElement("label");
+    lab.className = "motif is-on";
+    lab.innerHTML =
+      `<input type="checkbox" checked data-id="${m.id}">` +
+      `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#d-${m.id}"></use></svg>` +
+      `<span>${m.label}</span>`;
+    list.append(lab);
   });
 
-  COLORS.forEach((c) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "swatch";
-    b.style.background = c.v;
-    b.dataset.color = c.v;
-    b.title = c.label;
-    b.setAttribute("aria-label", c.label);
-    el.swatches.append(b);
+  const row = document.createElement("div");
+  row.className = "btn-row";
+  row.innerHTML =
+    `<button type="button" class="chip mini" data-group="${g.id}" data-set="on">alle</button>` +
+    `<button type="button" class="chip mini" data-group="${g.id}" data-set="off">keine</button>`;
+
+  const body = document.createElement("div");
+  body.className = "group-body";
+  body.append(list, row);
+
+  box.append(sum, body);
+  el.acc.append(box);
+});
+
+function syncMotifs() {
+  el.acc.querySelectorAll(".motif input").forEach((box) => {
+    box.checked = enabled.has(box.dataset.id);
+    box.closest(".motif").classList.toggle("is-on", box.checked);
+  });
+  GROUPS.forEach((g) => {
+    const on = g.items.filter((m) => enabled.has(m.id)).length;
+    el.acc.querySelector(`[data-count="${g.id}"]`).textContent = on + " / " + g.items.length;
+  });
+  const label = enabled.size + " von " + ALL_ITEMS.length + " aktiv";
+  el.lblCount.textContent = label;
+  el.hintMotifs.textContent = label;
+}
+
+function setMotifs(items, on) {
+  items.forEach((m) => (on ? enabled.add(m.id) : enabled.delete(m.id)));
+  syncMotifs();
+  layout();
+}
+
+/* ---------- Geometrie ---------- */
+
+function geometry() {
+  const f = FORMATS[sheetState.paper][sheetState.orient];
+  const panelW = f.bw;
+  const panelH = f.bh / 2;
+  const bandX = Math.min(sheetState.band, panelW * 0.36);
+  const bandY = Math.min(Math.max(sheetState.band * (panelH / panelW) * 1.35, 7), panelH * 0.32);
+  return {
+    f, panelW, panelH,
+    card: { x: bandX, y: bandY, w: panelW - 2 * bandX, h: panelH - 2 * bandY }
+  };
+}
+
+/** Innenmasse des Textfelds in Millimetern - identisch fuer Vorschau und Export. */
+function textBox(g) {
+  const b = sheetState.cardFrame ? CARD_BORDER_MM : 0;
+  const padY = g.panelH * 0.024;
+  const padX = g.panelH * 0.03;
+  return {
+    border: b, padX, padY,
+    x: g.card.x + b + padX,
+    y: g.card.y + b + padY,
+    w: g.card.w - 2 * (b + padX),
+    h: g.card.h - 2 * (b + padY)
+  };
+}
+
+function layout() {
+  const g = geometry();
+  const f = g.f;
+  const twin = sheetState.paper === "a4";
+
+  el.sheet.style.setProperty("--sw", f.w + "mm");
+  el.sheet.style.setProperty("--sh", f.h + "mm");
+  el.sheet.style.setProperty("--frame-color", sheetState.frameColor);
+  el.sheet.style.setProperty("--frame-width", sheetState.cardFrame ? CARD_BORDER_MM + "mm" : "0");
+  el.sheet.dataset.dir = f.dir;
+
+  el.badge2.hidden = !twin;
+  el.cut.hidden = !twin || !sheetState.marks;
+  el.cut.classList.toggle("cut--v", f.dir === "row");
+  el.cut.classList.toggle("cut--h", f.dir !== "row");
+  el.fold1.hidden = !sheetState.marks;
+  el.fold2.hidden = !sheetState.marks;
+
+  // Der Druck bekommt exakt das gewaehlte Papier - kein A4-Zwang, kein Rand,
+  // keine zusaetzliche Schnittlinie. Vorschau und Ausdruck sind deckungsgleich.
+  // Die Seitenmasse und die Blattmasse kommen aus derselben Quelle; um die
+  // Seitenzahl kuemmert sich das Druck-CSS (das Blatt liegt ausserhalb des
+  // Flusses, deshalb kann es nie mehr als eine Seite werden).
+  el.pageRule.textContent =
+    `@page { size: ${f.w}mm ${f.h}mm; margin: 0; }\n` +
+    `@media print {\n` +
+    `  .sheet { width: ${f.w}mm !important; height: ${f.h}mm !important; }\n` +
+    `}`;
+
+  const pad = textBox(g);
+  [el.cardFront, el.cardBack, el.cardFront2, el.cardBack2].forEach((card) => {
+    card.style.left = (g.card.x / g.panelW * 100) + "%";
+    card.style.top = (g.card.y / g.panelH * 100) + "%";
+    card.style.width = (g.card.w / g.panelW * 100) + "%";
+    card.style.height = (g.card.h / g.panelH * 100) + "%";
+    card.style.padding = pad.padY.toFixed(3) + "mm " + pad.padX.toFixed(3) + "mm";
   });
 
-  /* ---------- Motiv-Akkordeon ---------- */
+  const pick = (filler) => GROUPS
+    .filter((grp) => (grp.role === "filler") === filler)
+    .flatMap((grp) => grp.items)
+    .filter((m) => enabled.has(m.id))
+    .map((m) => m.id);
 
-  GROUPS.forEach((g, i) => {
-    const box = document.createElement("details");
-    box.className = "group";
-    box.open = i === 0;
+  const iconIds = pick(false);
+  const fillerIds = pick(true);
+  const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
+    sheetState.motif, sheetState.gap, sheetState.edge, sheetState.frameStyle,
+    sheetState.frameColor, sheetState.lineWidth, iconIds, fillerIds, sheetState.whole);
 
-    const sum = document.createElement("summary");
-    sum.innerHTML =
-      `<span class="group-name"><span class="group-caret"></span>${g.label}</span>` +
-      `<span class="group-count" data-count="${g.id}"></span>`;
-
-    const list = document.createElement("div");
-    list.className = "motif-list";
-    g.items.forEach((m) => {
-      const lab = document.createElement("label");
-      lab.className = "motif is-on";
-      lab.innerHTML =
-        `<input type="checkbox" checked data-id="${m.id}">` +
-        `<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#d-${m.id}"></use></svg>` +
-        `<span>${m.label}</span>`;
-      list.append(lab);
-    });
-
-    const row = document.createElement("div");
-    row.className = "btn-row";
-    row.innerHTML =
-      `<button type="button" class="chip mini" data-group="${g.id}" data-set="on">alle</button>` +
-      `<button type="button" class="chip mini" data-group="${g.id}" data-set="off">keine</button>`;
-
-    const body = document.createElement("div");
-    body.className = "group-body";
-    body.append(list, row);
-
-    box.append(sum, body);
-    el.acc.append(box);
-  });
-
-  function syncMotifs() {
-    el.acc.querySelectorAll(".motif input").forEach((box) => {
-      box.checked = enabled.has(box.dataset.id);
-      box.closest(".motif").classList.toggle("is-on", box.checked);
-    });
-    GROUPS.forEach((g) => {
-      const on = g.items.filter((m) => enabled.has(m.id)).length;
-      el.acc.querySelector(`[data-count="${g.id}"]`).textContent = on + " / " + g.items.length;
-    });
-    el.lblCount.textContent = enabled.size + " von " + ALL_ITEMS.length + " aktiv";
+  draw(el.sceneFront, sheetState.seed);
+  draw(el.sceneBack, sheetState.seed + 977);
+  if (twin) {
+    draw(el.sceneFront2, sheetState.seed + 3319);
+    draw(el.sceneBack2, sheetState.seed + 4507);
   }
 
-  function setMotifs(items, on) {
-    items.forEach((m) => (on ? enabled.add(m.id) : enabled.delete(m.id)));
-    syncMotifs();
-    layout();
-  }
+  el.lblBand.textContent = sheetState.band + " mm";
+  el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
+  el.lblGap.textContent = nf(sheetState.gap, 1) + " mm";
+  el.lblEdge.textContent = sheetState.edge === 0
+    ? "Kante"
+    : (sheetState.edge > 0 ? "+" : "") + nf(sheetState.edge, 1) + " mm";
+  el.lblLine.textContent = nf(sheetState.lineWidth, 1) + "×";
 
-  el.acc.addEventListener("change", (e) => {
-    const box = e.target.closest("input[data-id]");
-    if (!box) return;
-    if (box.checked) enabled.add(box.dataset.id);
-    else enabled.delete(box.dataset.id);
-    syncMotifs();
-    layout();
-  });
+  el.pillFormat.textContent = f.w + " × " + f.h + " mm";
+  el.brandSub.textContent = f.label;
+  el.hintSheet.textContent = f.label;
+  // Das Blatt kann anders herum liegen als das einzelne Schild - beides zeigen.
+  el.lblSheetSize.textContent = "Blatt " + f.w + " × " + f.h + " mm";
+  el.hintFrame.textContent = el.style.selectedOptions[0] ? el.style.selectedOptions[0].textContent : "";
+}
 
-  el.acc.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-group]");
-    if (!btn) return;
-    const g = GROUPS.find((x) => x.id === btn.dataset.group);
-    setMotifs(g.items, btn.dataset.set === "on");
-  });
+/* ---------- Vorschau einpassen ---------- */
 
-  el.all.addEventListener("click", () => setMotifs(ALL_ITEMS, true));
-  el.none.addEventListener("click", () => setMotifs(ALL_ITEMS, false));
+let lastFitWidth = -1;
 
-  /* ---------- Geometrie ---------- */
+function fitSheet(force) {
+  const avail = el.fit.clientWidth;
+  if (!avail) return;
+  if (!force && avail === lastFitWidth) return;
+  lastFitWidth = avail;
 
-  function geometry() {
-    const f = FORMATS[sheetState.paper][sheetState.orient];
-    const panelW = f.bw;
-    const panelH = f.bh / 2;
-    const bandX = Math.min(sheetState.band, panelW * 0.36);
-    const bandY = Math.min(
-      Math.max(sheetState.band * (panelH / panelW) * 1.35, 7),
-      panelH * 0.32
-    );
-    return {
-      f, panelW, panelH,
-      card: { x: bandX, y: bandY, w: panelW - 2 * bandX, h: panelH - 2 * bandY }
-    };
-  }
+  // Echte Blattmasse in px - transform zaehlt hier nicht mit.
+  const w = el.sheet.offsetWidth;
+  const h = el.sheet.offsetHeight;
+  if (!w || !h) return;
 
-  function layout() {
-    const g = geometry();
-    const twin = sheetState.paper === "a4";
+  // Auf grossen Bildschirmen soll neben dem Blatt noch etwas Platz bleiben.
+  const roomy = window.innerWidth > 1100;
+  const maxH = Math.max(280, window.innerHeight - (roomy ? 230 : 170));
+  const k = Math.min(avail / w, maxH / h);
 
-    el.sheet.style.setProperty("--sw", g.f.w + "mm");
-    el.sheet.style.setProperty("--sh", g.f.h + "mm");
-    el.sheet.dataset.dir = g.f.dir;
+  el.sheet.style.transform = "translateX(-50%) scale(" + k + ")";
+  el.fit.style.height = (h * k) + "px";
+  el.pillZoom.textContent = Math.round(k * 100) + " %";
+}
 
-    el.badge2.hidden = !twin;
-    el.cut.hidden = !twin;
-    el.cut.classList.toggle("cut--v", g.f.dir === "row");
-    el.cut.classList.toggle("cut--h", g.f.dir !== "row");
-    el.pageRule.textContent = `@page { size: ${g.f.page}; margin: 0; }`;
+if (window.ResizeObserver) {
+  new ResizeObserver((entries) => {
+    // Nur auf Breitenaenderungen reagieren, sonst schaukelt sich die
+    // gesetzte Hoehe mit dem Beobachter auf.
+    if (Math.abs(entries[0].contentRect.width - lastFitWidth) > 0.5) fitSheet(false);
+  }).observe(el.fit);
+}
 
-    // Nur auf A5 bleibt Rand auf der A4-Seite frei - dort zeigt eine
-    // gestrichelte Linie im Ausdruck, wo geschnitten wird.
-    el.sheet.classList.toggle("sheet--trim", !twin);
+/* ---------- Text ---------- */
 
-    // Abstand vom Text zum Rahmen: waagerecht wie senkrecht gleich viel,
-    // gerechnet aus der Panelhoehe und in Millimetern gesetzt.
-    const padY = (g.panelH * 0.024).toFixed(2) + "mm";
-    const padX = (g.panelH * 0.03).toFixed(2) + "mm";
+function overflows(span, box) {
+  return span.scrollHeight > box.clientHeight + 1 || span.scrollWidth > box.clientWidth + 1;
+}
 
-    [el.cardFront, el.cardBack, el.cardFront2, el.cardBack2].forEach((card) => {
-      card.style.left = (g.card.x / g.panelW * 100) + "%";
-      card.style.top = (g.card.y / g.panelH * 100) + "%";
-      card.style.width = (g.card.w / g.panelW * 100) + "%";
-      card.style.height = (g.card.h / g.panelH * 100) + "%";
-      card.style.padding = padY + " " + padX;
-    });
+function applyText(key) {
+  const s = text[key];
+  const p = parts(key);
 
-    const pick = (filler) => GROUPS
-      .filter((g) => (g.role === "filler") === filler)
-      .flatMap((g) => g.items)
-      .filter((m) => enabled.has(m.id))
-      .map((m) => m.id);
+  // Auf A5 ist das zweite Schild ausgeblendet - dann gibt es nichts zu messen.
+  if (!p.box.clientHeight) return false;
 
-    const iconIds = pick(false);
-    const fillerIds = pick(true);
-    const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
-      sheetState.motif, sheetState.gap, sheetState.edge, sheetState.frameStyle,
-      sheetState.frameColor, sheetState.lineWidth, iconIds, fillerIds, sheetState.whole);
+  // `size` ist ein Prozentwert der Panelhoehe, gesetzt wird er in Millimetern:
+  // Container-Einheiten loest nicht jeder Browser beim Drucken gleich auf.
+  const panelH = geometry().panelH;
+  const mm = (v) => (v * panelH / 100).toFixed(3) + "mm";
 
-    draw(el.sceneFront, sheetState.seed);
-    draw(el.sceneBack, sheetState.seed + 977);
-    if (twin) {
-      draw(el.sceneFront2, sheetState.seed + 3319);
-      draw(el.sceneBack2, sheetState.seed + 4507);
-    }
+  const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
 
-    el.lblBand.textContent = sheetState.band + " ";
-    el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
-    el.lblGap.textContent = sheetState.gap.toFixed(1).replace(".", ",") + " mm";
-    el.lblEdge.textContent = sheetState.edge === 0
-      ? "Kante"
-      : (sheetState.edge > 0 ? "+" : "") + sheetState.edge.toFixed(1).replace(".", ",") + " mm";
-    el.lblLine.textContent = sheetState.lineWidth.toFixed(1).replace(".", ",") + "x";
-    el.sheet.style.setProperty("--frame-color", sheetState.frameColor);
-    saveDraft();
-  }
+  p.span.textContent = p.src.value.trim() ? p.src.value : p.fallback;
+  p.span.style.fontFamily = font.css;
+  p.span.style.fontWeight = font.weight;
+  p.span.style.color = s.color;
+  p.span.style.lineHeight = s.lh;
+  p.span.style.textAlign = s.align;
+  p.span.style.textTransform = s.upper ? "uppercase" : "none";
+  p.span.style.textShadow = s.shadow ? "0.55mm 0.75mm 0 " + shadowInk(s.color) : "none";
+  p.box.style.justifyContent =
+    s.align === "left" ? "flex-start" : s.align === "right" ? "flex-end" : "center";
 
-  /* ---------- Vorschau auf die verfuegbare Breite skalieren ---------- */
-
-  let lastFitWidth = -1;
-  let previewTurn = 0;   // reine Ansichtssache: 0, 90, 180 oder 270 Grad
-
-  function fitSheet(force) {
-    const avail = el.fit.clientWidth;
-    if (!avail) return;
-    if (!force && avail === lastFitWidth) return;
-    lastFitWidth = avail;
-
-    // echte Blattmasse in px (transform zaehlt hier nicht mit)
-    const w = el.sheet.offsetWidth;
-    const h = el.sheet.offsetHeight;
-    if (!w) return;
-
-    // Quer gedreht tauschen Breite und Hoehe die Rollen
-    const turned = previewTurn % 180 !== 0;
-    const k = avail / (turned ? h : w);
-
-    el.sheet.style.transform =
-      "rotate(" + previewTurn + "deg) scale(" + k + ")";
-    el.fit.style.height = ((turned ? w : h) * k) + "px";
-  }
-
-  function turnPreview(delta) {
-    previewTurn = (previewTurn + delta + 360) % 360;
-    el.lblTurn.textContent = previewTurn + "°";
-    fitSheet(true);
-  }
-
-  if (window.ResizeObserver) {
-    new ResizeObserver(() => fitSheet(false)).observe(el.fit);
-  }
-
-  /* ---------- Text ---------- */
-
-  function overflows(span, box) {
-    return span.scrollHeight > box.clientHeight + 1 || span.scrollWidth > box.clientWidth + 1;
-  }
-
-  function applyText(key) {
-    const s = text[key];
-    const p = parts(key);
-
-    // Auf A5 ist das zweite Schild ausgeblendet - dann gibt es nichts zu messen.
-    if (!p.box.clientHeight) return false;
-
-    // `size` ist ein Prozentwert der Panelhoehe, gesetzt wird er aber in
-    // Millimetern: Container-Einheiten (cqh) loest nicht jeder Browser beim
-    // Drucken gleich auf, Millimeter schon.
-    const mm = (v) => (v * geometry().panelH / 100).toFixed(3) + "mm";
-
-    const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
-
-    p.span.textContent = p.src.value.trim() ? p.src.value : p.fallback;
-    p.span.style.fontFamily = font.css;
-    p.span.style.fontWeight = font.weight;
-    p.span.style.color = s.color;
-    p.span.style.lineHeight = s.lh;
-    p.span.style.textAlign = s.align;
-    p.span.style.textTransform = s.upper ? "uppercase" : "none";
-    p.span.style.textShadow = s.shadow
-      ? "0.55mm 0.75mm 0 " + (s.color === "#1a1a1a" ? "#f5c518" : "#1a1a1a")
-      : "none";
-    p.box.style.justifyContent =
-      s.align === "left" ? "flex-start" : s.align === "right" ? "flex-end" : "center";
-
-    if (s.auto) {
-      let v = s.max;
+  if (s.auto) {
+    let v = s.max;
+    p.span.style.fontSize = mm(v);
+    while (v > s.min && overflows(p.span, p.box)) {
+      v -= 0.4;
       p.span.style.fontSize = mm(v);
-      while (v > s.min && overflows(p.span, p.box)) {
-        v -= 0.4;
-        p.span.style.fontSize = mm(v);
-      }
-      s.size = Math.round(v * 5) / 5;
-    } else {
-      p.span.style.fontSize = mm(s.size);
     }
+    // Gerundet merken und genauso setzen, damit Vorschau und Export
+    // dieselbe Schriftgroesse benutzen.
+    s.size = Math.round(v * 5) / 5;
+  }
+  p.span.style.fontSize = mm(s.size);
 
-    return overflows(p.span, p.box);
+  return overflows(p.span, p.box);
+}
+
+const shadowInk = (color) => (color === "#1a1a1a" ? "#f5c518" : "#1a1a1a");
+
+function syncControls() {
+  const s = cur();
+  const panelH = geometry().panelH;
+
+  document.querySelectorAll("[data-paper]").forEach((b) =>
+    b.classList.toggle("is-on", b.dataset.paper === sheetState.paper));
+  document.querySelectorAll("[data-orient]").forEach((b) =>
+    b.classList.toggle("is-on", b.dataset.orient === sheetState.orient));
+
+  el.font.value = s.font;
+  el.auto.checked = s.auto;
+  el.size.value = s.size;
+  el.lh.value = s.lh;
+  el.band.value = sheetState.band;
+  el.scale.value = Math.round(sheetState.motif * 100);
+  el.gap.value = sheetState.gap;
+  el.edge.value = sheetState.edge;
+  el.style.value = sheetState.frameStyle;
+  el.frameColor.value = sheetState.frameColor;
+  if (!el.frameColor.value) el.frameColor.value = "#1a1a1a";
+  el.line.value = sheetState.lineWidth;
+  el.edge.disabled = sheetState.whole;
+  el.whole.checked = sheetState.whole;
+  el.marks.checked = sheetState.marks;
+  el.cardFrame.checked = sheetState.cardFrame;
+
+  el.lblSize.textContent = nf(s.size * panelH / 100, 1) + " mm" + (s.auto ? " (auto)" : "");
+  el.lblLh.textContent = nf(s.lh, 2);
+
+  el.swatches.querySelectorAll(".swatch").forEach((b) =>
+    b.classList.toggle("is-on", b.dataset.color === s.color));
+  el.aligns.querySelectorAll(".chip").forEach((b) =>
+    b.classList.toggle("is-on", b.dataset.align === s.align));
+
+  el.upper.classList.toggle("is-on", s.upper);
+  el.upper.setAttribute("aria-pressed", String(s.upper));
+  el.shadow.classList.toggle("is-on", s.shadow);
+  el.shadow.setAttribute("aria-pressed", String(s.shadow));
+
+  syncSideFields();
+}
+
+function syncSideFields() {
+  const twin = sheetState.paper === "a4";
+  if (!twin) cardIndex = 1;
+  el.segCard.hidden = !twin;
+
+  document.querySelectorAll("[data-only]").forEach((field) => {
+    const visible = field.dataset.only === side && Number(field.dataset.card || 1) === cardIndex;
+    field.hidden = !visible;
+  });
+
+  document.querySelectorAll("[data-side]").forEach((button) => {
+    const selected = button.dataset.side === side;
+    button.classList.toggle("is-on", selected);
+    button.setAttribute("aria-selected", String(selected));
+  });
+
+  document.querySelectorAll("[data-card-tab]").forEach((button) => {
+    const selected = Number(button.dataset.cardTab) === cardIndex;
+    button.classList.toggle("is-on", selected);
+    button.setAttribute("aria-selected", String(selected));
+  });
+
+  el.hintText.textContent =
+    (twin ? "Schild " + cardIndex + " · " : "") +
+    (side === "front" ? "Vorderseite" : "Rückseite");
+}
+
+function renderText() {
+  const over = {};
+  TEXT_KEYS.forEach((key) => { over[key] = applyText(key); });
+  el.warn.hidden = !(over[textKey()] && !cur().auto);
+  syncControls();
+  saveDraft();
+}
+
+function renderAll() {
+  layout();
+  fitSheet(true);
+  renderText();
+}
+
+/* ---------- Entwurf & Historie ---------- */
+
+const edits = { undo: [], redo: [], applying: false };
+let baseline = null;
+let commitTimer = 0;
+
+function projectData() {
+  return {
+    version: 2,
+    sheetState: { ...sheetState },
+    text: structuredClone(text),
+    values: {
+      name: el.name.value, text: el.text.value,
+      name2: el.name2.value, text2: el.text2.value
+    },
+    enabled: [...enabled],
+    side, cardIndex
+  };
+}
+
+/**
+ * Uebernimmt ein Projekt (Entwurf oder Schritt aus der Historie). Fehlende
+ * Angaben aelterer Entwuerfe werden auf sinnvolle Werte gesetzt.
+ */
+function applyProject(project) {
+  Object.assign(sheetState, DEFAULT_SHEET, project.sheetState);
+  sheetState.paper = sheetState.paper === "a4" ? "a4" : "a5";
+  sheetState.orient = sheetState.orient === "portrait" ? "portrait" : "landscape";
+  if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
+  if (sheetState.whole) sheetState.edge = 0;
+  if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
+  if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
+  if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
+  sheetState.marks = sheetState.marks !== false;
+  sheetState.cardFrame = sheetState.cardFrame !== false;
+
+  TEXT_KEYS.forEach((key) => {
+    if (project.text && project.text[key]) Object.assign(text[key], project.text[key]);
+    // Die Groessengrenzen sind Programmvorgaben, keine Projekteinstellung.
+    text[key].max = DEFAULT_TEXT[key].max;
+    text[key].min = DEFAULT_TEXT[key].min;
+    text[key].size = Number.isFinite(text[key].size)
+      ? Math.min(Math.max(text[key].size, Number(el.size.min)), Number(el.size.max))
+      : DEFAULT_TEXT[key].size;
+  });
+
+  const values = project.values;
+  if (values) {
+    el.name.value = values.name || "";
+    el.text.value = values.text || "";
+    if ("name2" in values) el.name2.value = values.name2 || "";
+    if ("text2" in values) el.text2.value = values.text2 || "";
   }
 
-  function syncControls() {
-    const s = cur();
-    const panelH = geometry().panelH;
-
-    document.querySelectorAll("[data-paper]").forEach((b) =>
-      b.classList.toggle("is-on", b.dataset.paper === sheetState.paper));
-    document.querySelectorAll("[data-orient]").forEach((b) =>
-      b.classList.toggle("is-on", b.dataset.orient === sheetState.orient));
-
-    el.font.value = s.font;
-    el.auto.checked = s.auto;
-    el.size.value = s.size;
-    el.lh.value = s.lh;
-    el.band.value = sheetState.band;
-    el.scale.value = Math.round(sheetState.motif * 100);
-    el.gap.value = sheetState.gap;
-    el.edge.value = sheetState.edge;
-    el.style.value = sheetState.frameStyle;
-    el.frameColor.value = sheetState.frameColor;
-    if (el.frameColor.value !== sheetState.frameColor) {
-      el.frameColor.value = "#1a1a1a";
-    }
-    el.line.value = sheetState.lineWidth;
-    el.edge.disabled = sheetState.whole;
-    el.whole.checked = sheetState.whole;
-
-    el.lblSize.textContent = (s.size * panelH / 100).toFixed(1).replace(".", ",") + " mm"
-      + (s.auto ? " (auto)" : "");
-    el.lblLh.textContent = s.lh.toFixed(2).replace(".", ",");
-
-    el.swatches.querySelectorAll(".swatch").forEach((b) =>
-      b.classList.toggle("is-on", b.dataset.color === s.color));
-    el.aligns.querySelectorAll(".chip").forEach((b) =>
-      b.classList.toggle("is-on", b.dataset.align === s.align));
-
-    el.upper.classList.toggle("is-on", s.upper);
-    el.upper.setAttribute("aria-pressed", String(s.upper));
-    el.shadow.classList.toggle("is-on", s.shadow);
-    el.shadow.setAttribute("aria-pressed", String(s.shadow));
-
-    syncSideFields();
-  }
-
-  function syncSideFields() {
-    const twin = sheetState.paper === "a4";
-    if (!twin) cardIndex = 1;
-    el.segCard.hidden = !twin;
-
-    document.querySelectorAll("[data-only]").forEach((field) => {
-      const visible = field.dataset.only === side
-        && Number(field.dataset.card || 1) === cardIndex;
-      field.hidden = !visible;
-      field.setAttribute("aria-hidden", String(!visible));
-    });
-
-    document.querySelectorAll("[data-side]").forEach((button) => {
-      const selected = button.dataset.side === side;
-      button.classList.toggle("is-on", selected);
-      button.setAttribute("aria-selected", String(selected));
-    });
-
-    document.querySelectorAll("[data-card-tab]").forEach((button) => {
-      const selected = Number(button.dataset.cardTab) === cardIndex;
-      button.classList.toggle("is-on", selected);
-      button.setAttribute("aria-selected", String(selected));
-    });
-  }
-
-  function renderText() {
-    const over = {};
-    TEXT_KEYS.forEach((key) => { over[key] = applyText(key); });
-    el.warn.hidden = !(over[textKey()] && !cur().auto);
-    syncControls();
-    saveDraft();
-  }
-
-  function renderAll() {
-    layout();
-    fitSheet(true);
-    renderText();
-  }
-
-  function projectData() {
-    return {
-      version: 1,
-      sheetState: { ...sheetState },
-      text: structuredClone(text),
-      values: {
-        name: el.name.value, text: el.text.value,
-        name2: el.name2.value, text2: el.text2.value
-      },
-      enabled: [...enabled],
-      side,
-      cardIndex,
-      previewTurn
-    };
-  }
-
-  /**
-   * Uebernimmt ein Projekt (Entwurf, Import oder Schritt aus der Historie).
-   * Aeltere Dateien kennen weder A4 noch das zweite Schild - fehlende Angaben
-   * werden hier auf sinnvolle Werte gesetzt.
-   */
-  function applyProject(project) {
-    Object.assign(sheetState, project.sheetState);
-    sheetState.paper = sheetState.paper === "a4" ? "a4" : "a5";
-    sheetState.orient = sheetState.orient === "portrait" ? "portrait" : "landscape";
-    if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
-    if (sheetState.whole) sheetState.edge = 0;
-    if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
-    if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
-    if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
-
-    TEXT_KEYS.forEach((key) => {
-      if (project.text && project.text[key]) Object.assign(text[key], project.text[key]);
-
-      // Die Groessengrenzen sind Programmvorgaben und keine Projekteinstellung:
-      // aeltere Dateien wuerden sonst die alte, niedrigere Obergrenze mitbringen.
-      text[key].max = DEFAULT_TEXT[key].max;
-      text[key].min = DEFAULT_TEXT[key].min;
-      text[key].size = Number.isFinite(text[key].size)
-        ? Math.min(Math.max(text[key].size, Number(el.size.min)), Number(el.size.max))
-        : DEFAULT_TEXT[key].size;
-    });
-
-    const values = project.values;
-    if (values) {
-      el.name.value = values.name || "";
-      el.text.value = values.text || "";
-      if ("name2" in values) el.name2.value = values.name2 || "";
-      if ("text2" in values) el.text2.value = values.text2 || "";
-    }
-
+  if (Array.isArray(project.enabled)) {
     enabled.clear();
-    (project.enabled || []).forEach((id) => {
+    project.enabled.forEach((id) => {
       if (ALL_ITEMS.some((item) => item.id === id)) enabled.add(id);
     });
-
-    side = project.side === "back" ? "back" : "front";
-    cardIndex = (project.cardIndex === 2 && sheetState.paper === "a4") ? 2 : 1;
-    previewTurn = [0, 90, 180, 270].includes(project.previewTurn) ? project.previewTurn : 0;
-    el.lblTurn.textContent = previewTurn + "°";
   }
 
-  function updateHistoryButtons() {
-    el.undo.disabled = history.undo.length === 0;
-    el.redo.disabled = history.redo.length === 0;
-  }
+  side = project.side === "back" ? "back" : "front";
+  cardIndex = (project.cardIndex === 2 && sheetState.paper === "a4") ? 2 : 1;
+}
 
-  function rememberHistory() {
-    if (history.applying) return;
-    history.undo.push(projectData());
-    if (history.undo.length > 40) history.undo.shift();
-    history.redo.length = 0;
-    updateHistoryButtons();
-  }
+function updateHistoryButtons() {
+  el.undo.disabled = edits.undo.length === 0;
+  el.redo.disabled = edits.redo.length === 0;
+}
 
-  function moveHistory(direction) {
-    const source = direction === "undo" ? history.undo : history.redo;
-    const target = direction === "undo" ? history.redo : history.undo;
-    if (!source.length) return;
-    target.push(projectData());
-    history.applying = true;
-    applyProject(source.pop());
-    syncMotifs();
-    renderAll();
-    history.applying = false;
-    updateHistoryButtons();
-  }
+function snapshot() { baseline = projectData(); }
 
-  function saveDraft() {
+function commit() {
+  if (edits.applying || !baseline) return;
+  const next = projectData();
+  if (JSON.stringify(next) === JSON.stringify(baseline)) return;
+  edits.undo.push(baseline);
+  if (edits.undo.length > 60) edits.undo.shift();
+  edits.redo.length = 0;
+  baseline = next;
+  updateHistoryButtons();
+}
+
+function commitSoon() {
+  if (edits.applying) return;
+  clearTimeout(commitTimer);
+  commitTimer = setTimeout(commit, 550);
+}
+
+function moveHistory(direction) {
+  clearTimeout(commitTimer);
+  commit();
+  const source = direction === "undo" ? edits.undo : edits.redo;
+  const target = direction === "undo" ? edits.redo : edits.undo;
+  if (!source.length) return;
+  target.push(projectData());
+  edits.applying = true;
+  applyProject(source.pop());
+  syncMotifs();
+  renderAll();
+  edits.applying = false;
+  snapshot();
+  updateHistoryButtons();
+}
+
+let saveTimer = 0;
+function saveDraft() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(projectData()));
     } catch (error) {
-      // Local storage can be disabled by the browser.
+      // Der Browser kann lokalen Speicher abschalten - das ist kein Fehler.
     }
-  }
+  }, 400);
+}
 
-  function exportProject() {
-    const project = projectData();
-    const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    const exportName = el.name.value.trim()
-      .replace(/\s+/g, "-")
-      .replace(/[<>:"/\\|?*]/g, "");
-    link.download = (exportName ? "namensschild-" + exportName : "namensschild-projekt") + ".json";
-    link.click();
-    URL.revokeObjectURL(url);
-  }
+/* =======================================================================
+   Export als PNG oder PDF
 
-  async function importProject(file) {
-    try {
-      const project = JSON.parse(await file.text());
-      if (!project || project.version !== 1 || !project.sheetState || !project.text || !Array.isArray(project.enabled)) {
-        throw new Error("Dieses Format wird nicht unterstützt.");
-      }
+   Gezeichnet wird dasselbe Blatt wie in der Vorschau: gleiche Geometrie in
+   Millimetern, gleiche Motive, gleiche Schrift, gleicher Zeilenumbruch.
+   Das Ergebnis ist randlos und exakt so gross wie das gewaehlte Papier.
+   ======================================================================= */
 
-      rememberHistory();
-      applyProject(project);
-      syncMotifs();
-      renderAll();
-    } catch (error) {
-      window.alert("Die Datei konnte nicht geladen werden: " + error.message);
-    } finally {
-      el.importFile.value = "";
+/** Baut aus einer Motivflaeche ein eigenstaendiges SVG mit eingebetteten Formen. */
+function sceneToDataUrl(svg, wPx, hPx) {
+  const ids = new Set();
+  svg.querySelectorAll("use").forEach((u) => {
+    const href = u.getAttribute("href") || u.getAttributeNS(XLINK, "href") || "";
+    if (href.startsWith("#")) ids.add(href.slice(1));
+  });
+
+  let defs = "";
+  ids.forEach((id) => {
+    const node = document.getElementById(id);
+    if (node) defs += node.outerHTML;
+  });
+
+  const markup =
+    `<svg xmlns="${SVG_NS}" xmlns:xlink="${XLINK}" width="${wPx}" height="${hPx}" ` +
+    `viewBox="${svg.getAttribute("viewBox")}"><defs>${defs}</defs>${svg.innerHTML}</svg>`;
+
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(markup);
+}
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Motive konnten nicht gezeichnet werden."));
+    img.src = url;
+  });
+}
+
+/** Liest die Zeilen so aus, wie der Browser sie tatsaechlich umbrochen hat. */
+function domLines(span) {
+  const node = span.firstChild;
+  if (!node || node.nodeType !== Node.TEXT_NODE) return [];
+  const raw = node.textContent;
+  if (!raw) return [];
+
+  const range = document.createRange();
+  const out = [];
+  let line = "";
+  let lastTop = null;
+
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (ch === "\n") { out.push(line); line = ""; lastTop = null; continue; }
+    range.setStart(node, i);
+    range.setEnd(node, i + 1);
+    const rect = range.getClientRects()[0];
+    if (rect) {
+      const top = Math.round(rect.top * 20) / 20;
+      if (lastTop !== null && Math.abs(top - lastTop) > 0.6) { out.push(line); line = ""; }
+      lastTop = top;
     }
+    line += ch;
+  }
+  out.push(line);
+  return out.map((l) => l.replace(/\s+$/, ""));
+}
+
+function drawCard(ctx, s, g, key) {
+  const c = g.card;
+  const box = textBox(g);
+
+  if (box.border > 0) {
+    ctx.save();
+    ctx.strokeStyle = sheetState.frameColor;
+    ctx.lineWidth = box.border * s;
+    ctx.strokeRect(
+      (c.x + box.border / 2) * s, (c.y + box.border / 2) * s,
+      (c.w - box.border) * s, (c.h - box.border) * s
+    );
+    ctx.restore();
   }
 
-  /* ---------- Ereignisse ---------- */
+  if (box.w <= 0 || box.h <= 0) return;
 
-  // Die Umschalter sitzen in der <summary>. Ein Klick darauf soll nur schalten
-  // und nicht zusaetzlich das Bedienfeld zuklappen.
-  document.querySelectorAll("details.controls > summary .seg").forEach((seg) => {
-    seg.addEventListener("click", (e) => e.preventDefault());
+  const st = text[key];
+  const lines = domLines(parts(key).span);
+  if (!lines.length) return;
+
+  const font = FONTS.find((f) => f.id === st.font) || FONTS[0];
+  const fpx = st.size * g.panelH / 100 * s;
+
+  ctx.save();
+  ctx.font = `${font.weight} ${fpx}px ${font.css}`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = (-0.005 * fpx).toFixed(3) + "px";
+  ctx.textBaseline = "alphabetic";
+
+  const metrics = ctx.measureText("Hg");
+  const asc = metrics.fontBoundingBoxAscent || fpx * 0.8;
+  const desc = metrics.fontBoundingBoxDescent || fpx * 0.2;
+  const lh = st.lh * fpx;
+  const top = box.y * s + (box.h * s - lines.length * lh) / 2;
+
+  lines.forEach((raw, i) => {
+    const line = st.upper ? raw.toLocaleUpperCase("de-DE") : raw;
+    const width = ctx.measureText(line).width;
+    let x = box.x * s;
+    if (st.align === "center") x += (box.w * s - width) / 2;
+    else if (st.align === "right") x += box.w * s - width;
+
+    const baseline = top + i * lh + (lh - (asc + desc)) / 2 + asc;
+
+    if (st.shadow) {
+      ctx.fillStyle = shadowInk(st.color);
+      ctx.fillText(line, x + 0.55 * s, baseline + 0.75 * s);
+    }
+    ctx.fillStyle = st.color;
+    ctx.fillText(line, x, baseline);
   });
 
-  document.querySelectorAll("[data-paper]").forEach((b) => {
-    b.addEventListener("click", () => {
-      if (sheetState.paper === b.dataset.paper) return;
-      sheetState.paper = b.dataset.paper;
-      if (sheetState.paper === "a5") cardIndex = 1;
-      syncSideFields();
-      renderAll();
-    });
-  });
+  ctx.restore();
+}
 
-  document.querySelectorAll("[data-orient]").forEach((b) => {
-    b.addEventListener("click", () => {
-      sheetState.orient = b.dataset.orient;
-      renderAll();
-    });
-  });
+async function drawPanel(ctx, s, g, x, y, rotated, svg, key) {
+  const w = g.panelW;
+  const h = g.panelH;
 
-  document.querySelectorAll("[data-side]").forEach((b) => {
-    b.addEventListener("click", () => {
-      side = b.dataset.side;
-      syncSideFields();
-      renderText();
-    });
-  });
-
-  document.querySelectorAll("[data-card-tab]").forEach((b) => {
-    b.addEventListener("click", () => {
-      cardIndex = Number(b.dataset.cardTab);
-      syncSideFields();
-      renderText();
-    });
-  });
-
-  el.band.addEventListener("input", () => {
-    sheetState.band = parseInt(el.band.value, 10);
-    renderAll();
-  });
-
-  el.scale.addEventListener("input", () => {
-    sheetState.motif = parseInt(el.scale.value, 10) / 100;
-    renderAll();
-  });
-
-  el.gap.addEventListener("input", () => {
-    sheetState.gap = parseFloat(el.gap.value);
-    layout();
-  });
-
-  el.edge.addEventListener("input", () => {
-    sheetState.edge = parseFloat(el.edge.value);
-    layout();
-  });
-
-  el.style.addEventListener("change", () => {
-    sheetState.frameStyle = el.style.value;
-    layout();
-  });
-
-  el.frameColor.addEventListener("change", () => {
-    sheetState.frameColor = el.frameColor.value;
-    layout();
-  });
-
-  el.line.addEventListener("input", () => {
-    sheetState.lineWidth = parseFloat(el.line.value);
-    layout();
-  });
-
-  el.whole.addEventListener("change", () => {
-    sheetState.whole = el.whole.checked;
-    if (sheetState.whole) sheetState.edge = 0;
-    layout();
-    syncControls();
-  });
-
-  el.shuffle.addEventListener("click", () => {
-    sheetState.seed = Math.floor(Math.random() * 1e9);
-    renderAll();
-  });
-
-  el.name.addEventListener("input", renderText);
-  el.text.addEventListener("input", renderText);
-  el.name2.addEventListener("input", renderText);
-  el.text2.addEventListener("input", renderText);
-  el.font.addEventListener("change", () => { cur().font = el.font.value; renderText(); });
-  el.auto.addEventListener("change", () => { cur().auto = el.auto.checked; renderText(); });
-  el.size.addEventListener("input", () => {
-    cur().auto = false;
-    cur().size = parseFloat(el.size.value);
-    renderText();
-  });
-  el.lh.addEventListener("input", () => { cur().lh = parseFloat(el.lh.value); renderText(); });
-
-  el.swatches.addEventListener("click", (e) => {
-    const b = e.target.closest(".swatch");
-    if (!b) return;
-    cur().color = b.dataset.color;
-    renderText();
-  });
-
-  el.aligns.addEventListener("click", (e) => {
-    const b = e.target.closest(".chip");
-    if (!b) return;
-    cur().align = b.dataset.align;
-    renderText();
-  });
-
-  el.upper.addEventListener("click", () => { cur().upper = !cur().upper; renderText(); });
-  el.shadow.addEventListener("click", () => { cur().shadow = !cur().shadow; renderText(); });
-
-  el.turnLeft.addEventListener("click", () => turnPreview(180));
-  el.turnRight.addEventListener("click", () => turnPreview(-180));
-  el.export.addEventListener("click", exportProject);
-  el.import.addEventListener("click", () => el.importFile.click());
-  el.importFile.addEventListener("change", () => {
-    if (el.importFile.files[0]) importProject(el.importFile.files[0]);
-  });
-
-  el.undo.addEventListener("click", () => moveHistory("undo"));
-  el.redo.addEventListener("click", () => moveHistory("redo"));
-
-  el.reset.addEventListener("click", () => {
-    rememberHistory();
-    Object.assign(sheetState, {
-      paper: "a5",
-      orient: "landscape", band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
-      frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
-      seed: 20260827
-    });
-    TEXT_KEYS.forEach((key) => Object.assign(text[key], DEFAULT_TEXT[key]));
-    el.name.value = DEFAULT_VALUES.name;
-    el.text.value = DEFAULT_VALUES.text;
-    el.name2.value = DEFAULT_VALUES.name2;
-    el.text2.value = DEFAULT_VALUES.text2;
-    enabled.clear();
-    ALL_ITEMS.forEach((item) => enabled.add(item.id));
-    side = "front";
-    cardIndex = 1;
-    previewTurn = 0;
-    el.lblTurn.textContent = "0°";
-    syncMotifs();
-    renderAll();
-  });
-
-  window.addEventListener("resize", () => { fitSheet(false); renderText(); });
-  window.addEventListener("beforeprint", renderText);
-  document.fonts.ready.then(() => { fitSheet(true); renderText(); });
-  document.getElementById("btn-print").addEventListener("click", () => window.print());
-
-  /* ---------- Rechtliches ---------- */
-
-  const legal = document.getElementById("legal");
-
-  // Beim Start ist der Hinweis ein Einstieg: er laesst sich nur ueber einen der
-  // beiden Knoepfe verlassen. Wird er spaeter ueber die Fusszeile geoeffnet,
-  // verhaelt er sich wie ein normaler Dialog.
-  let legalIsGate = true;
-
-  legal.addEventListener("cancel", (e) => { if (legalIsGate) e.preventDefault(); });
-  legal.addEventListener("click", (e) => { if (!legalIsGate && e.target === legal) legal.close(); });
-
-  document.getElementById("btn-legal-ok").addEventListener("click", () => {
-    legalIsGate = false;
-    legal.close();
-  });
-
-  document.getElementById("btn-legal-leave").addEventListener("click", () => {
-    window.close();
-    // window.close() greift nur bei Tabs, die ein Skript geoeffnet hat. Bleibt die
-    // Seite offen, wird sie stattdessen geleert - der Tab kann dann zu bleiben.
-    setTimeout(() => window.location.replace("about:blank"), 150);
-  });
-
-  document.getElementById("btn-legal").addEventListener("click", () => legal.showModal());
+  ctx.save();
+  ctx.translate((x + w / 2) * s, (y + h / 2) * s);
+  if (rotated) ctx.rotate(Math.PI);
+  ctx.translate(-(w / 2) * s, -(h / 2) * s);
 
   try {
-    const draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (draft && draft.version === 1 && draft.sheetState && draft.text) {
-      applyProject(draft);
-    }
+    const img = await loadImage(sceneToDataUrl(svg, Math.round(w * s), Math.round(h * s)));
+    ctx.drawImage(img, 0, 0, w * s, h * s);
   } catch (error) {
-    // Ignore an invalid or unavailable local draft.
+    // Ohne Motive weiterzeichnen ist besser als gar kein Export.
   }
 
+  drawCard(ctx, s, g, key);
+  ctx.restore();
+}
+
+/** Falt- bzw. Schnittkante: weisses Band, Beschriftung, gestrichelte Linie. */
+function drawMark(ctx, s, x, y, len, dir, label) {
+  const thick = 2.6;
+  const pad = 4;
+  const gap = 1.6;
+  const fs = 2.2;
+  const ink = "#1a1a1a";
+
+  ctx.save();
+  ctx.fillStyle = "#ffffff";
+  if (dir === "h") ctx.fillRect(x * s, (y - thick / 2) * s, len * s, thick * s);
+  else ctx.fillRect((x - thick / 2) * s, y * s, thick * s, len * s);
+
+  ctx.fillStyle = ink;
+  ctx.strokeStyle = ink;
+  ctx.font = `600 ${fs * s}px "Work Sans", system-ui, sans-serif`;
+  if ("letterSpacing" in ctx) ctx.letterSpacing = (0.12 * fs * s).toFixed(2) + "px";
+  ctx.textBaseline = "middle";
+
+  const caption = label.toLocaleUpperCase("de-DE");
+  const tw = ctx.measureText(caption).width;
+
+  ctx.lineWidth = 0.4 * s;
+  ctx.setLineDash([1.2 * s, 1.2 * s]);
+
+  if (dir === "h") {
+    ctx.fillText(caption, (x + pad) * s, y * s);
+    ctx.beginPath();
+    ctx.moveTo((x + pad) * s + tw + gap * s, y * s);
+    ctx.lineTo((x + len - pad) * s, y * s);
+    ctx.stroke();
+  } else {
+    ctx.save();
+    ctx.translate(x * s, (y + pad) * s);
+    ctx.rotate(Math.PI / 2);
+    ctx.fillText(caption, 0, 0);
+    ctx.restore();
+    ctx.beginPath();
+    ctx.moveTo(x * s, (y + pad) * s + tw + gap * s);
+    ctx.lineTo(x * s, (y + len - pad) * s);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+async function renderSheetCanvas(dpi) {
+  await document.fonts.ready;
+  renderText();
+
+  const g = geometry();
+  const f = g.f;
+  const s = dpi / MM_PER_INCH;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(f.w * s));
+  canvas.height = Math.max(1, Math.round(f.h * s));
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const twin = sheetState.paper === "a4";
+  const badges = twin ? [1, 2] : [1];
+
+  for (const index of badges) {
+    const ox = (twin && f.dir === "row" && index === 2) ? f.bw : 0;
+    const oy = (twin && f.dir === "column" && index === 2) ? f.bh : 0;
+    const suffix = index === 2 ? "2" : "";
+
+    // Oben die Rueckseite auf dem Kopf, unten die Vorderseite.
+    await drawPanel(ctx, s, g, ox, oy, true, el["sceneBack" + suffix], "back" + suffix);
+    await drawPanel(ctx, s, g, ox, oy + f.bh / 2, false, el["sceneFront" + suffix], "front" + suffix);
+
+    if (sheetState.marks) drawMark(ctx, s, ox, oy + f.bh / 2, f.bw, "h", "Faltkante");
+  }
+
+  if (twin && sheetState.marks) {
+    if (f.dir === "row") drawMark(ctx, s, f.bw, 0, f.h, "v", "Schnittkante");
+    else drawMark(ctx, s, 0, f.bh, f.w, "h", "Schnittkante");
+  }
+
+  return canvas;
+}
+
+/* ---------- Minimaler PDF-Schreiber ---------- */
+
+function latin1(str) {
+  const out = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) out[i] = str.charCodeAt(i) & 0xff;
+  return out;
+}
+
+async function canvasToPdf(canvas, wMm, hMm) {
+  const ctx = canvas.getContext("2d");
+  const src = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+  const rgb = new Uint8Array(canvas.width * canvas.height * 3);
+  for (let i = 0, j = 0; j < rgb.length; i += 4) {
+    rgb[j++] = src[i];
+    rgb[j++] = src[i + 1];
+    rgb[j++] = src[i + 2];
+  }
+
+  let data;
+  let filter;
+  if (typeof CompressionStream === "function") {
+    const stream = new Blob([rgb]).stream().pipeThrough(new CompressionStream("deflate"));
+    data = new Uint8Array(await new Response(stream).arrayBuffer());
+    filter = "/FlateDecode";
+  } else {
+    const jpeg = await new Promise((r) => canvas.toBlob(r, "image/jpeg", 0.96));
+    data = new Uint8Array(await jpeg.arrayBuffer());
+    filter = "/DCTDecode";
+  }
+
+  const W = (wMm * 72 / MM_PER_INCH).toFixed(4);
+  const H = (hMm * 72 / MM_PER_INCH).toFixed(4);
+
+  const chunks = [];
+  const offsets = [];
+  let pos = 0;
+
+  const put = (part) => {
+    const bytes = typeof part === "string" ? latin1(part) : part;
+    chunks.push(bytes);
+    pos += bytes.length;
+  };
+  const obj = (n, body) => {
+    offsets[n] = pos;
+    put(n + " 0 obj\n" + body + "\nendobj\n");
+  };
+
+  put("%PDF-1.4\n%âãÏÓ\n");
+  obj(1, "<< /Type /Catalog /Pages 2 0 R >>");
+  obj(2, "<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+  obj(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] ` +
+         `/Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>`);
+
+  const content = `q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q\n`;
+  obj(4, `<< /Length ${content.length} >>\nstream\n${content}endstream`);
+
+  offsets[5] = pos;
+  put("5 0 obj\n");
+  put(`<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} ` +
+      `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ${filter} /Length ${data.length} >>\nstream\n`);
+  put(data);
+  put("\nendstream\nendobj\n");
+
+  const xref = pos;
+  let table = "xref\n0 6\n0000000000 65535 f \n";
+  for (let i = 1; i <= 5; i++) table += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+  put(table);
+  put(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+
+  return new Blob(chunks, { type: "application/pdf" });
+}
+
+/* ---------- Export ausloesen ---------- */
+
+function exportBasename() {
+  const twin = sheetState.paper === "a4";
+  const raw = [el.name.value, twin ? el.name2.value : ""]
+    .map((v) => v.trim())
+    .filter(Boolean)
+    .join("-");
+  const safe = raw.replace(/\s+/g, "-").replace(/[^\p{L}\p{N}_.-]+/gu, "");
+  return safe ? "namensschild-" + safe : "namensschild";
+}
+
+function download(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function exportFormat() {
+  const picked = document.querySelector('input[name="exp-format"]:checked');
+  return picked ? picked.value : "png";
+}
+
+function updateExportNote() {
+  const f = geometry().f;
+  const dpi = Number(el.expDpi.value);
+  const w = Math.round(f.w * dpi / MM_PER_INCH);
+  const h = Math.round(f.h * dpi / MM_PER_INCH);
+  el.expNote.textContent =
+    `${f.label} · ${f.w} × ${f.h} mm · ${w} × ${h} Pixel. ` +
+    `Die Datei ist randlos und entspricht genau der Vorschau.`;
+}
+
+async function runExport() {
+  const format = exportFormat();
+  const f = geometry().f;
+  let dpi = Number(el.expDpi.value) || 300;
+
+  // Sehr grosse Flaechen sprengen den Speicher mancher Browser.
+  while (dpi > 150 && (f.w * dpi / MM_PER_INCH) * (f.h * dpi / MM_PER_INCH) > 40e6) {
+    dpi = dpi === 600 ? 300 : 150;
+    toast("Auflösung auf " + dpi + " dpi verringert – das Blatt ist sehr groß.");
+  }
+
+  el.expRun.disabled = true;
+  el.expRun.textContent = "Wird erstellt …";
+
+  try {
+    const canvas = await renderSheetCanvas(dpi);
+
+    if (format === "pdf") {
+      const blob = await canvasToPdf(canvas, f.w, f.h);
+      download(blob, exportBasename() + ".pdf");
+    } else {
+      const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+      if (!blob) throw new Error("Das Bild konnte nicht erzeugt werden.");
+      download(blob, exportBasename() + ".png");
+    }
+
+    el.dlgExport.close();
+    toast(format === "pdf" ? "PDF gespeichert." : "PNG gespeichert.");
+  } catch (error) {
+    toast("Export fehlgeschlagen: " + error.message, true);
+  } finally {
+    el.expRun.disabled = false;
+    el.expRun.textContent = "Datei erstellen";
+  }
+}
+
+/* ---------- Ereignisse ---------- */
+
+el.acc.addEventListener("change", (e) => {
+  const box = e.target.closest("input[data-id]");
+  if (!box) return;
+  if (box.checked) enabled.add(box.dataset.id);
+  else enabled.delete(box.dataset.id);
+  syncMotifs();
+  layout();
+});
+
+el.acc.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-group]");
+  if (!btn) return;
+  const group = GROUPS.find((g) => g.id === btn.dataset.group);
+  setMotifs(group.items, btn.dataset.set === "on");
+});
+
+el.all.addEventListener("click", () => setMotifs(ALL_ITEMS, true));
+el.none.addEventListener("click", () => setMotifs(ALL_ITEMS, false));
+
+document.querySelectorAll("[data-paper]").forEach((b) => {
+  b.addEventListener("click", () => {
+    if (sheetState.paper === b.dataset.paper) return;
+    sheetState.paper = b.dataset.paper;
+    if (sheetState.paper === "a5") cardIndex = 1;
+    syncSideFields();
+    renderAll();
+  });
+});
+
+document.querySelectorAll("[data-orient]").forEach((b) => {
+  b.addEventListener("click", () => {
+    if (sheetState.orient === b.dataset.orient) return;
+    sheetState.orient = b.dataset.orient;
+    renderAll();
+  });
+});
+
+document.querySelectorAll("[data-side]").forEach((b) => {
+  b.addEventListener("click", () => {
+    side = b.dataset.side;
+    syncSideFields();
+    renderText();
+  });
+});
+
+document.querySelectorAll("[data-card-tab]").forEach((b) => {
+  b.addEventListener("click", () => {
+    cardIndex = Number(b.dataset.cardTab);
+    syncSideFields();
+    renderText();
+  });
+});
+
+el.band.addEventListener("input", () => {
+  sheetState.band = parseInt(el.band.value, 10);
+  renderAll();
+});
+
+el.scale.addEventListener("input", () => {
+  sheetState.motif = parseInt(el.scale.value, 10) / 100;
+  layout();
+});
+
+el.gap.addEventListener("input", () => {
+  sheetState.gap = parseFloat(el.gap.value);
+  layout();
+});
+
+el.edge.addEventListener("input", () => {
+  sheetState.edge = parseFloat(el.edge.value);
+  layout();
+});
+
+el.style.addEventListener("change", () => {
+  sheetState.frameStyle = el.style.value;
+  layout();
+});
+
+el.frameColor.addEventListener("change", () => {
+  sheetState.frameColor = el.frameColor.value;
+  layout();
+});
+
+el.line.addEventListener("input", () => {
+  sheetState.lineWidth = parseFloat(el.line.value);
+  layout();
+});
+
+el.whole.addEventListener("change", () => {
+  sheetState.whole = el.whole.checked;
+  if (sheetState.whole) sheetState.edge = 0;
+  layout();
+  syncControls();
+});
+
+el.marks.addEventListener("change", () => {
+  sheetState.marks = el.marks.checked;
+  layout();
+});
+
+el.cardFrame.addEventListener("change", () => {
+  sheetState.cardFrame = el.cardFrame.checked;
+  renderAll();
+});
+
+el.shuffle.addEventListener("click", () => {
+  sheetState.seed = Math.floor(Math.random() * 1e9);
+  layout();
+});
+
+[el.name, el.text, el.name2, el.text2].forEach((input) =>
+  input.addEventListener("input", renderText));
+
+el.font.addEventListener("change", () => { cur().font = el.font.value; renderText(); });
+el.auto.addEventListener("change", () => { cur().auto = el.auto.checked; renderText(); });
+
+el.size.addEventListener("input", () => {
+  cur().auto = false;
+  cur().size = parseFloat(el.size.value);
+  renderText();
+});
+
+el.lh.addEventListener("input", () => { cur().lh = parseFloat(el.lh.value); renderText(); });
+
+el.swatches.addEventListener("click", (e) => {
+  const b = e.target.closest(".swatch");
+  if (!b) return;
+  cur().color = b.dataset.color;
+  renderText();
+});
+
+el.aligns.addEventListener("click", (e) => {
+  const b = e.target.closest(".chip");
+  if (!b) return;
+  cur().align = b.dataset.align;
+  renderText();
+});
+
+el.upper.addEventListener("click", () => { cur().upper = !cur().upper; renderText(); });
+el.shadow.addEventListener("click", () => { cur().shadow = !cur().shadow; renderText(); });
+
+el.undo.addEventListener("click", () => moveHistory("undo"));
+el.redo.addEventListener("click", () => moveHistory("redo"));
+
+el.reset.addEventListener("click", () => {
+  commit();
+  Object.assign(sheetState, DEFAULT_SHEET);
+  TEXT_KEYS.forEach((key) => Object.assign(text[key], DEFAULT_TEXT[key]));
+  el.name.value = DEFAULT_VALUES.name;
+  el.text.value = DEFAULT_VALUES.text;
+  el.name2.value = DEFAULT_VALUES.name2;
+  el.text2.value = DEFAULT_VALUES.text2;
+  enabled.clear();
+  ALL_ITEMS.forEach((item) => enabled.add(item.id));
+  side = "front";
+  cardIndex = 1;
   syncMotifs();
   renderAll();
+  commit();
+  toast("Alles zurückgesetzt.");
+});
 
+// Jede Bedienung schiebt - gebuendelt - einen Schritt in die Historie.
+document.querySelector(".col-controls").addEventListener("input", commitSoon);
+document.querySelector(".col-controls").addEventListener("change", commitSoon);
+document.querySelector(".col-controls").addEventListener("click", (e) => {
+  if (e.target.closest("button") && !e.target.closest("#btn-undo, #btn-redo")) commitSoon();
+});
+
+/* ---------- Drucken & Exportieren ---------- */
+
+// Nicht "print" nennen: eine Funktion auf oberster Ebene landet am globalen
+// Objekt und wuerde window.print ueberschreiben - der Aufruf unten riefe dann
+// sich selbst auf.
+function printSheet() {
+  renderText();
+  window.print();
+}
+
+$("btn-print").addEventListener("click", printSheet);
+$("btn-print-m").addEventListener("click", printSheet);
+
+function openExport() {
+  updateExportNote();
+  el.dlgExport.showModal();
+}
+
+$("btn-export-open").addEventListener("click", openExport);
+$("btn-export-open-m").addEventListener("click", openExport);
+el.expDpi.addEventListener("change", updateExportNote);
+el.expRun.addEventListener("click", runExport);
+
+document.querySelectorAll("[data-close]").forEach((b) =>
+  b.addEventListener("click", () => $(b.dataset.close).close()));
+
+el.dlgExport.addEventListener("click", (e) => {
+  if (e.target === el.dlgExport) el.dlgExport.close();
+});
+
+window.addEventListener("resize", () => { fitSheet(true); renderText(); });
+window.addEventListener("beforeprint", renderText);
+document.fonts.ready.then(() => { fitSheet(true); renderText(); });
+
+/* ---------- Design hell/dunkel ---------- */
+
+function applyTheme(mode) {
+  if (mode === "light" || mode === "dark") document.documentElement.dataset.theme = mode;
+  else delete document.documentElement.dataset.theme;
+}
+
+try {
+  applyTheme(localStorage.getItem(THEME_KEY));
+} catch (error) {
+  // Ohne lokalen Speicher bleibt es bei der Systemeinstellung.
+}
+
+$("btn-theme").addEventListener("click", () => {
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme === "dark"
+    : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const next = dark ? "light" : "dark";
+  applyTheme(next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (error) { /* egal */ }
+});
+
+/* ---------- Rechtliches ---------- */
+
+const legal = $("legal");
+let legalIsGate = false;
+
+legal.addEventListener("cancel", (e) => { if (legalIsGate) e.preventDefault(); });
+legal.addEventListener("click", (e) => { if (!legalIsGate && e.target === legal) legal.close(); });
+
+$("btn-legal-ok").addEventListener("click", () => {
+  legalIsGate = false;
+  try { localStorage.setItem(LEGAL_KEY, "1"); } catch (error) { /* egal */ }
+  legal.close();
+});
+
+$("btn-legal-leave").addEventListener("click", () => {
+  window.close();
+  // window.close() greift nur bei Tabs, die ein Skript geoeffnet hat.
+  setTimeout(() => window.location.replace("about:blank"), 150);
+});
+
+$("btn-legal").addEventListener("click", () => legal.showModal());
+
+/* ---------- Start ---------- */
+
+try {
+  const draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  if (draft && draft.sheetState && draft.text) applyProject(draft);
+} catch (error) {
+  // Ein unbrauchbarer Entwurf wird einfach ignoriert.
+}
+
+syncMotifs();
+renderAll();
+snapshot();
+updateHistoryButtons();
+
+let seenLegal = false;
+try { seenLegal = localStorage.getItem(LEGAL_KEY) === "1"; } catch (error) { /* egal */ }
+if (!seenLegal) {
+  legalIsGate = true;
   legal.showModal();
+}
 </script>
 </body>
 </html>
