@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Namensschilder zum Falten selbst gestalten - A5 oder A4, mit gekritzeltem Motivrahmen. Drucken oder als PNG bzw. PDF exportieren.">
+<meta name="description" content="Namensschilder zum Falten selbst gestalten - A5 oder A4, zum Zuschneiden ohne weißen Rand, mit gekritzeltem Motivrahmen. Drucken oder als PNG bzw. PDF exportieren.">
 <title>Namensschild</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,9 +15,8 @@
      Namensschild - Oberflaeche
 
      Grundsatz fuer den Druck: Auf dem Papier landet ausschliesslich das
-     Blatt. Es behaelt dabei exakt die Masse, die die Vorschau zeigt, und
-     bekommt vom Programm keinerlei zusaetzliche Rahmen, Raender oder
-     Schnittlinien. Die Seitengroesse ist immer das gewaehlte Papier.
+     Blatt, in Originalgroesse. Die Seitengroesse ist immer das Papier der
+     gewaehlten Druckvorlage.
      ===================================================================== */
 
   :root {
@@ -160,6 +159,7 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     white-space: nowrap;
+    text-decoration: none;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
   }
 
@@ -167,6 +167,7 @@
   .btn:active { transform: translateY(1px); }
   .btn[disabled] { opacity: 0.42; cursor: not-allowed; transform: none; }
   .btn[disabled]:hover { background: var(--ui-panel); border-color: var(--ui-line-strong); }
+  .btn[hidden] { display: none; }
 
   .btn--primary {
     background: var(--ui-accent); color: var(--ui-accent-ink);
@@ -178,6 +179,13 @@
   .btn--ghost:hover { background: var(--ui-panel-2); border-color: var(--ui-line); }
 
   .btn--icon { padding: 9px; width: var(--tap); }
+
+  .btn--sm { min-height: 32px; padding: 5px 11px; font-size: 13px; gap: 6px; }
+  .btn--sm svg { width: 15px; height: 15px; }
+
+  .btn.is-on, .btn.is-on:hover {
+    background: var(--ui-accent-soft); border-color: var(--ui-accent); color: var(--ui-accent);
+  }
 
   .btn svg {
     width: 17px; height: 17px; flex: none;
@@ -201,9 +209,7 @@
     .app { grid-template-columns: minmax(0, 1fr); }
   }
 
-  /* Die Spalte fuellt die ganze Zeilenhoehe, das Blatt darin klebt. So bleibt
-     der Klebebereich auf die Zeile begrenzt und laeuft nicht ueber die
-     Hinweise und die Fusszeile darunter. */
+  /* Die Spalte fuellt die ganze Zeilenhoehe, das Blatt darin klebt. */
   .col-preview { min-width: 0; align-self: stretch; }
   .col-controls { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 
@@ -218,14 +224,13 @@
     overflow: hidden;
   }
 
-  /* Einspaltig steht die Vorschau ganz normal im Fluss. */
   @media (max-width: 1100px) {
     .preview { position: static; }
   }
 
   .preview-head {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    padding: 11px 16px;
+    padding: 9px 12px 9px 16px;
     border-bottom: 1px solid var(--ui-line);
   }
 
@@ -261,12 +266,11 @@
   .sheet-fit { position: relative; width: 100%; }
 
   .sheet {
-    --sw: 210mm; --sh: 148mm;
+    --sw: 297mm; --sh: 210mm;
     position: absolute; top: 0; left: 50%;
-    transform-origin: top center;
+    transform-origin: 50% 50%;
     width: var(--sw);
     height: var(--sh);
-    display: flex; flex-direction: column;
     background: var(--paper);
     overflow: hidden;
     box-shadow: var(--ui-shadow-lg);
@@ -274,33 +278,27 @@
     print-color-adjust: exact;
   }
 
-  /* Auf A4 liegen zwei Schilder auf einem Blatt: quer untereinander,
-     hoch nebeneinander. Nach dem Schneiden ist jedes davon ein A5-Schild. */
-  .sheet[data-dir="row"] { flex-direction: row; }
+  /* Nur beim Drehen animieren, nicht bei jeder Groessenaenderung. */
+  .sheet.is-turning { transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.2, 1); }
 
-  .badge {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0; min-height: 0;
-    background: var(--paper);
-    overflow: hidden;
+  @media (prefers-reduced-motion: reduce) {
+    .sheet.is-turning { transition: none; }
   }
 
-  .badge[hidden] { display: none; }
+  /* Jede Haelfte eines Schildes ist eine eigene Flaeche in Blattkoordinaten.
+     Die Rueckseite steht auf dem Kopf - nach dem Falten liest sie sich
+     richtig herum. */
+  .panel { position: absolute; overflow: hidden; }
+  .panel[hidden] { display: none; }
+  .panel--back { transform: rotate(180deg); transform-origin: 50% 50%; }
 
-  .panel { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; }
-
-  .panel--back { top: 0; transform: rotate(180deg); transform-origin: center center; }
-  .panel--front { bottom: 0; }
-
-  .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: hidden; }
 
   .card {
     position: absolute;
     background: transparent;
     border: var(--frame-width) solid var(--frame-color);
     display: flex;
-    padding: 2mm;
     overflow: hidden;
   }
 
@@ -319,51 +317,19 @@
     letter-spacing: -0.005em;
   }
 
-  /* Falt- und Schnittmarken. Abschaltbar - und wenn sie an sind, in
-     Vorschau, Druck und Export voellig gleich gezeichnet. */
-  .fold, .cut {
-    position: absolute;
-    display: flex; align-items: center; gap: 1.6mm;
-    background: var(--paper);
-    color: var(--paper-ink);
+  .card-text[hidden] { display: none; }
+
+  /* Schnittmarken, Falt- und Schnittlinien - reine Linien, keine Flaechen. */
+  .marks {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block; overflow: visible; pointer-events: none;
   }
 
-  .fold { z-index: 4; }
-  .cut { z-index: 5; }
-
-  .fold[hidden], .cut[hidden] { display: none; }
-
-  .fold, .cut--h {
-    left: 0; right: 0; top: 50%;
-    height: 2.6mm; transform: translateY(-1.3mm);
-    flex-direction: row; padding: 0 4mm;
+  @media screen {
+    .panel { cursor: pointer; }
+    .panel:hover .card { outline: 0.5mm dashed rgba(47, 111, 87, 0.5); outline-offset: 0.8mm; }
+    .card.is-active, .panel:hover .card.is-active { outline: 0.7mm dashed var(--ui-accent); outline-offset: 0.8mm; }
   }
-
-  .fold::after, .cut--h::after {
-    content: ""; flex: 1; height: 0;
-    border-top: 0.4mm dashed currentColor;
-  }
-
-  .cut--v {
-    top: 0; bottom: 0; left: 50%; right: auto;
-    width: 2.6mm; height: auto; transform: translateX(-1.3mm);
-    flex-direction: column; padding: 4mm 0;
-  }
-
-  .cut--v::after {
-    content: ""; flex: 1; width: 0; height: auto;
-    border-top: 0; border-left: 0.4mm dashed currentColor;
-  }
-
-  .mark-label {
-    flex: none;
-    font-family: "Work Sans", sans-serif;
-    font-size: 2.2mm; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: currentColor;
-  }
-
-  .cut--v .mark-label { writing-mode: vertical-rl; }
 
   .preview-foot {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -372,7 +338,7 @@
     font-size: 12.5px; color: var(--ui-muted);
   }
 
-  .preview-foot .warn { color: var(--ui-warn); font-weight: 600; }
+  .preview-foot .warn { margin: 0; color: var(--ui-warn); font-weight: 600; }
   .preview-foot .warn[hidden] { display: none; }
   .preview-foot .spacer { margin-left: auto; }
 
@@ -437,6 +403,8 @@
     gap: 14px 16px;
   }
 
+  .grid[hidden] { display: none; }
+
   .span-all { grid-column: 1 / -1; }
 
   .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -454,6 +422,18 @@
     letter-spacing: 0; text-transform: none;
     font-variant-numeric: tabular-nums;
   }
+
+  .field-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ui-muted); }
+  .field-note[hidden] { display: none; }
+
+  .callout {
+    margin: 0; padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--ui-accent-soft);
+    font-size: 13px; line-height: 1.5;
+  }
+
+  .callout[hidden] { display: none; }
 
   input[type="text"], textarea, select {
     font-size: 14.5px;
@@ -520,6 +500,45 @@
   .seg-btn:hover { color: var(--ui-ink); }
   .seg-btn.is-on, .seg-btn.is-on:hover { background: var(--ui-accent); color: var(--ui-accent-ink); }
   .seg-btn:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: 1px; }
+
+  /* Druckvorlagen */
+  .layouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+  @media (max-width: 380px) {
+    .layouts { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .layout-card {
+    position: relative;
+    display: flex; flex-direction: column; gap: 5px;
+    padding: 10px 11px 11px;
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: 11px;
+    background: var(--ui-bg);
+    color: var(--ui-muted);
+    cursor: pointer;
+  }
+
+  .layout-card input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .layout-card b { font-size: 13px; line-height: 1.3; color: var(--ui-ink); }
+  .layout-card small { font-size: 11.5px; line-height: 1.4; }
+  .layout-card:hover { border-color: var(--ui-accent); }
+  .layout-card:has(input:checked) { border-color: var(--ui-accent); background: var(--ui-accent-soft); color: var(--ui-accent); }
+  .layout-card:has(input:focus-visible) { outline: 2.5px solid var(--ui-accent); outline-offset: 2px; }
+
+  .layout-card .rec {
+    position: absolute; top: 8px; right: 8px;
+    padding: 2px 7px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    background: var(--ui-accent); color: var(--ui-accent-ink);
+  }
+
+  .pict { width: 48px; height: 36px; display: block; flex: none; }
+  .pict .pg { fill: var(--ui-panel); stroke: currentColor; stroke-width: 1.2; }
+  .pict .bd { fill: currentColor; fill-opacity: 0.22; }
+  .pict .fold { stroke: currentColor; stroke-width: 0.8; stroke-dasharray: 1.4 1.2; fill: none; }
+  .pict .cut { stroke: currentColor; stroke-width: 1.3; stroke-dasharray: 3 1.5; fill: none; }
+  .pict .tick { stroke: currentColor; stroke-width: 1; fill: none; }
 
   .swatch-row { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 2px; }
 
@@ -666,7 +685,7 @@
   dialog[open] { display: flex; flex-direction: column; }
   dialog::backdrop { background: rgba(16, 14, 10, 0.55); }
 
-  dialog.narrow { width: min(460px, calc(100vw - 24px)); }
+  dialog.narrow { width: min(480px, calc(100vw - 24px)); }
 
   .dlg-head {
     flex: none;
@@ -693,11 +712,17 @@
   .dlg-body a { color: var(--ui-accent); }
   .dlg-body b { font-weight: 600; }
 
+  .dlg-section { display: flex; flex-direction: column; gap: 8px; }
+  .dlg-section[hidden] { display: none; }
+
   .dlg-note {
     margin-top: 4px; padding-top: 12px;
     border-top: 1px solid var(--ui-line);
     font-size: 12px; color: var(--ui-muted);
   }
+
+  .dlg-body .dlg-note { font-size: 12px; }
+  .dlg-note[hidden] { display: none; }
 
   .dlg-foot {
     flex: none;
@@ -708,6 +733,20 @@
   }
 
   .dlg-foot .spacer { margin-right: auto; }
+
+  .paper-hint {
+    display: flex; align-items: center; gap: 13px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: 11px;
+    background: var(--ui-bg);
+    color: var(--ui-accent);
+  }
+
+  .paper-hint b { display: block; font-size: 14.5px; color: var(--ui-ink); }
+  .paper-hint span { display: block; font-size: 12.5px; line-height: 1.45; color: var(--ui-muted); }
+
+  .steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; line-height: 1.5; }
 
   .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -767,7 +806,6 @@
       border-top: 1px solid var(--ui-line);
     }
 
-    /* Auf schmalen Schirmen zaehlen die Knoepfe, nicht der Hinweistext. */
     #preview-note { display: none; }
 
     .actionbar .btn { flex: 1 1 0; }
@@ -777,60 +815,38 @@
   /* =====================================================================
      Druck
 
-     Auf das Papier kommt nur das Blatt: in Originalgroesse, ohne Rahmen,
-     ohne Schatten, ohne Rand. Die Seitengroesse setzt layout() dynamisch
-     in <style id="page-rule"> - immer exakt auf das gewaehlte Papier.
+     Das Blatt steht ganz normal im Fluss und ist der einzige Inhalt der
+     Seite. Kein position: fixed und keine Hoehe 0 - daran scheitert WebKit
+     (iPhone, iPad, Safari) und druckt leere Seiten. Seiten- und Blattgroesse
+     setzt layout() in <style id="page-rule">.
      ===================================================================== */
 
   @media print {
     :root { color-scheme: light; }
 
-    /* Der Seitenkoerper traegt im Druck keinerlei Inhalt mehr: Das Blatt wird
-       unten aus dem Fluss genommen. Damit gibt es nichts, was umbrechen oder
-       eine zweite Seite anstossen koennte - unabhaengig von Rundungen,
-       Skalierung oder Randeinstellungen im Druckdialog. */
     html, body {
       margin: 0 !important; padding: 0 !important;
       background: #fff !important;
-      width: auto !important; height: auto !important;
-      min-height: 0 !important; max-height: none !important;
-      overflow: hidden !important;
+      min-height: 0 !important;
     }
 
     .no-print, .toast-host { display: none !important; }
 
-    /* Alle Huellen um das Blatt herum verlieren jede Wirkung und jede Hoehe. */
-    .app, .col-preview, .preview, .preview-stage, .sheet-fit {
-      display: block !important;
-      position: static !important;
-      width: auto !important; height: 0 !important;
-      max-width: none !important; min-width: 0 !important;
-      min-height: 0 !important;
-      margin: 0 !important; padding: 0 !important;
-      gap: 0 !important;
-      background: none !important;
-      border: 0 !important; border-radius: 0 !important;
-      box-shadow: none !important;
-      overflow: visible !important;
-      transform: none !important;
-    }
+    /* Die Huellen um das Blatt verlieren ihren Kasten. */
+    .app, .col-preview, .preview, .preview-stage, .sheet-fit { display: contents !important; }
 
-    /* Das Blatt sitzt fest auf der Seite. Ein Element ausserhalb des Flusses
-       belegt keine Hoehe, also bleibt es bei genau einer Seite. Die Masse
-       setzt layout() - immer exakt das gewaehlte Papier. */
     .sheet {
-      position: fixed !important;
-      top: 0 !important; left: 0 !important; right: auto !important; bottom: auto !important;
+      position: relative !important;
+      left: auto !important; top: auto !important;
       transform: none !important;
+      transition: none !important;
       margin: 0 !important;
       box-shadow: none !important;
-      border: 0 !important; outline: 0 !important;
-      break-inside: auto; page-break-inside: auto;
-      break-before: auto; page-break-before: auto;
-      break-after: auto; page-break-after: auto;
+      break-inside: avoid; page-break-inside: avoid;
     }
 
-    /* Farben, Flaechen und Linien des Blattes nicht wegoptimieren. */
+    .card { outline: none !important; }
+
     .sheet, .sheet * {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -838,8 +854,8 @@
   }
 </style>
 
-<!-- Seitengroesse und Blattmasse setzt layout() - immer das gewaehlte Papier. -->
-<style id="page-rule">@page { size: 210mm 148mm; margin: 0; }</style>
+<!-- Seitengroesse und Blattmasse setzt layout() - immer das Papier der Druckvorlage. -->
+<style id="page-rule">@page { size: 297mm 210mm; margin: 0; }</style>
 </head>
 
 <body>
@@ -1344,7 +1360,7 @@
     <span class="brand-mark" aria-hidden="true">N</span>
     <div>
       <h1>Namensschild</h1>
-      <small id="brand-sub">A5 quer &middot; 1 Schild</small>
+      <small id="brand-sub">A5 zum Zuschneiden &middot; quer</small>
     </div>
   </div>
 
@@ -1372,63 +1388,49 @@
   <div class="col-preview">
     <section class="preview" aria-label="Vorschau">
       <div class="preview-head no-print">
-        <span class="preview-title">Vorschau &equals; Druck</span>
+        <span class="preview-title">Vorschau</span>
         <div class="preview-meta">
-          <span class="pill" id="pill-format">210 &times; 148 mm</span>
+          <span class="pill" id="pill-format">A4 &middot; 297 &times; 210 mm</span>
           <span class="pill" id="pill-zoom">100 %</span>
+          <button type="button" class="btn btn--sm" id="btn-turn" aria-pressed="false"
+                  title="Blatt in der Vorschau um 180&deg; drehen">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 3.8v4.6h-4.6"/></svg>
+            <span>Drehen</span>
+          </button>
         </div>
       </div>
 
       <div class="preview-stage">
         <div class="sheet-fit" id="sheet-fit">
-          <div class="sheet" id="sheet" data-dir="column">
+          <div class="sheet" id="sheet">
 
-            <div class="badge" id="badge-1">
-              <div class="panel panel--back">
-                <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
-                <div class="card" id="card-back">
-                  <div class="card-inner" id="box-back"><span class="card-text" id="out-text">Klasse 5b
-Schuljahr 2026/27</span></div>
-                </div>
-              </div>
-
-              <div class="fold" id="fold-1" aria-hidden="true"><span class="mark-label">Faltkante</span></div>
-
-              <div class="panel panel--front">
-                <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
-                <div class="card" id="card-front">
-                  <div class="card-inner" id="box-front"><span class="card-text" id="out-name">Mia</span></div>
-                </div>
-              </div>
+            <div class="panel panel--back" id="panel-back" data-key="back">
+              <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
+              <div class="card" id="card-back"><div class="card-inner" id="box-back"><span class="card-text" id="out-back"></span></div></div>
             </div>
 
-            <div class="cut cut--h" id="cut" aria-hidden="true" hidden><span class="mark-label">Schnittkante</span></div>
-
-            <div class="badge" id="badge-2" hidden>
-              <div class="panel panel--back">
-                <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
-                <div class="card" id="card-back2">
-                  <div class="card-inner" id="box-back2"><span class="card-text" id="out-text2">Klasse 5b
-Schuljahr 2026/27</span></div>
-                </div>
-              </div>
-
-              <div class="fold" id="fold-2" aria-hidden="true"><span class="mark-label">Faltkante</span></div>
-
-              <div class="panel panel--front">
-                <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
-                <div class="card" id="card-front2">
-                  <div class="card-inner" id="box-front2"><span class="card-text" id="out-name2">Tom</span></div>
-                </div>
-              </div>
+            <div class="panel" id="panel-front" data-key="front">
+              <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
+              <div class="card" id="card-front"><div class="card-inner" id="box-front"><span class="card-text" id="out-front"></span></div></div>
             </div>
 
+            <div class="panel panel--back" id="panel-back2" data-key="back2" hidden>
+              <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
+              <div class="card" id="card-back2"><div class="card-inner" id="box-back2"><span class="card-text" id="out-back2"></span></div></div>
+            </div>
+
+            <div class="panel" id="panel-front2" data-key="front2" hidden>
+              <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
+              <div class="card" id="card-front2"><div class="card-inner" id="box-front2"><span class="card-text" id="out-front2"></span></div></div>
+            </div>
+
+            <svg class="marks" id="marks" aria-hidden="true" focusable="false"></svg>
           </div>
         </div>
       </div>
 
       <div class="preview-foot no-print">
-        <span id="preview-note">Die Vorschau zeigt das Blatt in Originalgr&ouml;&szlig;e.</span>
+        <span id="preview-note">Tipp: Auf ein Textfeld klicken, um diese Seite zu bearbeiten.</span>
         <p class="warn" id="warn" hidden role="status">Der Text ragt &uuml;ber das Feld hinaus.</p>
         <span class="spacer"></span>
         <button type="button" class="chip" id="btn-undo" disabled>R&uuml;ckg&auml;ngig</button>
@@ -1445,30 +1447,89 @@ Schuljahr 2026/27</span></div>
       <summary>
         <span class="caret" aria-hidden="true"></span>
         <h2 class="panel-title">Blatt</h2>
-        <span class="panel-hint" id="hint-sheet">A5 &middot; quer</span>
+        <span class="panel-hint" id="hint-sheet">A5 zum Zuschneiden</span>
       </summary>
       <div class="panel-body">
         <div class="grid">
           <div class="field span-all">
-            <span class="lbl" id="lbl-paper">Papier</span>
-            <div class="seg" role="group" aria-labelledby="lbl-paper">
-              <button type="button" class="seg-btn is-on" data-paper="a5">A5 &middot; 1 Schild</button>
-              <button type="button" class="seg-btn" data-paper="a4">A4 &middot; 2 Schilder</button>
+            <span class="lbl" id="lbl-layout">Druckvorlage</span>
+            <div class="layouts" role="radiogroup" aria-labelledby="lbl-layout">
+              <label class="layout-card">
+                <input type="radio" name="layout" value="a4-trim" checked>
+                <span class="rec">Empfohlen</span>
+                <svg class="pict" viewBox="0 0 48 36" aria-hidden="true">
+                  <rect class="pg" x="3" y="3" width="42" height="30" rx="1.5"/>
+                  <rect class="bd" x="10" y="8" width="28" height="20"/>
+                  <path class="fold" d="M10 18h28"/>
+                  <path class="tick" d="M10 6.5v-2M38 6.5v-2M10 29.5v2M38 29.5v2M8.5 8h-2M8.5 28h-2M39.5 8h2M39.5 28h2"/>
+                </svg>
+                <b>A5 zum Zuschneiden</b>
+                <small>1 Schild auf A4. Nach dem Schneiden ganz ohne wei&szlig;en Rand.</small>
+              </label>
+              <label class="layout-card">
+                <input type="radio" name="layout" value="a4-trim2">
+                <svg class="pict" viewBox="0 0 48 36" aria-hidden="true">
+                  <rect class="pg" x="12" y="1" width="24" height="34" rx="1.5"/>
+                  <rect class="bd" x="15.5" y="4.5" width="17" height="13.5"/>
+                  <rect class="bd" x="15.5" y="18" width="17" height="13.5"/>
+                  <path class="fold" d="M15.5 11.25h17M15.5 24.75h17"/>
+                  <path class="tick" d="M14.6 4.5h-1.6M14.6 18h-1.6M14.6 31.5h-1.6M33.4 4.5h1.6M33.4 18h1.6M33.4 31.5h1.6"/>
+                </svg>
+                <b>2 Schilder zum Zuschneiden</b>
+                <small>Auf A4, je 18,4 &times; 13,6 cm. Ohne wei&szlig;en Rand.</small>
+              </label>
+              <label class="layout-card">
+                <input type="radio" name="layout" value="a5">
+                <svg class="pict" viewBox="0 0 48 36" aria-hidden="true">
+                  <rect class="pg" x="3" y="3" width="42" height="30" rx="1.5"/>
+                  <rect class="bd" x="3" y="3" width="42" height="30" rx="1.5"/>
+                  <path class="fold" d="M3 18h42"/>
+                </svg>
+                <b>A5-Papier</b>
+                <small>1 Schild, kein Schneiden. A5 muss im Drucker liegen.</small>
+              </label>
+              <label class="layout-card">
+                <input type="radio" name="layout" value="a4-2">
+                <svg class="pict" viewBox="0 0 48 36" aria-hidden="true">
+                  <rect class="pg" x="12" y="1" width="24" height="34" rx="1.5"/>
+                  <rect class="bd" x="12" y="1" width="24" height="34" rx="1.5"/>
+                  <path class="fold" d="M12 9.5h24M12 26.5h24"/>
+                  <path class="cut" d="M12 18h24"/>
+                </svg>
+                <b>2 Schilder auf A4</b>
+                <small>Je A5 gro&szlig;, nur in der Mitte teilen.</small>
+              </label>
             </div>
           </div>
 
           <div class="field span-all">
-            <span class="lbl" id="lbl-orient">Format des Schildes <span class="val" id="lbl-sheetsize">&ndash;</span></span>
+            <span class="lbl" id="lbl-orient">Schild <span class="val" id="lbl-sheetsize">&ndash;</span></span>
             <div class="seg" role="group" aria-labelledby="lbl-orient">
               <button type="button" class="seg-btn is-on" data-orient="landscape">Quer</button>
               <button type="button" class="seg-btn" data-orient="portrait">Hoch</button>
             </div>
           </div>
 
+          <p class="field-note span-all" id="note-trim">Die Motive laufen 3&nbsp;mm &uuml;ber die Schnittmarken hinaus. So bleibt nach dem Schneiden kein wei&szlig;er Rand &ndash; mit jedem Drucker.</p>
+
+          <div class="field span-all" id="f-finish" hidden>
+            <span class="lbl" id="lbl-finish">Rand am Papier</span>
+            <div class="seg" role="group" aria-labelledby="lbl-finish">
+              <button type="button" class="seg-btn is-on" data-finish="safe">Wei&szlig;er Rand</button>
+              <button type="button" class="seg-btn" data-finish="borderless">Randlos</button>
+            </div>
+            <p class="field-note" id="note-finish">&ndash;</p>
+          </div>
+
+          <div class="field span-all" id="f-safe" hidden>
+            <label for="in-safe">Randbreite <span class="val" id="lbl-safe">&ndash;</span></label>
+            <input type="range" id="in-safe" min="3" max="12" step="0.5" value="6">
+          </div>
+
           <div class="field span-all">
-            <span class="lbl">Auf dem Blatt</span>
+            <span class="lbl">Auf dem Schild</span>
             <div class="checks">
-              <label class="check"><input type="checkbox" id="in-marks" checked> Falt- und Schnittkanten zeigen</label>
+              <label class="check"><input type="checkbox" id="in-marks" checked> Falt- und Schnittlinie</label>
               <label class="check"><input type="checkbox" id="in-cardframe" checked> Rahmen um das Textfeld</label>
             </div>
           </div>
@@ -1489,11 +1550,32 @@ Schuljahr 2026/27</span></div>
         </div>
 
         <div class="seg" role="tablist" aria-label="Seite ausw&auml;hlen">
-          <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite &middot; Name</button>
-          <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">R&uuml;ckseite &middot; Text</button>
+          <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite</button>
+          <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">R&uuml;ckseite</button>
         </div>
 
-        <div class="grid">
+        <div class="field">
+          <span class="lbl" id="lbl-content">Inhalt dieser Seite</span>
+          <div class="seg" role="group" aria-labelledby="lbl-content">
+            <button type="button" class="seg-btn is-on" data-content="text" aria-pressed="true">Text</button>
+            <button type="button" class="seg-btn" data-content="blank" aria-pressed="false">Leer</button>
+            <button type="button" class="seg-btn" data-content="lines" aria-pressed="false">Schreiblinien</button>
+          </div>
+        </div>
+
+        <p class="callout" id="note-content" hidden>&ndash;</p>
+
+        <div class="field" id="f-lines" hidden>
+          <span class="lbl" id="lbl-lines">Anzahl Linien</span>
+          <div class="btn-row" id="lines-row" role="group" aria-labelledby="lbl-lines">
+            <button type="button" class="chip" data-lines="1">1</button>
+            <button type="button" class="chip" data-lines="2">2</button>
+            <button type="button" class="chip" data-lines="3">3</button>
+            <button type="button" class="chip" data-lines="4">4</button>
+          </div>
+        </div>
+
+        <div class="grid" id="text-fields">
           <div class="field span-all" data-only="front" data-card="1">
             <label for="in-name">Name</label>
             <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
@@ -1610,19 +1692,19 @@ Schuljahr 2026/27</textarea>
           </div>
 
           <div class="field">
-            <span class="lbl">Abstand zum Rand <span class="val" id="lbl-edge">&ndash;</span></span>
-            <input type="range" id="in-edge" min="-5" max="8" step="0.5" value="0"
-                   aria-label="Abstand der Motive zum Papierrand in Millimetern">
-          </div>
-
-          <div class="field">
             <span class="lbl">Linienst&auml;rke <span class="val" id="lbl-line">&ndash;</span></span>
             <input type="range" id="in-line" min="0.6" max="2" step="0.1" value="1"
                    aria-label="Linienstaerke der Motive">
           </div>
 
           <div class="field span-all">
-            <label class="check"><input type="checkbox" id="in-whole"> Motive nicht am Rand abschneiden</label>
+            <label class="check"><input type="checkbox" id="in-cutmotifs" checked> Motive am Rand anschneiden</label>
+          </div>
+
+          <div class="field span-all" id="f-edge" hidden>
+            <span class="lbl">Abstand zum Rand <span class="val" id="lbl-edge">&ndash;</span></span>
+            <input type="range" id="in-edge" min="0" max="8" step="0.5" value="2"
+                   aria-label="Abstand der Motive zum Rand in Millimetern">
           </div>
         </div>
 
@@ -1659,15 +1741,15 @@ Schuljahr 2026/27</textarea>
   <section class="tips no-print" aria-label="Hinweise">
     <div class="tip">
       <h3>Drucken</h3>
-      <p>Der Druckdialog bekommt automatisch <b>genau das gew&auml;hlte Papier</b> und keine R&auml;nder. Dort bitte <b>Skalierung 100&nbsp;%</b> und <b>Ma&szlig;stab: Standard</b> lassen, dann kommt das Blatt so aus dem Drucker, wie es die Vorschau zeigt.</p>
+      <p>Normale Drucker lassen ringsum 3&ndash;5&nbsp;mm frei. Mit einer Vorlage <b>zum Zuschneiden</b> ist das egal: Nach dem Schneiden bleibt kein wei&szlig;er Rand. Auf iPhone und iPad &uuml;ber die <b>PDF-Datei</b> drucken.</p>
     </div>
     <div class="tip">
       <h3>Falten</h3>
-      <p>Entlang der Faltkante knicken. Die obere H&auml;lfte steht kopf &ndash; nach dem Falten liest sich die R&uuml;ckseite richtig herum. Auf A4 vorher an der Schnittkante teilen.</p>
+      <p>In der Mitte knicken. Die obere H&auml;lfte steht kopf &ndash; nach dem Falten liest sich die R&uuml;ckseite richtig herum. Mit <b>Drehen</b> &uuml;ber der Vorschau steht sie beim Bearbeiten aufrecht.</p>
     </div>
     <div class="tip">
-      <h3>Exportieren</h3>
-      <p><b>PNG</b> f&uuml;r die Weitergabe als Bild, <b>PDF</b> zum Drucken anderswo. Beides entsteht aus derselben Vorlage wie die Vorschau &ndash; randlos und in Originalgr&ouml;&szlig;e.</p>
+      <h3>Selbst gestalten</h3>
+      <p>Eine Seite auf <b>Leer</b> oder <b>Schreiblinien</b> stellen &ndash; dann bleibt das Feld frei, und die Kinder schreiben oder malen selbst hinein.</p>
     </div>
   </section>
 
@@ -1677,7 +1759,7 @@ Schuljahr 2026/27</textarea>
     <button type="button" class="linkish" id="btn-legal">Rechtliches</button>
     <span class="sep" aria-hidden="true">&middot;</span>
     <a href="https://github.com/TimMHoffmann/JuliasNamensschilder" target="_blank" rel="noopener">Quellcode</a>
-    </footer>
+  </footer>
 </main>
 
 <div class="actionbar no-print">
@@ -1686,6 +1768,59 @@ Schuljahr 2026/27</textarea>
 </div>
 
 <div class="toast-host" id="toasts" aria-live="polite"></div>
+
+<!-- ============ Drucken ============ -->
+<dialog class="narrow no-print" id="dlg-print" aria-labelledby="dlg-print-title">
+  <div class="dlg-head">
+    <h2 id="dlg-print-title">Drucken</h2>
+    <button type="button" class="btn btn--icon btn--ghost" data-close="dlg-print" aria-label="Schlie&szlig;en">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <div class="dlg-body">
+    <div class="paper-hint">
+      <svg class="pict" viewBox="0 0 48 36" aria-hidden="true">
+        <rect class="pg" x="3" y="3" width="42" height="30" rx="1.5" id="pr-pict-page"/>
+        <path class="tick" d="M17 18h14M26 13l5 5-5 5"/>
+      </svg>
+      <div>
+        <b id="pr-paper">A4 quer einlegen</b>
+        <span id="pr-mode">&ndash;</span>
+      </div>
+    </div>
+
+    <div class="radio-row">
+      <label class="radio-card">
+        <input type="radio" name="pr-method" value="direct" checked>
+        <b>Direkt drucken</b>
+        <span>&Ouml;ffnet den Druckdialog des Browsers.</span>
+      </label>
+      <label class="radio-card">
+        <input type="radio" name="pr-method" value="pdf">
+        <b>&Uuml;ber PDF</b>
+        <span>F&uuml;r iPhone, iPad und Safari &ndash; am zuverl&auml;ssigsten.</span>
+      </label>
+    </div>
+
+    <div class="dlg-section" id="pr-direct">
+      <h3>Im Druckdialog einstellen</h3>
+      <ol class="steps" id="pr-steps"></ol>
+      <p class="dlg-note" id="pr-ios" hidden>Auf iPhone und iPad passt der Browser das Blatt eigenm&auml;chtig an das Papier an. Dort lieber &uuml;ber PDF drucken.</p>
+    </div>
+
+    <div class="dlg-section" id="pr-pdf" hidden>
+      <p id="pr-pdf-text">Die PDF-Datei ist genau so gro&szlig; wie das Blatt. Beim Drucken <b>100&nbsp;%</b> bzw. &bdquo;Tats&auml;chliche Gr&ouml;&szlig;e&ldquo; w&auml;hlen.</p>
+      <p class="callout" id="pr-status" hidden>Die PDF-Datei ist fertig.</p>
+    </div>
+  </div>
+
+  <div class="dlg-foot">
+    <button type="button" class="btn spacer" id="btn-print-save" hidden>Speichern</button>
+    <button type="button" class="btn" data-close="dlg-print">Abbrechen</button>
+    <button type="button" class="btn btn--primary" id="btn-print-run">Drucken</button>
+  </div>
+</dialog>
 
 <!-- ============ Export ============ -->
 <dialog class="narrow no-print" id="dlg-export" aria-labelledby="dlg-export-title">
@@ -1706,7 +1841,7 @@ Schuljahr 2026/27</textarea>
       <label class="radio-card">
         <input type="radio" name="exp-format" value="pdf">
         <b>PDF</b>
-        <span>Druckfertig in Originalgr&ouml;&szlig;e, ohne Rand.</span>
+        <span>Druckfertig in Originalgr&ouml;&szlig;e.</span>
       </label>
     </div>
 
@@ -1763,7 +1898,7 @@ Schuljahr 2026/27</textarea>
        <b>nicht &uuml;bertragen</b> &ndash; es gibt weder einen Server im Hintergrund noch Cookies oder Tracking.
        Der zuletzt bearbeitete Entwurf bleibt nur lokal im Browser gespeichert.</p>
     <p>Einzige Ausnahme: Die Schriftarten werden von <b>Google Fonts</b> nachgeladen. Der Browser
-       baut dafür eine Verbindung zu Google auf und &uuml;bermittelt dabei die IP-Adresse.</p>
+       baut daf&uuml;r eine Verbindung zu Google auf und &uuml;bermittelt dabei die IP-Adresse.</p>
 
     <p class="dlg-note">R&uuml;ckmeldungen und Fehlerberichte gerne als Issue auf GitHub.</p>
   </div>
@@ -1783,7 +1918,7 @@ Schuljahr 2026/27</textarea>
 
    Eine einzige Quelle der Wahrheit: der Zustand unten. Vorschau, Druck und
    Export werden alle daraus abgeleitet und benutzen dieselbe Geometrie in
-   Millimetern. Deshalb sieht der Ausdruck aus wie die Vorschau.
+   Millimetern auf dem Blatt. Deshalb sieht der Ausdruck aus wie die Vorschau.
    ======================================================================= */
 
 /* ---------- Motive ---------- */
@@ -1865,6 +2000,15 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const XLINK = "http://www.w3.org/1999/xlink";
 const MM_PER_INCH = 25.4;
 
+// Auf iOS benutzt jeder Browser WebKit - und druckt HTML-Seiten nicht massstabsgetreu.
+const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_SAFARI = /safari/i.test(navigator.userAgent) &&
+  !/chrome|chromium|crios|fxios|edg|android/i.test(navigator.userAgent);
+
+// Safari auf iOS verweigert Canvas-Flaechen ueber etwa 16,7 Megapixel.
+const MAX_CANVAS_PIXELS = IS_IOS ? 16e6 : 36e6;
+
 function mulberry32(a) {
   return function () {
     a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -1872,95 +2016,6 @@ function mulberry32(a) {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-/**
- * Streut Motive als Rahmen um das freie Mittelfeld.
- * Grosse Motive zuerst, kleine fuellen die Luecken. Jede Position wird gegen
- * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
- * bleibt mindestens `gap` Millimeter Luft.
- */
-function buildScene(svg, W, H, card, seed, motifScale, gap, edge, frameStyle, frameColor, lineWidth, iconIds, fillerIds, whole) {
-  const rnd = mulberry32(seed);
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-  const root = document.createElementNS(SVG_NS, "g");
-  root.setAttribute("fill", "none");
-  root.setAttribute("stroke", "currentColor");
-  root.setAttribute("color", frameColor);
-  root.setAttribute("stroke-linecap", "round");
-  root.setAttribute("stroke-linejoin", "round");
-  svg.append(root);
-
-  // "whole": kein Ueberstand ueber die Blattkante - jedes Motiv ist ganz zu
-  // sehen. Sonst duerfen Motive am Rand angeschnitten werden.
-  const bleed = whole ? 0 : Math.max(3, -edge);
-  const edgePad = edge;
-  const pad = 1.6;
-  const placed = [];
-
-  const clearOfCard = (x, y, r) =>
-    x + r < card.x - pad || x - r > card.x + card.w + pad ||
-    y + r < card.y - pad || y - r > card.y + card.h + pad;
-
-  const free = (x, y, r) => {
-    if (y - r < 0) return false;
-    if (x - r < edgePad || x + r > W - edgePad || y + r > H - edgePad) return false;
-    if (whole && (x - r < 0 || x + r > W || y + r > H)) return false;
-    if (!clearOfCard(x, y, r)) return false;
-    for (let i = 0; i < placed.length; i++) {
-      const p = placed[i];
-      const dx = x - p.x;
-      const dy = y - p.y;
-      const min = p.r + r + gap;
-      if (dx * dx + dy * dy < min * min) return false;
-    }
-    return true;
-  };
-
-  const place = (id, x, y, size, rot) => {
-    const s = size / 24;
-    const use = document.createElementNS(SVG_NS, "use");
-    use.setAttributeNS(XLINK, "xlink:href", "#d-" + id);
-    use.setAttribute("href", "#d-" + id);
-    use.setAttribute("transform",
-      `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
-      `scale(${s.toFixed(4)}) translate(-12 -12)`);
-    use.setAttribute("stroke-width", (0.42 * lineWidth / s).toFixed(2));
-    root.append(use);
-  };
-
-  const passesByStyle = {
-    doodle: [
-      { ids: iconIds,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
-      { ids: iconIds,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
-      { ids: fillerIds, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
-    ],
-    confetti: [
-      { ids: fillerIds, from: 2.8, to: 5.4, tries: 4200, turn: 70 }
-    ],
-    stars: [
-      { ids: fillerIds.filter((id) => ["star", "triangle", "dot"].includes(id)), from: 4, to: 8, tries: 3000, turn: 45 }
-    ],
-    minimal: [
-      { ids: iconIds, from: 9.4, to: 12.6, tries: 800, turn: 25 }
-    ]
-  };
-  const passes = passesByStyle[frameStyle] || passesByStyle.doodle;
-
-  for (const pass of passes) {
-    if (!pass.ids.length) continue;
-    for (let i = 0; i < pass.tries; i++) {
-      const size = (pass.from + rnd() * (pass.to - pass.from)) * motifScale;
-      const r = size * 0.5;
-      const x = -bleed + rnd() * (W + 2 * bleed);
-      const y = -bleed + rnd() * (H + 2 * bleed);
-      if (!free(x, y, r)) continue;
-      place(pass.ids[Math.floor(rnd() * pass.ids.length)], x, y, size, (rnd() - 0.5) * pass.turn);
-      placed.push({ x, y, r });
-    }
-  }
 }
 
 /* ---------- Schrift & Farben ---------- */
@@ -1983,29 +2038,40 @@ const COLORS = [
   { label: "Orange",  v: "#f58220" }
 ];
 
-/* ---------- Zustand ----------
+/* ---------- Druckvorlagen ----------
 
-   `w`/`h` ist das Blatt, `bw`/`bh` ein einzelnes Schild darauf. Auf A4 liegen
-   zwei Schilder auf einem Blatt: quer untereinander, hoch nebeneinander.
-   Gedruckt wird immer genau dieses Blatt - die Seitengroesse im Druckdialog
-   entspricht 1:1 den Massen hier.                                           */
+   Ein Schild ist ein Blatt zum Falten: oben die Rueckseite auf dem Kopf,
+   unten die Vorderseite. Die Vorlage legt fest, wie viele Schilder auf
+   welchem Papier liegen und was an den Kanten passiert:
 
-const FORMATS = {
-  a5: {
-    landscape: { w: 210, h: 148, bw: 210, bh: 148,   dir: "column", label: "A5 quer" },
-    portrait:  { w: 148, h: 210, bw: 148, bh: 210,   dir: "column", label: "A5 hoch" }
-  },
-  a4: {
-    landscape: { w: 210, h: 297, bw: 210,   bh: 148.5, dir: "column", label: "A4 hoch · 2 Schilder quer" },
-    portrait:  { w: 297, h: 210, bw: 148.5, bh: 210,   dir: "row",    label: "A4 quer · 2 Schilder hoch" }
-  }
+   - zum Zuschneiden: Die Motive laufen BLEED_MM ueber die Schnittkante,
+     aussen sitzen Schnittmarken. Nach dem Schneiden gibt es keinen weissen
+     Rand - mit jedem Drucker.
+   - weisser Rand: rundum ein gleichmaessiger, bewusst freier Rand.
+   - randlos: Motive bis an die Papierkante. Nur fuer Randlos-Drucker.      */
+
+const BLEED_MM = 3;
+const TRIM_MARGIN_MM = 13;
+const MARK_LEN_MM = 4.5;
+const CARD_BORDER_MM = 0.9;
+const CROP_INK = "#1a1a1a";
+const GUIDE_INK = "#8f8f8f";
+
+const LAYOUTS = {
+  "a4-trim":  { label: "A5 zum Zuschneiden",         paper: "A4", count: 1, trim: true },
+  "a4-trim2": { label: "2 Schilder zum Zuschneiden", paper: "A4", count: 2, trim: true },
+  "a5":       { label: "A5-Papier",                  paper: "A5", count: 1, trim: false },
+  "a4-2":     { label: "2 Schilder auf A4",          paper: "A4", count: 2, trim: false }
 };
 
-const CARD_BORDER_MM = 0.9;
+const FRAME_STYLES = ["doodle", "confetti", "stars", "minimal"];
+const CONTENTS = ["text", "blank", "lines"];
+
+/* ---------- Zustand ---------- */
 
 const DEFAULT_SHEET = {
-  paper: "a5", orient: "landscape",
-  band: 30, motif: 1, gap: 1.2, edge: 0, whole: false,
+  layout: "a4-trim", orient: "landscape", finish: "safe", safe: 6,
+  band: 30, motif: 1, gap: 1.2, cutMotifs: true, edge: 2,
   frameStyle: "doodle", frameColor: "#1a1a1a", lineWidth: 1,
   marks: true, cardFrame: true,
   seed: 20260827
@@ -2014,10 +2080,10 @@ const DEFAULT_SHEET = {
 const sheetState = { ...DEFAULT_SHEET };
 
 const DEFAULT_TEXT = {
-  front:  { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
-  back:   { font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 },
-  front2: { font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
-  back2:  { font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 }
+  front:  { content: "text", lines: 1, font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
+  back:   { content: "text", lines: 2, font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 },
+  front2: { content: "text", lines: 1, font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
+  back2:  { content: "text", lines: 2, font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 }
 };
 
 const DEFAULT_VALUES = {
@@ -2026,6 +2092,7 @@ const DEFAULT_VALUES = {
 };
 
 const TEXT_KEYS = ["front", "back", "front2", "back2"];
+const SEED_OFFSET = { front: 0, back: 977, front2: 3319, back2: 4507 };
 const text = structuredClone(DEFAULT_TEXT);
 
 let side = "front";
@@ -2034,38 +2101,35 @@ let cardIndex = 1;
 const textKey = () => side + (cardIndex === 2 ? "2" : "");
 const cur = () => text[textKey()];
 
-const STORAGE_KEY = "namensschild-entwurf-v2";
+const STORAGE_KEY = "namensschild-entwurf-v3";
+const OLD_STORAGE_KEY = "namensschild-entwurf-v2";
 const THEME_KEY = "namensschild-design";
 const LEGAL_KEY = "namensschild-hinweis-gelesen";
+const PRINT_METHOD_KEY = "namensschild-druckweg";
 
 const $ = (id) => document.getElementById(id);
 
 const el = {
-  sheet: $("sheet"), fit: $("sheet-fit"), pageRule: $("page-rule"),
-  pillFormat: $("pill-format"), pillZoom: $("pill-zoom"),
+  sheet: $("sheet"), fit: $("sheet-fit"), pageRule: $("page-rule"), marksSvg: $("marks"),
+  pillFormat: $("pill-format"), pillZoom: $("pill-zoom"), turn: $("btn-turn"),
   brandSub: $("brand-sub"), hintSheet: $("hint-sheet"),
   hintText: $("hint-text"), hintFrame: $("hint-frame"), hintMotifs: $("hint-motifs"),
   lblSheetSize: $("lbl-sheetsize"),
 
-  sceneFront: $("scene-front"),  sceneBack: $("scene-back"),
-  sceneFront2: $("scene-front2"), sceneBack2: $("scene-back2"),
-  cardFront: $("card-front"),    cardBack: $("card-back"),
-  cardFront2: $("card-front2"),  cardBack2: $("card-back2"),
-  badge2: $("badge-2"), cut: $("cut"), fold1: $("fold-1"), fold2: $("fold-2"),
-  segCard: $("seg-card"),
+  noteTrim: $("note-trim"), fFinish: $("f-finish"), noteFinish: $("note-finish"),
+  fSafe: $("f-safe"), safe: $("in-safe"), lblSafe: $("lbl-safe"),
+  marks: $("in-marks"), cardFrame: $("in-cardframe"),
 
-  band: $("in-band"), scale: $("in-scale"), gap: $("in-gap"), edge: $("in-edge"),
-  style: $("in-style"), frameColor: $("in-frame-color"), line: $("in-line"),
-  whole: $("in-whole"), marks: $("in-marks"), cardFrame: $("in-cardframe"),
+  segCard: $("seg-card"), textFields: $("text-fields"),
+  noteContent: $("note-content"), fLines: $("f-lines"), linesRow: $("lines-row"),
+
+  band: $("in-band"), scale: $("in-scale"), gap: $("in-gap"), edge: $("in-edge"), fEdge: $("f-edge"),
+  style: $("in-style"), frameColor: $("in-frame-color"), line: $("in-line"), cutMotifs: $("in-cutmotifs"),
   lblBand: $("lbl-band"), lblScale: $("lbl-scale"), lblGap: $("lbl-gap"),
   lblEdge: $("lbl-edge"), lblLine: $("lbl-line"), lblCount: $("lbl-count"),
   acc: $("acc"), shuffle: $("btn-shuffle"), all: $("btn-all"), none: $("btn-none"),
 
   name: $("in-name"), text: $("in-text"), name2: $("in-name2"), text2: $("in-text2"),
-  outName: $("out-name"), outText: $("out-text"),
-  outName2: $("out-name2"), outText2: $("out-text2"),
-  boxFront: $("box-front"), boxBack: $("box-back"),
-  boxFront2: $("box-front2"), boxBack2: $("box-back2"),
 
   font: $("in-font"), size: $("in-size"), auto: $("in-auto"), lh: $("in-lh"),
   lblSize: $("lbl-size"), lblLh: $("lbl-lh"),
@@ -2074,16 +2138,31 @@ const el = {
 
   reset: $("btn-reset"), undo: $("btn-undo"), redo: $("btn-redo"),
   toasts: $("toasts"),
+
+  dlgPrint: $("dlg-print"), prPaper: $("pr-paper"), prMode: $("pr-mode"), prPage: $("pr-pict-page"),
+  prDirect: $("pr-direct"), prSteps: $("pr-steps"), prIos: $("pr-ios"),
+  prPdf: $("pr-pdf"), prStatus: $("pr-status"), prSave: $("btn-print-save"), prRun: $("btn-print-run"),
+
   dlgExport: $("dlg-export"), expDpi: $("exp-dpi"), expNote: $("exp-note"),
   expRun: $("btn-export-run")
 };
 
-const parts = (key) => ({
-  front:  { span: el.outName,  box: el.boxFront,  src: el.name,  fallback: "Name" },
-  back:   { span: el.outText,  box: el.boxBack,   src: el.text,  fallback: "Text" },
-  front2: { span: el.outName2, box: el.boxFront2, src: el.name2, fallback: "Name" },
-  back2:  { span: el.outText2, box: el.boxBack2,  src: el.text2, fallback: "Text" }
-}[key]);
+const FRAME_COLORS = [...el.frameColor.options].map((o) => o.value);
+
+const view = {};
+TEXT_KEYS.forEach((key) => {
+  view[key] = {
+    root: $("panel-" + key), svg: $("scene-" + key),
+    card: $("card-" + key), box: $("box-" + key), span: $("out-" + key)
+  };
+});
+
+const SOURCES = {
+  front:  { src: el.name,  fallback: "Name" },
+  back:   { src: el.text,  fallback: "Text" },
+  front2: { src: el.name2, fallback: "Name" },
+  back2:  { src: el.text2, fallback: "Text" }
+};
 
 /* ---------- Kleine Helfer ---------- */
 
@@ -2096,6 +2175,16 @@ function toast(message, isError) {
 }
 
 const nf = (v, digits) => v.toFixed(digits).replace(".", ",");
+const mmText = (v) => String(Math.round(v * 10) / 10).replace(".", ",");
+const pickOne = (value, allowed, fallback) => (allowed.includes(value) ? value : fallback);
+const clampNum = (value, min, max, fallback) =>
+  (Number.isFinite(value) ? Math.min(Math.max(value, min), max) : fallback);
+
+function svgNode(name, attrs) {
+  const node = document.createElementNS(SVG_NS, name);
+  Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+  return node;
+}
 
 /* ---------- Auswahllisten aufbauen ---------- */
 
@@ -2174,25 +2263,127 @@ function setMotifs(items, on) {
   layout();
 }
 
-/* ---------- Geometrie ---------- */
+/* ---------- Geometrie ----------
 
-function geometry() {
-  const f = FORMATS[sheetState.paper][sheetState.orient];
-  const panelW = f.bw;
-  const panelH = f.bh / 2;
-  const bandX = Math.min(sheetState.band, panelW * 0.36);
-  const bandY = Math.min(Math.max(sheetState.band * (panelH / panelW) * 1.35, 7), panelH * 0.32);
+   Alle Masse in Millimetern. Jede Haelfte eines Schildes ("Panel") hat ein
+   eigenes Koordinatensystem: x von links nach rechts, y = 0 an der
+   Faltkante, y = H an der Aussenkante. Die Rueckseite ist dasselbe Panel,
+   nur um 180 Grad gedreht.                                                 */
+
+function sheetLayout() {
+  const spec = LAYOUTS[sheetState.layout];
+  const land = sheetState.orient === "landscape";
+  const B = BLEED_MM;
+  const edges = (t, r, b, l) => ({ t, r, b, l });
+  const none = edges(0, 0, 0, 0);
+  let page;
+  let badges;
+
+  switch (sheetState.layout) {
+    case "a4-trim": {
+      const w = land ? 210 : 148;
+      const h = land ? 148 : 210;
+      page = land ? { w: 297, h: 210 } : { w: 210, h: 297 };
+      badges = [{ x: (page.w - w) / 2, y: (page.h - h) / 2, w, h, bleed: edges(B, B, B, B) }];
+      break;
+    }
+    case "a4-trim2": {
+      // Zwei Schilder teilen sich eine Schnittkante, aussen bleibt Platz fuer
+      // Beschnitt und Schnittmarken innerhalb des druckbaren Bereichs.
+      const m = TRIM_MARGIN_MM;
+      const half = (297 - 2 * m) / 2;
+      const full = 210 - 2 * m;
+      if (land) {
+        page = { w: 210, h: 297 };
+        badges = [
+          { x: m, y: m,        w: full, h: half, bleed: edges(B, B, 0, B) },
+          { x: m, y: m + half, w: full, h: half, bleed: edges(0, B, B, B) }
+        ];
+      } else {
+        page = { w: 297, h: 210 };
+        badges = [
+          { x: m,        y: m, w: half, h: full, bleed: edges(B, 0, B, B) },
+          { x: m + half, y: m, w: half, h: full, bleed: edges(B, B, B, 0) }
+        ];
+      }
+      break;
+    }
+    case "a4-2":
+      if (land) {
+        page = { w: 210, h: 297 };
+        badges = [
+          { x: 0, y: 0,     w: 210, h: 148.5, bleed: none },
+          { x: 0, y: 148.5, w: 210, h: 148.5, bleed: none }
+        ];
+      } else {
+        page = { w: 297, h: 210 };
+        badges = [
+          { x: 0,     y: 0, w: 148.5, h: 210, bleed: none },
+          { x: 148.5, y: 0, w: 148.5, h: 210, bleed: none }
+        ];
+      }
+      break;
+    default:
+      page = land ? { w: 210, h: 148 } : { w: 148, h: 210 };
+      badges = [{ x: 0, y: 0, w: page.w, h: page.h, bleed: none }];
+  }
+
+  const finish = spec.trim ? "trim" : sheetState.finish;
   return {
-    f, panelW, panelH,
-    card: { x: bandX, y: bandY, w: panelW - 2 * bandX, h: panelH - 2 * bandY }
+    spec, page, badges, finish,
+    safe: finish === "safe" ? sheetState.safe : 0,
+    orientLabel: land ? "quer" : "hoch",
+    paperLabel: spec.paper + " " + (page.w > page.h ? "quer" : "hoch")
   };
 }
 
-/** Innenmasse des Textfelds in Millimetern - identisch fuer Vorschau und Export. */
+function panelGeometry(L, badge) {
+  const W = badge.w;
+  const H = badge.h / 2;
+  const s = L.safe;
+  const cw = W - 2 * s;
+  const ch = H - s;
+  const bandX = Math.min(sheetState.band, cw * 0.36);
+  const bandY = Math.min(Math.max(sheetState.band * (ch / cw) * 1.35, 7), ch * 0.32);
+  return { W, H, card: { x: s + bandX, y: bandY, w: cw - 2 * bandX, h: ch - 2 * bandY } };
+}
+
+/** Alle Panels mit Zeichenflaeche (clip), Lage auf dem Blatt (box) und Ursprung. */
+function sheetPanels(L) {
+  const out = [];
+  L.badges.forEach((b, i) => {
+    const g = panelGeometry(L, b);
+    const fold = b.y + b.h / 2;
+    ["back", "front"].forEach((sideName) => {
+      const back = sideName === "back";
+      // Durch die Drehung tauschen links und rechts, aussen ist oben am Blatt.
+      const l = back ? b.bleed.r : b.bleed.l;
+      const r = back ? b.bleed.l : b.bleed.r;
+      const o = back ? b.bleed.t : b.bleed.b;
+      const s = L.safe;
+      const clip = s > 0
+        ? { x0: s, x1: g.W - s, y1: g.H - s }
+        : { x0: -l, x1: g.W + r, y1: g.H + o };
+      out.push({
+        key: sideName + (i ? "2" : ""), back, g, clip,
+        box: {
+          x: back ? b.x + g.W - clip.x1 : b.x + clip.x0,
+          y: back ? fold - clip.y1 : fold,
+          w: clip.x1 - clip.x0,
+          h: clip.y1
+        },
+        origin: { x: back ? b.x + g.W : b.x, y: fold }
+      });
+    });
+  });
+  return out;
+}
+
+/** Innenmasse des Textfelds in Panel-Millimetern - identisch fuer Vorschau und Export. */
 function textBox(g) {
   const b = sheetState.cardFrame ? CARD_BORDER_MM : 0;
-  const padY = g.panelH * 0.024;
-  const padX = g.panelH * 0.03;
+  const padY = g.H * 0.024;
+  const padX = g.H * 0.03;
   return {
     border: b, padX, padY,
     x: g.card.x + b + padX,
@@ -2202,82 +2393,270 @@ function textBox(g) {
   };
 }
 
-function layout() {
-  const g = geometry();
-  const f = g.f;
-  const twin = sheetState.paper === "a4";
+/** Schnittmarken, Falt- und Schnittlinien in Blattkoordinaten - fuer SVG und Canvas. */
+function markItems(L) {
+  const items = [];
+  const line = (x1, y1, x2, y2, extra) =>
+    items.push({ x1, y1, x2, y2, ink: CROP_INK, width: 0.25, dash: null, ...extra });
 
-  el.sheet.style.setProperty("--sw", f.w + "mm");
-  el.sheet.style.setProperty("--sh", f.h + "mm");
+  if (L.finish === "trim") {
+    const a = BLEED_MM;
+    const z = BLEED_MM + MARK_LEN_MM;
+    L.badges.forEach((b) => {
+      const right = b.x + b.w;
+      const bottom = b.y + b.h;
+      const fold = b.y + b.h / 2;
+      // Marken nur an Aussenkanten - nie in ein Nachbarschild hinein.
+      [b.x, right].forEach((x) => {
+        if (b.bleed.t) line(x, b.y - a, x, b.y - z);
+        if (b.bleed.b) line(x, bottom + a, x, bottom + z);
+      });
+      [b.y, bottom].forEach((y) => {
+        if (b.bleed.l) line(b.x - a, y, b.x - z, y);
+        if (b.bleed.r) line(right + a, y, right + z, y);
+      });
+      const dash = [1, 0.8];
+      if (b.bleed.l) line(b.x - a, fold, b.x - z, fold, { dash });
+      if (b.bleed.r) line(right + a, fold, right + z, fold, { dash });
+    });
+
+    const first = L.badges[0];
+    const bottom = Math.max(...L.badges.map((b) => b.y + b.h));
+    items.push({
+      text: "An den Marken schneiden · an der gestrichelten Linie falten",
+      x: first.x + first.w / 2, y: bottom + BLEED_MM + 3.2, size: 2.2, ink: GUIDE_INK
+    });
+  }
+
+  if (sheetState.marks) {
+    L.badges.forEach((b) => {
+      const fold = b.y + b.h / 2;
+      line(b.x + L.safe, fold, b.x + b.w - L.safe, fold, { ink: GUIDE_INK, dash: [1.6, 1.2] });
+    });
+    if (L.finish !== "trim" && L.badges.length === 2) {
+      const b = L.badges[1];
+      const dash = [4, 1.4, 0.6, 1.4];
+      if (b.x > 0) line(b.x, 0, b.x, L.page.h, { ink: GUIDE_INK, dash });
+      else line(0, b.y, L.page.w, b.y, { ink: GUIDE_INK, dash });
+    }
+  }
+
+  return items;
+}
+
+/**
+ * Streut Motive als Rahmen um das freie Mittelfeld.
+ * Grosse Motive zuerst, kleine fuellen die Luecken. Jede Position wird gegen
+ * alle bereits gesetzten Motive geprueft: kein Ueberlappen, und dazwischen
+ * bleibt mindestens `gap` Millimeter Luft.
+ */
+function buildScene(svg, p, seed, ids, lineCount) {
+  const { W, H, card } = p.g;
+  const clip = p.clip;
+  // Sichtbarer Bereich nach dem Schneiden bzw. innerhalb des weissen Randes.
+  const vis = { x0: Math.max(clip.x0, 0), x1: Math.min(clip.x1, W), y1: Math.min(clip.y1, H) };
+  const rnd = mulberry32(seed);
+
+  svg.setAttribute("viewBox", `${clip.x0} 0 ${clip.x1 - clip.x0} ${clip.y1}`);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  const root = svgNode("g", {
+    fill: "none", stroke: "currentColor", color: sheetState.frameColor,
+    "stroke-linecap": "round", "stroke-linejoin": "round"
+  });
+  svg.append(root);
+
+  const cut = sheetState.cutMotifs;
+  const edge = cut ? 0 : sheetState.edge;
+  const gap = sheetState.gap;
+  const pad = 1.6;
+  const placed = [];
+
+  const clearOfCard = (x, y, r) =>
+    x + r < card.x - pad || x - r > card.x + card.w + pad ||
+    y + r < card.y - pad || y - r > card.y + card.h + pad;
+
+  const inside = (x, y, r) => {
+    if (y - r < 0) return false; // Die Faltkante bleibt frei.
+    if (cut) {
+      // Ueber den Rand ragen darf ein Motiv - aber ein gutes Stueck bleibt sichtbar.
+      const k = r * 0.45;
+      return x >= vis.x0 - k && x <= vis.x1 + k && y <= vis.y1 + k;
+    }
+    return x - r >= vis.x0 + edge && x + r <= vis.x1 - edge && y + r <= vis.y1 - edge;
+  };
+
+  const free = (x, y, r) => {
+    if (!inside(x, y, r) || !clearOfCard(x, y, r)) return false;
+    for (let i = 0; i < placed.length; i++) {
+      const q = placed[i];
+      const dx = x - q.x;
+      const dy = y - q.y;
+      const min = q.r + r + gap;
+      if (dx * dx + dy * dy < min * min) return false;
+    }
+    return true;
+  };
+
+  const place = (id, x, y, size, rot) => {
+    const s = size / 24;
+    const use = document.createElementNS(SVG_NS, "use");
+    use.setAttributeNS(XLINK, "xlink:href", "#d-" + id);
+    use.setAttribute("href", "#d-" + id);
+    use.setAttribute("transform",
+      `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${rot.toFixed(1)}) ` +
+      `scale(${s.toFixed(4)}) translate(-12 -12)`);
+    use.setAttribute("stroke-width", (0.42 * sheetState.lineWidth / s).toFixed(2));
+    root.append(use);
+  };
+
+  const passesByStyle = {
+    doodle: [
+      { ids: ids.icons,   from: 9.4, to: 12.6, tries: 1200, turn: 30 },
+      { ids: ids.icons,   from: 6.8, to: 9.4,  tries: 1800, turn: 34 },
+      { ids: ids.fillers, from: 2.4, to: 4.8,  tries: 2600, turn: 50 }
+    ],
+    confetti: [
+      { ids: ids.fillers, from: 2.8, to: 5.4, tries: 4200, turn: 70 }
+    ],
+    stars: [
+      { ids: ids.fillers.filter((id) => ["star", "triangle", "dot"].includes(id)), from: 4, to: 8, tries: 3000, turn: 45 }
+    ],
+    minimal: [
+      { ids: ids.icons, from: 9.4, to: 12.6, tries: 800, turn: 25 }
+    ]
+  };
+  const passes = passesByStyle[sheetState.frameStyle] || passesByStyle.doodle;
+
+  for (const pass of passes) {
+    if (!pass.ids.length) continue;
+    for (let i = 0; i < pass.tries; i++) {
+      const size = (pass.from + rnd() * (pass.to - pass.from)) * sheetState.motif;
+      const r = size * 0.5;
+      const x = vis.x0 - r + rnd() * (vis.x1 - vis.x0 + 2 * r);
+      const y = rnd() * (vis.y1 + r);
+      if (!free(x, y, r)) continue;
+      place(pass.ids[Math.floor(rnd() * pass.ids.length)], x, y, size, (rnd() - 0.5) * pass.turn);
+      placed.push({ x, y, r });
+    }
+  }
+
+  // Schreiblinien zum Selberschreiben - Teil der Motivflaeche, damit Druck
+  // und Export sie automatisch gleich zeichnen.
+  if (lineCount) {
+    const box = textBox(p.g);
+    const group = svgNode("g", {
+      stroke: sheetState.frameColor, "stroke-opacity": "0.5",
+      "stroke-width": "0.35", "stroke-linecap": "round"
+    });
+    const row = box.h / lineCount;
+    for (let i = 0; i < lineCount; i++) {
+      const y = (box.y + row * (i + 1) - row * 0.22).toFixed(2);
+      group.append(svgNode("line", { x1: box.x.toFixed(2), y1: y, x2: (box.x + box.w).toFixed(2), y2: y }));
+    }
+    svg.append(group);
+  }
+}
+
+/* ---------- Aufbau des Blattes ---------- */
+
+let current = null;
+
+function layout() {
+  const L = sheetLayout();
+  const ps = sheetPanels(L);
+  current = { L, ps };
+
+  el.sheet.style.setProperty("--sw", L.page.w + "mm");
+  el.sheet.style.setProperty("--sh", L.page.h + "mm");
   el.sheet.style.setProperty("--frame-color", sheetState.frameColor);
   el.sheet.style.setProperty("--frame-width", sheetState.cardFrame ? CARD_BORDER_MM + "mm" : "0");
-  el.sheet.dataset.dir = f.dir;
 
-  el.badge2.hidden = !twin;
-  el.cut.hidden = !twin || !sheetState.marks;
-  el.cut.classList.toggle("cut--v", f.dir === "row");
-  el.cut.classList.toggle("cut--h", f.dir !== "row");
-  el.fold1.hidden = !sheetState.marks;
-  el.fold2.hidden = !sheetState.marks;
-
-  // Der Druck bekommt exakt das gewaehlte Papier - kein A4-Zwang, kein Rand,
-  // keine zusaetzliche Schnittlinie. Vorschau und Ausdruck sind deckungsgleich.
-  // Die Seitenmasse und die Blattmasse kommen aus derselben Quelle; um die
-  // Seitenzahl kuemmert sich das Druck-CSS (das Blatt liegt ausserhalb des
-  // Flusses, deshalb kann es nie mehr als eine Seite werden).
+  // Die Seite ist exakt das Papier der Vorlage. Das Blatt ist minimal
+  // niedriger, damit Rundungen nie eine zweite Seite anstossen.
   el.pageRule.textContent =
-    `@page { size: ${f.w}mm ${f.h}mm; margin: 0; }\n` +
+    `@page { size: ${L.page.w}mm ${L.page.h}mm; margin: 0; }\n` +
     `@media print {\n` +
-    `  .sheet { width: ${f.w}mm !important; height: ${f.h}mm !important; }\n` +
+    `  .sheet { width: ${L.page.w}mm !important; height: ${L.page.h - 0.5}mm !important; }\n` +
     `}`;
-
-  const pad = textBox(g);
-  [el.cardFront, el.cardBack, el.cardFront2, el.cardBack2].forEach((card) => {
-    card.style.left = (g.card.x / g.panelW * 100) + "%";
-    card.style.top = (g.card.y / g.panelH * 100) + "%";
-    card.style.width = (g.card.w / g.panelW * 100) + "%";
-    card.style.height = (g.card.h / g.panelH * 100) + "%";
-    card.style.padding = pad.padY.toFixed(3) + "mm " + pad.padX.toFixed(3) + "mm";
-  });
 
   const pick = (filler) => GROUPS
     .filter((grp) => (grp.role === "filler") === filler)
     .flatMap((grp) => grp.items)
     .filter((m) => enabled.has(m.id))
     .map((m) => m.id);
+  const ids = { icons: pick(false), fillers: pick(true) };
 
-  const iconIds = pick(false);
-  const fillerIds = pick(true);
-  const draw = (svg, seed) => buildScene(svg, g.panelW, g.panelH, g.card, seed,
-    sheetState.motif, sheetState.gap, sheetState.edge, sheetState.frameStyle,
-    sheetState.frameColor, sheetState.lineWidth, iconIds, fillerIds, sheetState.whole);
+  const mm = (v) => v.toFixed(3) + "mm";
 
-  draw(el.sceneFront, sheetState.seed);
-  draw(el.sceneBack, sheetState.seed + 977);
-  if (twin) {
-    draw(el.sceneFront2, sheetState.seed + 3319);
-    draw(el.sceneBack2, sheetState.seed + 4507);
-  }
+  TEXT_KEYS.forEach((key) => {
+    const v = view[key];
+    const p = ps.find((q) => q.key === key);
+    v.root.hidden = !p;
+    if (!p) return;
+
+    const box = textBox(p.g);
+    Object.assign(v.root.style, {
+      left: mm(p.box.x), top: mm(p.box.y), width: mm(p.box.w), height: mm(p.box.h)
+    });
+    Object.assign(v.card.style, {
+      left: mm(p.g.card.x - p.clip.x0), top: mm(p.g.card.y),
+      width: mm(p.g.card.w), height: mm(p.g.card.h),
+      padding: mm(box.padY) + " " + mm(box.padX)
+    });
+
+    const t = text[key];
+    buildScene(v.svg, p, sheetState.seed + SEED_OFFSET[key], ids, t.content === "lines" ? t.lines : 0);
+  });
+
+  renderMarks(L);
 
   el.lblBand.textContent = sheetState.band + " mm";
   el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
   el.lblGap.textContent = nf(sheetState.gap, 1) + " mm";
-  el.lblEdge.textContent = sheetState.edge === 0
-    ? "Kante"
-    : (sheetState.edge > 0 ? "+" : "") + nf(sheetState.edge, 1) + " mm";
+  el.lblEdge.textContent = sheetState.edge === 0 ? "Kante" : nf(sheetState.edge, 1) + " mm";
   el.lblLine.textContent = nf(sheetState.lineWidth, 1) + "×";
+  el.lblSafe.textContent = mmText(sheetState.safe) + " mm";
 
-  el.pillFormat.textContent = f.w + " × " + f.h + " mm";
-  el.brandSub.textContent = f.label;
-  el.hintSheet.textContent = f.label;
-  // Das Blatt kann anders herum liegen als das einzelne Schild - beides zeigen.
-  el.lblSheetSize.textContent = "Blatt " + f.w + " × " + f.h + " mm";
+  const b = L.badges[0];
+  el.pillFormat.textContent = L.spec.paper + " · " + L.page.w + " × " + L.page.h + " mm";
+  el.brandSub.textContent = L.spec.label + " · " + L.orientLabel;
+  el.hintSheet.textContent = L.spec.label;
+  el.lblSheetSize.textContent = mmText(b.w) + " × " + mmText(b.h) + " mm" +
+    (L.badges.length === 2 ? " · je Schild" : "");
   el.hintFrame.textContent = el.style.selectedOptions[0] ? el.style.selectedOptions[0].textContent : "";
 }
 
-/* ---------- Vorschau einpassen ---------- */
+function renderMarks(L) {
+  const svg = el.marksSvg;
+  svg.setAttribute("viewBox", `0 0 ${L.page.w} ${L.page.h}`);
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+  markItems(L).forEach((it) => {
+    if (it.text) {
+      const node = svgNode("text", {
+        x: it.x, y: it.y, fill: it.ink, "font-size": it.size,
+        "text-anchor": "middle", "dominant-baseline": "middle",
+        "font-family": "'Work Sans', system-ui, sans-serif", "font-weight": "600"
+      });
+      node.textContent = it.text;
+      svg.append(node);
+      return;
+    }
+    const node = svgNode("line", {
+      x1: it.x1, y1: it.y1, x2: it.x2, y2: it.y2,
+      stroke: it.ink, "stroke-width": it.width
+    });
+    if (it.dash) node.setAttribute("stroke-dasharray", it.dash.join(" "));
+    svg.append(node);
+  });
+}
+
+/* ---------- Vorschau einpassen & drehen ---------- */
 
 let lastFitWidth = -1;
+let turned = false;
+let turnTimer = 0;
 
 function fitSheet(force) {
   const avail = el.fit.clientWidth;
@@ -2290,14 +2669,27 @@ function fitSheet(force) {
   const h = el.sheet.offsetHeight;
   if (!w || !h) return;
 
-  // Auf grossen Bildschirmen soll neben dem Blatt noch etwas Platz bleiben.
   const roomy = window.innerWidth > 1100;
   const maxH = Math.max(280, window.innerHeight - (roomy ? 230 : 170));
   const k = Math.min(avail / w, maxH / h);
 
-  el.sheet.style.transform = "translateX(-50%) scale(" + k + ")";
+  // Um die Mitte skalieren und drehen, dann oben buendig einpassen.
+  el.sheet.style.transform =
+    `translate(${(-w / 2).toFixed(2)}px, ${((k - 1) * h / 2).toFixed(2)}px) ` +
+    `scale(${k}) rotate(${turned ? 180 : 0}deg)`;
   el.fit.style.height = (h * k) + "px";
   el.pillZoom.textContent = Math.round(k * 100) + " %";
+}
+
+function setTurn(on) {
+  if (turned === on) return;
+  turned = on;
+  el.sheet.classList.add("is-turning");
+  clearTimeout(turnTimer);
+  turnTimer = setTimeout(() => el.sheet.classList.remove("is-turning"), 460);
+  fitSheet(true);
+  el.turn.setAttribute("aria-pressed", String(turned));
+  el.turn.classList.toggle("is-on", turned);
 }
 
 if (window.ResizeObserver) {
@@ -2316,55 +2708,75 @@ function overflows(span, box) {
 
 function applyText(key) {
   const s = text[key];
-  const p = parts(key);
+  const v = view[key];
+  const isText = s.content === "text";
 
-  // Auf A5 ist das zweite Schild ausgeblendet - dann gibt es nichts zu messen.
-  if (!p.box.clientHeight) return false;
+  v.span.hidden = !isText;
+  if (!isText || v.root.hidden || !v.box.clientHeight) return false;
 
-  // `size` ist ein Prozentwert der Panelhoehe, gesetzt wird er in Millimetern:
-  // Container-Einheiten loest nicht jeder Browser beim Drucken gleich auf.
-  const panelH = geometry().panelH;
-  const mm = (v) => (v * panelH / 100).toFixed(3) + "mm";
-
+  // `size` ist ein Prozentwert der Panelhoehe, gesetzt wird er in Millimetern.
+  const panelH = current.ps[0].g.H;
+  const mm = (value) => (value * panelH / 100).toFixed(3) + "mm";
   const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
+  const source = SOURCES[key];
 
-  p.span.textContent = p.src.value.trim() ? p.src.value : p.fallback;
-  p.span.style.fontFamily = font.css;
-  p.span.style.fontWeight = font.weight;
-  p.span.style.color = s.color;
-  p.span.style.lineHeight = s.lh;
-  p.span.style.textAlign = s.align;
-  p.span.style.textTransform = s.upper ? "uppercase" : "none";
-  p.span.style.textShadow = s.shadow ? "0.55mm 0.75mm 0 " + shadowInk(s.color) : "none";
-  p.box.style.justifyContent =
+  v.span.textContent = source.src.value.trim() ? source.src.value : source.fallback;
+  v.span.style.fontFamily = font.css;
+  v.span.style.fontWeight = font.weight;
+  v.span.style.color = s.color;
+  v.span.style.lineHeight = s.lh;
+  v.span.style.textAlign = s.align;
+  v.span.style.textTransform = s.upper ? "uppercase" : "none";
+  v.span.style.textShadow = s.shadow ? "0.55mm 0.75mm 0 " + shadowInk(s.color) : "none";
+  v.box.style.justifyContent =
     s.align === "left" ? "flex-start" : s.align === "right" ? "flex-end" : "center";
 
   if (s.auto) {
-    let v = s.max;
-    p.span.style.fontSize = mm(v);
-    while (v > s.min && overflows(p.span, p.box)) {
-      v -= 0.4;
-      p.span.style.fontSize = mm(v);
+    // Binaere Suche statt Schritt fuer Schritt - wenige Messungen pro Tastendruck.
+    let lo = s.min;
+    let hi = s.max;
+    v.span.style.fontSize = mm(hi);
+    if (overflows(v.span, v.box)) {
+      while (hi - lo > 0.2) {
+        const mid = (lo + hi) / 2;
+        v.span.style.fontSize = mm(mid);
+        if (overflows(v.span, v.box)) hi = mid;
+        else lo = mid;
+      }
+    } else {
+      lo = hi;
     }
     // Gerundet merken und genauso setzen, damit Vorschau und Export
     // dieselbe Schriftgroesse benutzen.
-    s.size = Math.round(v * 5) / 5;
+    s.size = Math.floor(lo * 5) / 5;
   }
-  p.span.style.fontSize = mm(s.size);
+  v.span.style.fontSize = mm(s.size);
 
-  return overflows(p.span, p.box);
+  return overflows(v.span, v.box);
 }
 
 const shadowInk = (color) => (color === "#1a1a1a" ? "#f5c518" : "#1a1a1a");
 
 function syncControls() {
   const s = cur();
-  const panelH = geometry().panelH;
+  const L = current.L;
+  const panelH = current.ps[0].g.H;
 
-  document.querySelectorAll("[data-paper]").forEach((b) =>
-    b.classList.toggle("is-on", b.dataset.paper === sheetState.paper));
+  document.querySelectorAll('input[name="layout"]').forEach((input) => {
+    input.checked = input.value === sheetState.layout;
+  });
   document.querySelectorAll("[data-orient]").forEach((b) =>
     b.classList.toggle("is-on", b.dataset.orient === sheetState.orient));
+  document.querySelectorAll("[data-finish]").forEach((b) =>
+    b.classList.toggle("is-on", b.dataset.finish === sheetState.finish));
+
+  el.noteTrim.hidden = !L.spec.trim;
+  el.fFinish.hidden = L.spec.trim;
+  el.fSafe.hidden = L.finish !== "safe";
+  el.noteFinish.textContent = sheetState.finish === "safe"
+    ? "Ein gleichmäßiger weißer Rand, den der Drucker nicht abschneidet."
+    : "Motive bis an die Papierkante. Nur wählen, wenn der Drucker randlos drucken kann – sonst fehlen ringsum etwa 3–5 mm.";
+  el.safe.value = sheetState.safe;
 
   el.font.value = s.font;
   el.auto.checked = s.auto;
@@ -2376,12 +2788,25 @@ function syncControls() {
   el.edge.value = sheetState.edge;
   el.style.value = sheetState.frameStyle;
   el.frameColor.value = sheetState.frameColor;
-  if (!el.frameColor.value) el.frameColor.value = "#1a1a1a";
   el.line.value = sheetState.lineWidth;
-  el.edge.disabled = sheetState.whole;
-  el.whole.checked = sheetState.whole;
+  el.cutMotifs.checked = sheetState.cutMotifs;
+  el.fEdge.hidden = sheetState.cutMotifs;
   el.marks.checked = sheetState.marks;
   el.cardFrame.checked = sheetState.cardFrame;
+
+  document.querySelectorAll("[data-content]").forEach((b) => {
+    const on = b.dataset.content === s.content;
+    b.classList.toggle("is-on", on);
+    b.setAttribute("aria-pressed", String(on));
+  });
+  el.textFields.hidden = s.content !== "text";
+  el.noteContent.hidden = s.content === "text";
+  el.noteContent.textContent = s.content === "blank"
+    ? "Das Feld bleibt leer – zum Selberschreiben oder Malen."
+    : "Das Feld bekommt Linien zum Selberschreiben.";
+  el.fLines.hidden = s.content !== "lines";
+  el.linesRow.querySelectorAll("[data-lines]").forEach((b) =>
+    b.classList.toggle("is-on", Number(b.dataset.lines) === s.lines));
 
   el.lblSize.textContent = nf(s.size * panelH / 100, 1) + " mm" + (s.auto ? " (auto)" : "");
   el.lblLh.textContent = nf(s.lh, 2);
@@ -2400,7 +2825,7 @@ function syncControls() {
 }
 
 function syncSideFields() {
-  const twin = sheetState.paper === "a4";
+  const twin = LAYOUTS[sheetState.layout].count === 2;
   if (!twin) cardIndex = 1;
   el.segCard.hidden = !twin;
 
@@ -2421,9 +2846,12 @@ function syncSideFields() {
     button.setAttribute("aria-selected", String(selected));
   });
 
+  TEXT_KEYS.forEach((key) => view[key].card.classList.toggle("is-active", key === textKey()));
+
+  const content = { text: "", blank: " · leer", lines: " · Linien" }[cur().content];
   el.hintText.textContent =
     (twin ? "Schild " + cardIndex + " · " : "") +
-    (side === "front" ? "Vorderseite" : "Rückseite");
+    (side === "front" ? "Vorderseite" : "Rückseite") + content;
 }
 
 function renderText() {
@@ -2440,6 +2868,15 @@ function renderAll() {
   renderText();
 }
 
+function selectSide(nextSide, nextCard) {
+  side = nextSide;
+  cardIndex = nextCard;
+  syncSideFields();
+  renderText();
+  // Beim Bearbeiten der Rueckseite steht der Text aufrecht.
+  setTurn(side === "back");
+}
+
 /* ---------- Entwurf & Historie ---------- */
 
 const edits = { undo: [], redo: [], applying: false };
@@ -2448,7 +2885,7 @@ let commitTimer = 0;
 
 function projectData() {
   return {
-    version: 2,
+    version: 3,
     sheetState: { ...sheetState },
     text: structuredClone(text),
     values: {
@@ -2461,29 +2898,55 @@ function projectData() {
 }
 
 /**
- * Uebernimmt ein Projekt (Entwurf oder Schritt aus der Historie). Fehlende
- * Angaben aelterer Entwuerfe werden auf sinnvolle Werte gesetzt.
+ * Uebernimmt ein Projekt (Entwurf oder Schritt aus der Historie). Unbekannte
+ * oder fehlende Angaben werden auf sinnvolle Werte gesetzt.
  */
 function applyProject(project) {
-  Object.assign(sheetState, DEFAULT_SHEET, project.sheetState);
-  sheetState.paper = sheetState.paper === "a4" ? "a4" : "a5";
-  sheetState.orient = sheetState.orient === "portrait" ? "portrait" : "landscape";
-  if (!Number.isFinite(sheetState.edge)) sheetState.edge = 0;
-  if (sheetState.whole) sheetState.edge = 0;
-  if (!sheetState.frameStyle) sheetState.frameStyle = "doodle";
-  if (!sheetState.frameColor) sheetState.frameColor = "#1a1a1a";
-  if (!Number.isFinite(sheetState.lineWidth)) sheetState.lineWidth = 1;
+  const st = { ...(project.sheetState || {}) };
+
+  // Entwuerfe vor den Druckvorlagen kannten nur "a5" und "a4".
+  if (!st.layout && st.paper) {
+    st.layout = st.paper === "a4" ? "a4-2" : "a5";
+    st.cutMotifs = !st.whole;
+    st.edge = Math.max(0, Number(st.edge) || 0);
+  }
+  delete st.paper;
+  delete st.whole;
+
+  Object.assign(sheetState, DEFAULT_SHEET, st);
+  sheetState.layout = pickOne(sheetState.layout, Object.keys(LAYOUTS), DEFAULT_SHEET.layout);
+  sheetState.orient = pickOne(sheetState.orient, ["landscape", "portrait"], "landscape");
+  sheetState.finish = pickOne(sheetState.finish, ["safe", "borderless"], "safe");
+  sheetState.safe = clampNum(sheetState.safe, 3, 12, DEFAULT_SHEET.safe);
+  sheetState.band = clampNum(sheetState.band, 14, 46, DEFAULT_SHEET.band);
+  sheetState.motif = clampNum(sheetState.motif, 0.7, 1.45, 1);
+  sheetState.gap = clampNum(sheetState.gap, 0, 5, DEFAULT_SHEET.gap);
+  sheetState.edge = clampNum(sheetState.edge, 0, 8, DEFAULT_SHEET.edge);
+  sheetState.lineWidth = clampNum(sheetState.lineWidth, 0.6, 2, 1);
+  sheetState.frameStyle = pickOne(sheetState.frameStyle, FRAME_STYLES, "doodle");
+  sheetState.frameColor = pickOne(sheetState.frameColor, FRAME_COLORS, "#1a1a1a");
+  sheetState.seed = Number.isFinite(sheetState.seed) ? sheetState.seed : DEFAULT_SHEET.seed;
+  sheetState.cutMotifs = sheetState.cutMotifs !== false;
   sheetState.marks = sheetState.marks !== false;
   sheetState.cardFrame = sheetState.cardFrame !== false;
 
   TEXT_KEYS.forEach((key) => {
-    if (project.text && project.text[key]) Object.assign(text[key], project.text[key]);
+    const d = DEFAULT_TEXT[key];
+    const t = text[key];
+    Object.assign(t, d, project.text && project.text[key]);
+    t.content = pickOne(t.content, CONTENTS, "text");
+    t.lines = Math.round(clampNum(t.lines, 1, 4, d.lines));
+    t.font = pickOne(t.font, FONTS.map((f) => f.id), d.font);
+    t.color = /^#[0-9a-f]{6}$/i.test(t.color) ? t.color : d.color;
+    t.align = pickOne(t.align, ["left", "center", "right"], "center");
+    t.lh = clampNum(t.lh, 0.85, 1.9, d.lh);
+    t.size = clampNum(t.size, 3, 46, d.size);
+    t.auto = t.auto !== false;
+    t.upper = Boolean(t.upper);
+    t.shadow = Boolean(t.shadow);
     // Die Groessengrenzen sind Programmvorgaben, keine Projekteinstellung.
-    text[key].max = DEFAULT_TEXT[key].max;
-    text[key].min = DEFAULT_TEXT[key].min;
-    text[key].size = Number.isFinite(text[key].size)
-      ? Math.min(Math.max(text[key].size, Number(el.size.min)), Number(el.size.max))
-      : DEFAULT_TEXT[key].size;
+    t.max = d.max;
+    t.min = d.min;
   });
 
   const values = project.values;
@@ -2502,7 +2965,7 @@ function applyProject(project) {
   }
 
   side = project.side === "back" ? "back" : "front";
-  cardIndex = (project.cardIndex === 2 && sheetState.paper === "a4") ? 2 : 1;
+  cardIndex = (project.cardIndex === 2 && LAYOUTS[sheetState.layout].count === 2) ? 2 : 1;
 }
 
 function updateHistoryButtons() {
@@ -2561,8 +3024,8 @@ function saveDraft() {
    Export als PNG oder PDF
 
    Gezeichnet wird dasselbe Blatt wie in der Vorschau: gleiche Geometrie in
-   Millimetern, gleiche Motive, gleiche Schrift, gleicher Zeilenumbruch.
-   Das Ergebnis ist randlos und exakt so gross wie das gewaehlte Papier.
+   Millimetern, gleiche Motive, gleiche Schrift, gleicher Zeilenumbruch,
+   gleiche Marken. Das Ergebnis ist exakt so gross wie das Papier.
    ======================================================================= */
 
 /** Baut aus einer Motivflaeche ein eigenstaendiges SVG mit eingebetteten Formen. */
@@ -2639,14 +3102,14 @@ function drawCard(ctx, s, g, key) {
     ctx.restore();
   }
 
-  if (box.w <= 0 || box.h <= 0) return;
-
   const st = text[key];
-  const lines = domLines(parts(key).span);
+  if (st.content !== "text" || box.w <= 0 || box.h <= 0) return;
+
+  const lines = domLines(view[key].span);
   if (!lines.length) return;
 
   const font = FONTS.find((f) => f.id === st.font) || FONTS[0];
-  const fpx = st.size * g.panelH / 100 * s;
+  const fpx = st.size * g.H / 100 * s;
 
   ctx.save();
   ctx.font = `${font.weight} ${fpx}px ${font.css}`;
@@ -2679,108 +3142,69 @@ function drawCard(ctx, s, g, key) {
   ctx.restore();
 }
 
-async function drawPanel(ctx, s, g, x, y, rotated, svg, key) {
-  const w = g.panelW;
-  const h = g.panelH;
-
-  ctx.save();
-  ctx.translate((x + w / 2) * s, (y + h / 2) * s);
-  if (rotated) ctx.rotate(Math.PI);
-  ctx.translate(-(w / 2) * s, -(h / 2) * s);
-
-  try {
-    const img = await loadImage(sceneToDataUrl(svg, Math.round(w * s), Math.round(h * s)));
-    ctx.drawImage(img, 0, 0, w * s, h * s);
-  } catch (error) {
-    // Ohne Motive weiterzeichnen ist besser als gar kein Export.
-  }
-
-  drawCard(ctx, s, g, key);
-  ctx.restore();
+function drawMarks(ctx, s, items) {
+  items.forEach((it) => {
+    ctx.save();
+    if (it.text) {
+      ctx.fillStyle = it.ink;
+      ctx.font = `600 ${it.size * s}px "Work Sans", system-ui, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(it.text, it.x * s, it.y * s);
+    } else {
+      ctx.strokeStyle = it.ink;
+      ctx.lineWidth = it.width * s;
+      ctx.setLineDash(it.dash ? it.dash.map((d) => d * s) : []);
+      ctx.beginPath();
+      ctx.moveTo(it.x1 * s, it.y1 * s);
+      ctx.lineTo(it.x2 * s, it.y2 * s);
+      ctx.stroke();
+    }
+    ctx.restore();
+  });
 }
 
-/** Falt- bzw. Schnittkante: weisses Band, Beschriftung, gestrichelte Linie. */
-function drawMark(ctx, s, x, y, len, dir, label) {
-  const thick = 2.6;
-  const pad = 4;
-  const gap = 1.6;
-  const fs = 2.2;
-  const ink = "#1a1a1a";
-
-  ctx.save();
-  ctx.fillStyle = "#ffffff";
-  if (dir === "h") ctx.fillRect(x * s, (y - thick / 2) * s, len * s, thick * s);
-  else ctx.fillRect((x - thick / 2) * s, y * s, thick * s, len * s);
-
-  ctx.fillStyle = ink;
-  ctx.strokeStyle = ink;
-  ctx.font = `600 ${fs * s}px "Work Sans", system-ui, sans-serif`;
-  if ("letterSpacing" in ctx) ctx.letterSpacing = (0.12 * fs * s).toFixed(2) + "px";
-  ctx.textBaseline = "middle";
-
-  const caption = label.toLocaleUpperCase("de-DE");
-  const tw = ctx.measureText(caption).width;
-
-  ctx.lineWidth = 0.4 * s;
-  ctx.setLineDash([1.2 * s, 1.2 * s]);
-
-  if (dir === "h") {
-    ctx.fillText(caption, (x + pad) * s, y * s);
-    ctx.beginPath();
-    ctx.moveTo((x + pad) * s + tw + gap * s, y * s);
-    ctx.lineTo((x + len - pad) * s, y * s);
-    ctx.stroke();
-  } else {
-    ctx.save();
-    ctx.translate(x * s, (y + pad) * s);
-    ctx.rotate(Math.PI / 2);
-    ctx.fillText(caption, 0, 0);
-    ctx.restore();
-    ctx.beginPath();
-    ctx.moveTo(x * s, (y + pad) * s + tw + gap * s);
-    ctx.lineTo(x * s, (y + len - pad) * s);
-    ctx.stroke();
-  }
-
-  ctx.restore();
+/** Hoechste Aufloesung, die der Browser fuer dieses Blatt noch zeichnen kann. */
+function fitDpi(dpi, page) {
+  const squareInches = (page.w / MM_PER_INCH) * (page.h / MM_PER_INCH);
+  return Math.min(dpi, Math.floor(Math.sqrt(MAX_CANVAS_PIXELS / squareInches)));
 }
 
 async function renderSheetCanvas(dpi) {
   await document.fonts.ready;
   renderText();
 
-  const g = geometry();
-  const f = g.f;
+  const { L, ps } = current;
   const s = dpi / MM_PER_INCH;
 
   const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(f.w * s));
-  canvas.height = Math.max(1, Math.round(f.h * s));
+  canvas.width = Math.max(1, Math.round(L.page.w * s));
+  canvas.height = Math.max(1, Math.round(L.page.h * s));
 
   const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Das Blatt ist für diesen Browser zu groß.");
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const twin = sheetState.paper === "a4";
-  const badges = twin ? [1, 2] : [1];
+  for (const p of ps) {
+    ctx.save();
+    ctx.translate(p.origin.x * s, p.origin.y * s);
+    if (p.back) ctx.rotate(Math.PI);
 
-  for (const index of badges) {
-    const ox = (twin && f.dir === "row" && index === 2) ? f.bw : 0;
-    const oy = (twin && f.dir === "column" && index === 2) ? f.bh : 0;
-    const suffix = index === 2 ? "2" : "";
+    const w = p.clip.x1 - p.clip.x0;
+    try {
+      const url = sceneToDataUrl(view[p.key].svg, Math.round(w * s), Math.round(p.clip.y1 * s));
+      const img = await loadImage(url);
+      ctx.drawImage(img, p.clip.x0 * s, 0, w * s, p.clip.y1 * s);
+    } catch (error) {
+      // Ohne Motive weiterzeichnen ist besser als gar kein Export.
+    }
 
-    // Oben die Rueckseite auf dem Kopf, unten die Vorderseite.
-    await drawPanel(ctx, s, g, ox, oy, true, el["sceneBack" + suffix], "back" + suffix);
-    await drawPanel(ctx, s, g, ox, oy + f.bh / 2, false, el["sceneFront" + suffix], "front" + suffix);
-
-    if (sheetState.marks) drawMark(ctx, s, ox, oy + f.bh / 2, f.bw, "h", "Faltkante");
+    drawCard(ctx, s, p.g, p.key);
+    ctx.restore();
   }
 
-  if (twin && sheetState.marks) {
-    if (f.dir === "row") drawMark(ctx, s, f.bw, 0, f.h, "v", "Schnittkante");
-    else drawMark(ctx, s, 0, f.bh, f.w, "h", "Schnittkante");
-  }
-
+  drawMarks(ctx, s, markItems(L));
   return canvas;
 }
 
@@ -2857,10 +3281,22 @@ async function canvasToPdf(canvas, wMm, hMm) {
   return new Blob(chunks, { type: "application/pdf" });
 }
 
+async function buildPdf(dpi) {
+  const page = current.L.page;
+  const canvas = await renderSheetCanvas(fitDpi(dpi, page));
+  try {
+    return await canvasToPdf(canvas, page.w, page.h);
+  } finally {
+    // Speicher sofort freigeben - iOS zaehlt alle Canvas-Flaechen zusammen.
+    canvas.width = 0;
+    canvas.height = 0;
+  }
+}
+
 /* ---------- Export ausloesen ---------- */
 
 function exportBasename() {
-  const twin = sheetState.paper === "a4";
+  const twin = LAYOUTS[sheetState.layout].count === 2;
   const raw = [el.name.value, twin ? el.name2.value : ""]
     .map((v) => v.trim())
     .filter(Boolean)
@@ -2886,37 +3322,33 @@ function exportFormat() {
 }
 
 function updateExportNote() {
-  const f = geometry().f;
-  const dpi = Number(el.expDpi.value);
-  const w = Math.round(f.w * dpi / MM_PER_INCH);
-  const h = Math.round(f.h * dpi / MM_PER_INCH);
+  const L = current.L;
+  const wanted = Number(el.expDpi.value);
+  const dpi = fitDpi(wanted, L.page);
+  const w = Math.round(L.page.w * dpi / MM_PER_INCH);
+  const h = Math.round(L.page.h * dpi / MM_PER_INCH);
   el.expNote.textContent =
-    `${f.label} · ${f.w} × ${f.h} mm · ${w} × ${h} Pixel. ` +
-    `Die Datei ist randlos und entspricht genau der Vorschau.`;
+    `${L.spec.label} · ${L.page.w} × ${L.page.h} mm · ${w} × ${h} Pixel` +
+    (dpi < wanted ? ` (auf ${dpi} dpi begrenzt – mehr schafft dieses Gerät nicht)` : "") +
+    ". Die Datei entspricht genau dem Blatt in der Vorschau.";
 }
 
 async function runExport() {
   const format = exportFormat();
-  const f = geometry().f;
-  let dpi = Number(el.expDpi.value) || 300;
-
-  // Sehr grosse Flaechen sprengen den Speicher mancher Browser.
-  while (dpi > 150 && (f.w * dpi / MM_PER_INCH) * (f.h * dpi / MM_PER_INCH) > 40e6) {
-    dpi = dpi === 600 ? 300 : 150;
-    toast("Auflösung auf " + dpi + " dpi verringert – das Blatt ist sehr groß.");
-  }
+  const page = current.L.page;
+  const dpi = fitDpi(Number(el.expDpi.value) || 300, page);
 
   el.expRun.disabled = true;
   el.expRun.textContent = "Wird erstellt …";
 
   try {
-    const canvas = await renderSheetCanvas(dpi);
-
     if (format === "pdf") {
-      const blob = await canvasToPdf(canvas, f.w, f.h);
-      download(blob, exportBasename() + ".pdf");
+      download(await buildPdf(dpi), exportBasename() + ".pdf");
     } else {
+      const canvas = await renderSheetCanvas(dpi);
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+      canvas.width = 0;
+      canvas.height = 0;
       if (!blob) throw new Error("Das Bild konnte nicht erzeugt werden.");
       download(blob, exportBasename() + ".png");
     }
@@ -2929,6 +3361,129 @@ async function runExport() {
     el.expRun.disabled = false;
     el.expRun.textContent = "Datei erstellen";
   }
+}
+
+/* ---------- Drucken ----------
+
+   Direkt ueber den Druckdialog des Browsers - oder ueber eine PDF-Datei in
+   Originalgroesse. Auf iPhone und iPad ist die PDF der verlaessliche Weg.
+   Die PDF entsteht in einem ersten Schritt; geoeffnet bzw. geteilt wird sie
+   mit einem zweiten Tipp, damit der Browser das nicht als Popup blockiert. */
+
+const printPdf = { blob: null, url: "", busy: false };
+
+function printMethod() {
+  const picked = document.querySelector('input[name="pr-method"]:checked');
+  return picked ? picked.value : "direct";
+}
+
+function resetPrintPdf() {
+  if (printPdf.url) URL.revokeObjectURL(printPdf.url);
+  printPdf.blob = null;
+  printPdf.url = "";
+}
+
+function canSharePdf() {
+  if (!IS_IOS || !navigator.canShare || !printPdf.blob) return false;
+  try {
+    return navigator.canShare({ files: [new File([printPdf.blob], "namensschild.pdf", { type: "application/pdf" })] });
+  } catch (error) {
+    return false;
+  }
+}
+
+function updatePrintDialog() {
+  const L = current.L;
+  const method = printMethod();
+  const twin = L.badges.length === 2;
+
+  el.prPaper.textContent = L.paperLabel + " einlegen";
+  el.prMode.textContent = {
+    trim: "Nach dem Druck an den Schnittmarken schneiden – dann bleibt kein weißer Rand.",
+    safe: "Mit " + mmText(L.safe) + " mm weißem Rand – klappt mit jedem Drucker." + (twin ? " Danach in der Mitte teilen." : ""),
+    borderless: "Randlos – nur für Drucker, die randlos drucken können." + (twin ? " Danach in der Mitte teilen." : "")
+  }[L.finish];
+
+  const upright = L.page.h > L.page.w;
+  el.prPage.setAttribute("x", upright ? "12" : "3");
+  el.prPage.setAttribute("y", upright ? "1" : "3");
+  el.prPage.setAttribute("width", upright ? "24" : "42");
+  el.prPage.setAttribute("height", upright ? "34" : "30");
+
+  const steps = [
+    ["Papier: ", L.spec.paper, ", Ausrichtung " + (upright ? "Hochformat" : "Querformat")],
+    ["Skalierung: ", "100 %", " („Tatsächliche Größe“ bzw. „Standard“)"],
+    ["Ränder: ", "Keine", ""],
+    ["Kopf- und Fußzeilen: ", "aus", ""]
+  ];
+  if (L.finish === "borderless") steps.push(["", "Randlos drucken", " einschalten, falls angeboten"]);
+  el.prSteps.replaceChildren(...steps.map(([before, strong, after]) => {
+    const li = document.createElement("li");
+    const b = document.createElement("b");
+    b.textContent = strong;
+    li.append(before, b, after);
+    return li;
+  }));
+
+  el.prDirect.hidden = method !== "direct";
+  el.prIos.hidden = !IS_IOS;
+  el.prPdf.hidden = method !== "pdf";
+  el.prStatus.hidden = !printPdf.blob;
+  el.prStatus.textContent = canSharePdf()
+    ? "Die PDF-Datei ist fertig. Tippe auf „Teilen“ und dann auf „Drucken“."
+    : "Die PDF-Datei ist fertig und kann geöffnet und gedruckt werden.";
+  el.prSave.hidden = method !== "pdf" || !printPdf.blob;
+
+  el.prRun.disabled = printPdf.busy;
+  el.prRun.textContent = method === "direct"
+    ? "Drucken"
+    : printPdf.busy ? "Wird erstellt …"
+    : !printPdf.blob ? "PDF erstellen"
+    : canSharePdf() ? "Teilen" : "PDF öffnen";
+}
+
+function openPrint() {
+  renderText();
+  resetPrintPdf();
+  updatePrintDialog();
+  el.dlgPrint.showModal();
+}
+
+async function runPrint() {
+  if (printMethod() === "direct") {
+    el.dlgPrint.close();
+    renderText();
+    window.print();
+    return;
+  }
+
+  if (!printPdf.blob) {
+    printPdf.busy = true;
+    updatePrintDialog();
+    try {
+      printPdf.blob = await buildPdf(300);
+      printPdf.url = URL.createObjectURL(printPdf.blob);
+    } catch (error) {
+      toast("PDF konnte nicht erstellt werden: " + error.message, true);
+    } finally {
+      printPdf.busy = false;
+      updatePrintDialog();
+    }
+    return;
+  }
+
+  if (canSharePdf()) {
+    const file = new File([printPdf.blob], exportBasename() + ".pdf", { type: "application/pdf" });
+    try {
+      await navigator.share({ files: [file], title: "Namensschild" });
+    } catch (error) {
+      // Teilen abgebrochen - nichts zu tun.
+    }
+    return;
+  }
+
+  const win = window.open(printPdf.url, "_blank");
+  if (!win) download(printPdf.blob, exportBasename() + ".pdf");
 }
 
 /* ---------- Ereignisse ---------- */
@@ -2952,12 +3507,11 @@ el.acc.addEventListener("click", (e) => {
 el.all.addEventListener("click", () => setMotifs(ALL_ITEMS, true));
 el.none.addEventListener("click", () => setMotifs(ALL_ITEMS, false));
 
-document.querySelectorAll("[data-paper]").forEach((b) => {
-  b.addEventListener("click", () => {
-    if (sheetState.paper === b.dataset.paper) return;
-    sheetState.paper = b.dataset.paper;
-    if (sheetState.paper === "a5") cardIndex = 1;
-    syncSideFields();
+document.querySelectorAll('input[name="layout"]').forEach((input) => {
+  input.addEventListener("change", () => {
+    if (!input.checked) return;
+    sheetState.layout = input.value;
+    if (LAYOUTS[input.value].count === 1) cardIndex = 1;
     renderAll();
   });
 });
@@ -2970,20 +3524,52 @@ document.querySelectorAll("[data-orient]").forEach((b) => {
   });
 });
 
-document.querySelectorAll("[data-side]").forEach((b) => {
+document.querySelectorAll("[data-finish]").forEach((b) => {
   b.addEventListener("click", () => {
-    side = b.dataset.side;
-    syncSideFields();
+    if (sheetState.finish === b.dataset.finish) return;
+    sheetState.finish = b.dataset.finish;
+    renderAll();
+  });
+});
+
+el.safe.addEventListener("input", () => {
+  sheetState.safe = parseFloat(el.safe.value);
+  renderAll();
+});
+
+document.querySelectorAll("[data-side]").forEach((b) => {
+  b.addEventListener("click", () => selectSide(b.dataset.side, cardIndex));
+});
+
+document.querySelectorAll("[data-card-tab]").forEach((b) => {
+  b.addEventListener("click", () => selectSide(side, Number(b.dataset.cardTab)));
+});
+
+// Ein Tipp auf eine Haelfte des Blattes waehlt diese Seite zum Bearbeiten.
+el.sheet.addEventListener("click", (e) => {
+  const panel = e.target.closest(".panel");
+  if (!panel) return;
+  const key = panel.dataset.key;
+  $("pc-text").open = true;
+  selectSide(key.startsWith("back") ? "back" : "front", key.endsWith("2") ? 2 : 1);
+});
+
+el.turn.addEventListener("click", () => setTurn(!turned));
+
+document.querySelectorAll("[data-content]").forEach((b) => {
+  b.addEventListener("click", () => {
+    cur().content = b.dataset.content;
+    layout();
     renderText();
   });
 });
 
-document.querySelectorAll("[data-card-tab]").forEach((b) => {
-  b.addEventListener("click", () => {
-    cardIndex = Number(b.dataset.cardTab);
-    syncSideFields();
-    renderText();
-  });
+el.linesRow.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-lines]");
+  if (!b) return;
+  cur().lines = Number(b.dataset.lines);
+  layout();
+  renderText();
 });
 
 el.band.addEventListener("input", () => {
@@ -3006,6 +3592,12 @@ el.edge.addEventListener("input", () => {
   layout();
 });
 
+el.cutMotifs.addEventListener("change", () => {
+  sheetState.cutMotifs = el.cutMotifs.checked;
+  layout();
+  syncControls();
+});
+
 el.style.addEventListener("change", () => {
   sheetState.frameStyle = el.style.value;
   layout();
@@ -3019,13 +3611,6 @@ el.frameColor.addEventListener("change", () => {
 el.line.addEventListener("input", () => {
   sheetState.lineWidth = parseFloat(el.line.value);
   layout();
-});
-
-el.whole.addEventListener("change", () => {
-  sheetState.whole = el.whole.checked;
-  if (sheetState.whole) sheetState.edge = 0;
-  layout();
-  syncControls();
 });
 
 el.marks.addEventListener("change", () => {
@@ -3089,6 +3674,7 @@ el.reset.addEventListener("click", () => {
   ALL_ITEMS.forEach((item) => enabled.add(item.id));
   side = "front";
   cardIndex = 1;
+  setTurn(false);
   syncMotifs();
   renderAll();
   commit();
@@ -3099,21 +3685,31 @@ el.reset.addEventListener("click", () => {
 document.querySelector(".col-controls").addEventListener("input", commitSoon);
 document.querySelector(".col-controls").addEventListener("change", commitSoon);
 document.querySelector(".col-controls").addEventListener("click", (e) => {
-  if (e.target.closest("button") && !e.target.closest("#btn-undo, #btn-redo")) commitSoon();
+  if (e.target.closest("button")) commitSoon();
 });
 
-/* ---------- Drucken & Exportieren ---------- */
+/* ---------- Dialoge ---------- */
 
-// Nicht "print" nennen: eine Funktion auf oberster Ebene landet am globalen
-// Objekt und wuerde window.print ueberschreiben - der Aufruf unten riefe dann
-// sich selbst auf.
-function printSheet() {
-  renderText();
-  window.print();
-}
+$("btn-print").addEventListener("click", openPrint);
+$("btn-print-m").addEventListener("click", openPrint);
+el.prRun.addEventListener("click", runPrint);
+el.prSave.addEventListener("click", () => {
+  if (printPdf.blob) download(printPdf.blob, exportBasename() + ".pdf");
+});
 
-$("btn-print").addEventListener("click", printSheet);
-$("btn-print-m").addEventListener("click", printSheet);
+document.querySelectorAll('input[name="pr-method"]').forEach((input) => {
+  input.addEventListener("change", () => {
+    try { localStorage.setItem(PRINT_METHOD_KEY, printMethod()); } catch (error) { /* egal */ }
+    updatePrintDialog();
+  });
+});
+
+let storedMethod = null;
+try { storedMethod = localStorage.getItem(PRINT_METHOD_KEY); } catch (error) { /* egal */ }
+const initialMethod = pickOne(storedMethod, ["direct", "pdf"], IS_IOS || IS_SAFARI ? "pdf" : "direct");
+document.querySelectorAll('input[name="pr-method"]').forEach((input) => {
+  input.checked = input.value === initialMethod;
+});
 
 function openExport() {
   updateExportNote();
@@ -3128,11 +3724,14 @@ el.expRun.addEventListener("click", runExport);
 document.querySelectorAll("[data-close]").forEach((b) =>
   b.addEventListener("click", () => $(b.dataset.close).close()));
 
-el.dlgExport.addEventListener("click", (e) => {
-  if (e.target === el.dlgExport) el.dlgExport.close();
+[el.dlgExport, el.dlgPrint].forEach((dlg) => {
+  dlg.addEventListener("click", (e) => {
+    if (e.target === dlg) dlg.close();
+  });
 });
 
-window.addEventListener("resize", () => { fitSheet(true); renderText(); });
+// Die Groesse des Textes haengt nicht vom Fenster ab - nur das Einpassen.
+window.addEventListener("resize", () => fitSheet(true));
 window.addEventListener("beforeprint", renderText);
 document.fonts.ready.then(() => { fitSheet(true); renderText(); });
 
@@ -3183,7 +3782,7 @@ $("btn-legal").addEventListener("click", () => legal.showModal());
 /* ---------- Start ---------- */
 
 try {
-  const draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || localStorage.getItem(OLD_STORAGE_KEY));
   if (draft && draft.sheetState && draft.text) applyProject(draft);
 } catch (error) {
   // Ein unbrauchbarer Entwurf wird einfach ignoriert.
@@ -3191,6 +3790,7 @@ try {
 
 syncMotifs();
 renderAll();
+setTurn(side === "back");
 snapshot();
 updateHistoryButtons();
 
