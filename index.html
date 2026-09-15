@@ -279,10 +279,10 @@
   }
 
   /* Nur beim Drehen animieren, nicht bei jeder Groessenaenderung. */
-  .sheet.is-turning { transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.2, 1); }
+  .sheet-fit.is-turning .sheet { transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.2, 1); }
 
   @media (prefers-reduced-motion: reduce) {
-    .sheet.is-turning { transition: none; }
+    .sheet-fit.is-turning .sheet { transition: none; }
   }
 
   /* Jede Haelfte eines Schildes ist eine eigene Flaeche in Blattkoordinaten.
@@ -325,11 +325,74 @@
     display: block; overflow: visible; pointer-events: none;
   }
 
+  /* Bildschirm: Nur das Blatt mit dem gerade bearbeiteten Schild ist zu
+     sehen. Die anderen liegen unsichtbar darunter, damit ihr Text gemessen
+     werden kann. Die Markierung des aktiven Feldes ist ein weicher Schein -
+     sie soll nicht wie ein gedruckter Rahmen aussehen. */
   @media screen {
+    .sheet:not(.is-current) { visibility: hidden; pointer-events: none; }
     .panel { cursor: pointer; }
-    .panel:hover .card { outline: 0.5mm dashed rgba(47, 111, 87, 0.5); outline-offset: 0.8mm; }
-    .card.is-active, .panel:hover .card.is-active { outline: 0.7mm dashed var(--ui-accent); outline-offset: 0.8mm; }
+    .panel:hover .card { box-shadow: 0 0 0 1.2mm rgba(47, 111, 87, 0.18); }
+    .card.is-active, .panel:hover .card.is-active { box-shadow: 0 0 0 1.4mm rgba(47, 111, 87, 0.35); }
   }
+
+  /* ---------- Reiter fuer mehrere Schilder ---------- */
+
+  .badge-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--ui-line);
+  }
+
+  .badge-tabs {
+    flex: 1; min-width: 0;
+    display: flex; gap: 6px;
+    overflow-x: auto; scrollbar-width: thin;
+    padding: 2px;
+  }
+
+  .badge-tab {
+    flex: none; display: flex; align-items: stretch;
+    border: 1.5px solid var(--ui-line-strong);
+    border-radius: 9px;
+    background: var(--ui-bg);
+    overflow: hidden;
+  }
+
+  .badge-tab.is-on { border-color: var(--ui-accent); background: var(--ui-accent-soft); }
+
+  .badge-tab-main {
+    display: flex; align-items: center; gap: 7px;
+    max-width: 170px; min-height: 32px;
+    padding: 4px 9px 4px 6px;
+    background: none; border: 0; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--ui-muted);
+  }
+
+  .badge-tab.is-on .badge-tab-main { color: var(--ui-accent); }
+
+  .badge-tab-main .num {
+    flex: none; min-width: 19px; height: 19px; padding: 0 4px;
+    display: grid; place-items: center;
+    border-radius: 6px;
+    font-size: 11px; font-variant-numeric: tabular-nums;
+    background: var(--ui-panel-2); color: var(--ui-muted);
+  }
+
+  .badge-tab.is-on .num { background: var(--ui-accent); color: var(--ui-accent-ink); }
+  .badge-tab-main .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge-tab-main .nm.is-empty { font-style: italic; font-weight: 500; }
+
+  .badge-tab-del {
+    display: grid; place-items: center;
+    width: 28px; padding: 0;
+    background: none; border: 0; border-left: 1px solid var(--ui-line);
+    cursor: pointer; color: var(--ui-muted);
+  }
+
+  .badge-tab-del svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+  .badge-tab-del:hover { color: var(--ui-warn); background: var(--ui-panel-2); }
+  .badge-tab-main:focus-visible, .badge-tab-del:focus-visible { outline: 2.5px solid var(--ui-accent); outline-offset: -3px; }
 
   .preview-foot {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -842,10 +905,14 @@
       transition: none !important;
       margin: 0 !important;
       box-shadow: none !important;
+      visibility: visible !important;
       break-inside: avoid; page-break-inside: avoid;
+      break-after: page; page-break-after: always;
     }
 
-    .card { outline: none !important; }
+    .sheet:last-child { break-after: auto; page-break-after: auto; }
+
+    .card { outline: none !important; box-shadow: none !important; }
 
     .sheet, .sheet * {
       -webkit-print-color-adjust: exact;
@@ -1390,6 +1457,7 @@
       <div class="preview-head no-print">
         <span class="preview-title">Vorschau</span>
         <div class="preview-meta">
+          <span class="pill" id="pill-page" hidden>Blatt 1 / 1</span>
           <span class="pill" id="pill-format">A4 &middot; 297 &times; 210 mm</span>
           <span class="pill" id="pill-zoom">100 %</span>
           <button type="button" class="btn btn--sm" id="btn-turn" aria-pressed="false"
@@ -1400,37 +1468,21 @@
         </div>
       </div>
 
+      <div class="badge-bar no-print">
+        <div class="badge-tabs" id="badge-tabs" role="tablist" aria-label="Schilder"></div>
+        <button type="button" class="btn btn--sm" id="btn-add" title="Weiteres Schild anlegen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Schild</span>
+        </button>
+      </div>
+
       <div class="preview-stage">
-        <div class="sheet-fit" id="sheet-fit">
-          <div class="sheet" id="sheet">
-
-            <div class="panel panel--back" id="panel-back" data-key="back">
-              <svg class="scene" id="scene-back" aria-hidden="true" focusable="false"></svg>
-              <div class="card" id="card-back"><div class="card-inner" id="box-back"><span class="card-text" id="out-back"></span></div></div>
-            </div>
-
-            <div class="panel" id="panel-front" data-key="front">
-              <svg class="scene" id="scene-front" aria-hidden="true" focusable="false"></svg>
-              <div class="card" id="card-front"><div class="card-inner" id="box-front"><span class="card-text" id="out-front"></span></div></div>
-            </div>
-
-            <div class="panel panel--back" id="panel-back2" data-key="back2" hidden>
-              <svg class="scene" id="scene-back2" aria-hidden="true" focusable="false"></svg>
-              <div class="card" id="card-back2"><div class="card-inner" id="box-back2"><span class="card-text" id="out-back2"></span></div></div>
-            </div>
-
-            <div class="panel" id="panel-front2" data-key="front2" hidden>
-              <svg class="scene" id="scene-front2" aria-hidden="true" focusable="false"></svg>
-              <div class="card" id="card-front2"><div class="card-inner" id="box-front2"><span class="card-text" id="out-front2"></span></div></div>
-            </div>
-
-            <svg class="marks" id="marks" aria-hidden="true" focusable="false"></svg>
-          </div>
-        </div>
+        <!-- Die Blaetter baut das Skript: eines pro Druckseite. -->
+        <div class="sheet-fit" id="sheet-fit"></div>
       </div>
 
       <div class="preview-foot no-print">
-        <span id="preview-note">Tipp: Auf ein Textfeld klicken, um diese Seite zu bearbeiten.</span>
+        <span id="preview-note">Tipp: Auf ein Textfeld klicken, um diese Seite zu bearbeiten. Der farbige Rahmen zeigt nur, was gerade bearbeitet wird &ndash; er wird nicht gedruckt.</span>
         <p class="warn" id="warn" hidden role="status">Der Text ragt &uuml;ber das Feld hinaus.</p>
         <span class="spacer"></span>
         <button type="button" class="chip" id="btn-undo" disabled>R&uuml;ckg&auml;ngig</button>
@@ -1544,11 +1596,6 @@
         <span class="panel-hint" id="hint-text">Vorderseite</span>
       </summary>
       <div class="panel-body">
-        <div class="seg" role="tablist" aria-label="Schild ausw&auml;hlen" id="seg-card" hidden>
-          <button type="button" role="tab" class="seg-btn is-on" data-card-tab="1" aria-selected="true">Schild 1</button>
-          <button type="button" role="tab" class="seg-btn" data-card-tab="2" aria-selected="false">Schild 2</button>
-        </div>
-
         <div class="seg" role="tablist" aria-label="Seite ausw&auml;hlen">
           <button type="button" role="tab" class="seg-btn is-on" data-side="front" aria-selected="true">Vorderseite</button>
           <button type="button" role="tab" class="seg-btn" data-side="back" aria-selected="false">R&uuml;ckseite</button>
@@ -1576,26 +1623,14 @@
         </div>
 
         <div class="grid" id="text-fields">
-          <div class="field span-all" data-only="front" data-card="1">
+          <div class="field span-all" data-only="front">
             <label for="in-name">Name</label>
-            <input id="in-name" type="text" value="Mia" autocomplete="off" spellcheck="false">
+            <input id="in-name" type="text" autocomplete="off" spellcheck="false" placeholder="Name eintragen">
           </div>
 
-          <div class="field span-all" data-only="back" data-card="1" hidden>
+          <div class="field span-all" data-only="back" hidden>
             <label for="in-text">Text</label>
-            <textarea id="in-text" rows="2" spellcheck="false">Klasse 5b
-Schuljahr 2026/27</textarea>
-          </div>
-
-          <div class="field span-all" data-only="front" data-card="2" hidden>
-            <label for="in-name2">Name &middot; Schild 2</label>
-            <input id="in-name2" type="text" value="Tom" autocomplete="off" spellcheck="false">
-          </div>
-
-          <div class="field span-all" data-only="back" data-card="2" hidden>
-            <label for="in-text2">Text &middot; Schild 2</label>
-            <textarea id="in-text2" rows="2" spellcheck="false">Klasse 5b
-Schuljahr 2026/27</textarea>
+            <textarea id="in-text" rows="2" spellcheck="false"></textarea>
           </div>
 
           <div class="field span-all">
@@ -1746,6 +1781,10 @@ Schuljahr 2026/27</textarea>
     <div class="tip">
       <h3>Falten</h3>
       <p>In der Mitte knicken. Die obere H&auml;lfte steht kopf &ndash; nach dem Falten liest sich die R&uuml;ckseite richtig herum. Mit <b>Drehen</b> &uuml;ber der Vorschau steht sie beim Bearbeiten aufrecht.</p>
+    </div>
+    <div class="tip">
+      <h3>Mehrere Schilder</h3>
+      <p>Mit <b>+ Schild</b> &uuml;ber der Vorschau weitere Schilder anlegen &ndash; etwa f&uuml;r die ganze Klasse. Druck und PDF enthalten alle, bei den 2er-Vorlagen je zwei pro Blatt.</p>
     </div>
     <div class="tip">
       <h3>Selbst gestalten</h3>
@@ -1919,6 +1958,10 @@ Schuljahr 2026/27</textarea>
    Eine einzige Quelle der Wahrheit: der Zustand unten. Vorschau, Druck und
    Export werden alle daraus abgeleitet und benutzen dieselbe Geometrie in
    Millimetern auf dem Blatt. Deshalb sieht der Ausdruck aus wie die Vorschau.
+
+   Es gibt beliebig viele Schilder. Blatt, Druckvorlage und Motivrahmen gelten
+   fuer alle, Texte und Schriftbild hat jedes Schild selbst. Die Schilder
+   werden der Reihe nach auf Blaetter verteilt - eins oder zwei pro Blatt.
    ======================================================================= */
 
 /* ---------- Motive ---------- */
@@ -2056,6 +2099,7 @@ const MARK_LEN_MM = 4.5;
 const CARD_BORDER_MM = 0.9;
 const CROP_INK = "#1a1a1a";
 const GUIDE_INK = "#8f8f8f";
+const MAX_BADGES = 120;
 
 const LAYOUTS = {
   "a4-trim":  { label: "A5 zum Zuschneiden",         paper: "A4", count: 1, trim: true },
@@ -2066,6 +2110,7 @@ const LAYOUTS = {
 
 const FRAME_STYLES = ["doodle", "confetti", "stars", "minimal"];
 const CONTENTS = ["text", "blank", "lines"];
+const FACES = ["back", "front"];
 
 /* ---------- Zustand ---------- */
 
@@ -2080,29 +2125,38 @@ const DEFAULT_SHEET = {
 const sheetState = { ...DEFAULT_SHEET };
 
 const DEFAULT_TEXT = {
-  front:  { content: "text", lines: 1, font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
-  back:   { content: "text", lines: 2, font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 },
-  front2: { content: "text", lines: 1, font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
-  back2:  { content: "text", lines: 2, font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 }
+  front: { content: "text", lines: 1, font: "archivo", auto: true, size: 15, lh: 1.02, color: "#1a1a1a", align: "center", upper: true,  shadow: false, max: 46, min: 3 },
+  back:  { content: "text", lines: 2, font: "work",    auto: true, size: 9,  lh: 1.3,  color: "#1a1a1a", align: "center", upper: false, shadow: false, max: 30, min: 3 }
 };
 
-const DEFAULT_VALUES = {
-  name: "Mia",  text: "Klasse 5b\nSchuljahr 2026/27",
-  name2: "Tom", text2: "Klasse 5b\nSchuljahr 2026/27"
-};
+const DEFAULT_VALUES = { name: "Mia", text: "Klasse 5b\nSchuljahr 2026/27" };
 
-const TEXT_KEYS = ["front", "back", "front2", "back2"];
-const SEED_OFFSET = { front: 0, back: 977, front2: 3319, back2: 4507 };
-const text = structuredClone(DEFAULT_TEXT);
+function defaultBadge() {
+  return {
+    seed: 0, name: DEFAULT_VALUES.name, text: DEFAULT_VALUES.text,
+    front: structuredClone(DEFAULT_TEXT.front), back: structuredClone(DEFAULT_TEXT.back)
+  };
+}
 
+/** Neues Schild: gleiches Schriftbild und gleicher Rueckseitentext, eigene Motive. */
+function badgeLike(from) {
+  return {
+    seed: Math.floor(Math.random() * 1e9), name: "", text: from.text,
+    front: structuredClone(from.front), back: structuredClone(from.back)
+  };
+}
+
+let badges = [defaultBadge()];
+let active = 0;
 let side = "front";
-let cardIndex = 1;
 
-const textKey = () => side + (cardIndex === 2 ? "2" : "");
-const cur = () => text[textKey()];
+const cur = () => badges[active][side];
+const perSheet = () => LAYOUTS[sheetState.layout].count;
+const pageOf = (index) => Math.floor(index / perSheet());
+const badgeLabel = (b) => b.name.trim() || "Ohne Namen";
 
-const STORAGE_KEY = "namensschild-entwurf-v3";
-const OLD_STORAGE_KEY = "namensschild-entwurf-v2";
+const STORAGE_KEY = "namensschild-entwurf-v4";
+const OLD_STORAGE_KEYS = ["namensschild-entwurf-v3", "namensschild-entwurf-v2"];
 const THEME_KEY = "namensschild-design";
 const LEGAL_KEY = "namensschild-hinweis-gelesen";
 const PRINT_METHOD_KEY = "namensschild-druckweg";
@@ -2110,8 +2164,9 @@ const PRINT_METHOD_KEY = "namensschild-druckweg";
 const $ = (id) => document.getElementById(id);
 
 const el = {
-  sheet: $("sheet"), fit: $("sheet-fit"), pageRule: $("page-rule"), marksSvg: $("marks"),
-  pillFormat: $("pill-format"), pillZoom: $("pill-zoom"), turn: $("btn-turn"),
+  fit: $("sheet-fit"), pageRule: $("page-rule"),
+  pillPage: $("pill-page"), pillFormat: $("pill-format"), pillZoom: $("pill-zoom"), turn: $("btn-turn"),
+  tabs: $("badge-tabs"), add: $("btn-add"),
   brandSub: $("brand-sub"), hintSheet: $("hint-sheet"),
   hintText: $("hint-text"), hintFrame: $("hint-frame"), hintMotifs: $("hint-motifs"),
   lblSheetSize: $("lbl-sheetsize"),
@@ -2120,7 +2175,7 @@ const el = {
   fSafe: $("f-safe"), safe: $("in-safe"), lblSafe: $("lbl-safe"),
   marks: $("in-marks"), cardFrame: $("in-cardframe"),
 
-  segCard: $("seg-card"), textFields: $("text-fields"),
+  textFields: $("text-fields"),
   noteContent: $("note-content"), fLines: $("f-lines"), linesRow: $("lines-row"),
 
   band: $("in-band"), scale: $("in-scale"), gap: $("in-gap"), edge: $("in-edge"), fEdge: $("f-edge"),
@@ -2129,7 +2184,7 @@ const el = {
   lblEdge: $("lbl-edge"), lblLine: $("lbl-line"), lblCount: $("lbl-count"),
   acc: $("acc"), shuffle: $("btn-shuffle"), all: $("btn-all"), none: $("btn-none"),
 
-  name: $("in-name"), text: $("in-text"), name2: $("in-name2"), text2: $("in-text2"),
+  name: $("in-name"), text: $("in-text"),
 
   font: $("in-font"), size: $("in-size"), auto: $("in-auto"), lh: $("in-lh"),
   lblSize: $("lbl-size"), lblLh: $("lbl-lh"),
@@ -2148,21 +2203,6 @@ const el = {
 };
 
 const FRAME_COLORS = [...el.frameColor.options].map((o) => o.value);
-
-const view = {};
-TEXT_KEYS.forEach((key) => {
-  view[key] = {
-    root: $("panel-" + key), svg: $("scene-" + key),
-    card: $("card-" + key), box: $("box-" + key), span: $("out-" + key)
-  };
-});
-
-const SOURCES = {
-  front:  { src: el.name,  fallback: "Name" },
-  back:   { src: el.text,  fallback: "Text" },
-  front2: { src: el.name2, fallback: "Name" },
-  back2:  { src: el.text2, fallback: "Text" }
-};
 
 /* ---------- Kleine Helfer ---------- */
 
@@ -2268,7 +2308,7 @@ function setMotifs(items, on) {
    Alle Masse in Millimetern. Jede Haelfte eines Schildes ("Panel") hat ein
    eigenes Koordinatensystem: x von links nach rechts, y = 0 an der
    Faltkante, y = H an der Aussenkante. Die Rueckseite ist dasselbe Panel,
-   nur um 180 Grad gedreht.                                                 */
+   nur um 180 Grad gedreht. Die Geometrie ist fuer alle Blaetter gleich.     */
 
 function sheetLayout() {
   const spec = LAYOUTS[sheetState.layout];
@@ -2277,14 +2317,14 @@ function sheetLayout() {
   const edges = (t, r, b, l) => ({ t, r, b, l });
   const none = edges(0, 0, 0, 0);
   let page;
-  let badges;
+  let slots;
 
   switch (sheetState.layout) {
     case "a4-trim": {
       const w = land ? 210 : 148;
       const h = land ? 148 : 210;
       page = land ? { w: 297, h: 210 } : { w: 210, h: 297 };
-      badges = [{ x: (page.w - w) / 2, y: (page.h - h) / 2, w, h, bleed: edges(B, B, B, B) }];
+      slots = [{ x: (page.w - w) / 2, y: (page.h - h) / 2, w, h, bleed: edges(B, B, B, B) }];
       break;
     }
     case "a4-trim2": {
@@ -2295,13 +2335,13 @@ function sheetLayout() {
       const full = 210 - 2 * m;
       if (land) {
         page = { w: 210, h: 297 };
-        badges = [
+        slots = [
           { x: m, y: m,        w: full, h: half, bleed: edges(B, B, 0, B) },
           { x: m, y: m + half, w: full, h: half, bleed: edges(0, B, B, B) }
         ];
       } else {
         page = { w: 297, h: 210 };
-        badges = [
+        slots = [
           { x: m,        y: m, w: half, h: full, bleed: edges(B, 0, B, B) },
           { x: m + half, y: m, w: half, h: full, bleed: edges(B, B, B, 0) }
         ];
@@ -2311,13 +2351,13 @@ function sheetLayout() {
     case "a4-2":
       if (land) {
         page = { w: 210, h: 297 };
-        badges = [
+        slots = [
           { x: 0, y: 0,     w: 210, h: 148.5, bleed: none },
           { x: 0, y: 148.5, w: 210, h: 148.5, bleed: none }
         ];
       } else {
         page = { w: 297, h: 210 };
-        badges = [
+        slots = [
           { x: 0,     y: 0, w: 148.5, h: 210, bleed: none },
           { x: 148.5, y: 0, w: 148.5, h: 210, bleed: none }
         ];
@@ -2325,21 +2365,21 @@ function sheetLayout() {
       break;
     default:
       page = land ? { w: 210, h: 148 } : { w: 148, h: 210 };
-      badges = [{ x: 0, y: 0, w: page.w, h: page.h, bleed: none }];
+      slots = [{ x: 0, y: 0, w: page.w, h: page.h, bleed: none }];
   }
 
   const finish = spec.trim ? "trim" : sheetState.finish;
   return {
-    spec, page, badges, finish,
+    spec, page, slots, finish,
     safe: finish === "safe" ? sheetState.safe : 0,
     orientLabel: land ? "quer" : "hoch",
     paperLabel: spec.paper + " " + (page.w > page.h ? "quer" : "hoch")
   };
 }
 
-function panelGeometry(L, badge) {
-  const W = badge.w;
-  const H = badge.h / 2;
+function panelGeometry(L, slot) {
+  const W = slot.w;
+  const H = slot.h / 2;
   const s = L.safe;
   const cw = W - 2 * s;
   const ch = H - s;
@@ -2351,11 +2391,11 @@ function panelGeometry(L, badge) {
 /** Alle Panels mit Zeichenflaeche (clip), Lage auf dem Blatt (box) und Ursprung. */
 function sheetPanels(L) {
   const out = [];
-  L.badges.forEach((b, i) => {
+  L.slots.forEach((b, slot) => {
     const g = panelGeometry(L, b);
     const fold = b.y + b.h / 2;
-    ["back", "front"].forEach((sideName) => {
-      const back = sideName === "back";
+    FACES.forEach((face) => {
+      const back = face === "back";
       // Durch die Drehung tauschen links und rechts, aussen ist oben am Blatt.
       const l = back ? b.bleed.r : b.bleed.l;
       const r = back ? b.bleed.l : b.bleed.r;
@@ -2365,7 +2405,7 @@ function sheetPanels(L) {
         ? { x0: s, x1: g.W - s, y1: g.H - s }
         : { x0: -l, x1: g.W + r, y1: g.H + o };
       out.push({
-        key: sideName + (i ? "2" : ""), back, g, clip,
+        slot, face, back, g, clip,
         box: {
           x: back ? b.x + g.W - clip.x1 : b.x + clip.x0,
           y: back ? fold - clip.y1 : fold,
@@ -2393,23 +2433,24 @@ function textBox(g) {
   };
 }
 
-/** Schnittmarken, Falt- und Schnittlinien in Blattkoordinaten - fuer SVG und Canvas. */
-function markItems(L) {
+/** Schnittmarken, Falt- und Schnittlinien eines Blattes - fuer SVG und Canvas. */
+function markItems(L, occupied) {
   const items = [];
+  const used = L.slots.filter((_, i) => occupied[i]);
   const line = (x1, y1, x2, y2, extra) =>
     items.push({ x1, y1, x2, y2, ink: CROP_INK, width: 0.25, dash: null, ...extra });
 
-  if (L.finish === "trim") {
+  if (L.finish === "trim" && used.length) {
     const a = BLEED_MM;
     const z = BLEED_MM + MARK_LEN_MM;
-    L.badges.forEach((b) => {
+    used.forEach((b) => {
       const right = b.x + b.w;
       const bottom = b.y + b.h;
       const fold = b.y + b.h / 2;
       // Marken nur an Aussenkanten - nie in ein Nachbarschild hinein.
       [b.x, right].forEach((x) => {
         if (b.bleed.t) line(x, b.y - a, x, b.y - z);
-        if (b.bleed.b) line(x, bottom + a, x, bottom + z);
+        if (b.bleed.b || used.length === 1) line(x, bottom + a, x, bottom + z);
       });
       [b.y, bottom].forEach((y) => {
         if (b.bleed.l) line(b.x - a, y, b.x - z, y);
@@ -2420,8 +2461,8 @@ function markItems(L) {
       if (b.bleed.r) line(right + a, fold, right + z, fold, { dash });
     });
 
-    const first = L.badges[0];
-    const bottom = Math.max(...L.badges.map((b) => b.y + b.h));
+    const first = used[0];
+    const bottom = Math.max(...used.map((b) => b.y + b.h));
     items.push({
       text: "An den Marken schneiden · an der gestrichelten Linie falten",
       x: first.x + first.w / 2, y: bottom + BLEED_MM + 3.2, size: 2.2, ink: GUIDE_INK
@@ -2429,12 +2470,12 @@ function markItems(L) {
   }
 
   if (sheetState.marks) {
-    L.badges.forEach((b) => {
+    used.forEach((b) => {
       const fold = b.y + b.h / 2;
       line(b.x + L.safe, fold, b.x + b.w - L.safe, fold, { ink: GUIDE_INK, dash: [1.6, 1.2] });
     });
-    if (L.finish !== "trim" && L.badges.length === 2) {
-      const b = L.badges[1];
+    if (L.finish !== "trim" && used.length === 2) {
+      const b = L.slots[1];
       const dash = [4, 1.4, 0.6, 1.4];
       if (b.x > 0) line(b.x, 0, b.x, L.page.h, { ink: GUIDE_INK, dash });
       else line(0, b.y, L.page.w, b.y, { ink: GUIDE_INK, dash });
@@ -2558,44 +2599,140 @@ function buildScene(svg, p, seed, ids, lineCount) {
   }
 }
 
-/* ---------- Aufbau des Blattes ---------- */
+/* ---------- Blaetter ----------
 
+   Pro Druckseite ein .sheet mit Platz fuer zwei Schilder. Am Bildschirm ist
+   nur das Blatt mit dem aktiven Schild sichtbar; die anderen werden erst
+   gezeichnet, wenn sie gebraucht werden (Umschalten, Druck, Export).        */
+
+const pages = [];
 let current = null;
+
+function createPanel(slot, face) {
+  const root = document.createElement("div");
+  root.className = "panel" + (face === "back" ? " panel--back" : "");
+  root.dataset.slot = slot;
+  root.dataset.face = face;
+
+  const svg = svgNode("svg", { class: "scene", "aria-hidden": "true", focusable: "false" });
+  const card = document.createElement("div");
+  card.className = "card";
+  const box = document.createElement("div");
+  box.className = "card-inner";
+  const span = document.createElement("span");
+  span.className = "card-text";
+
+  box.append(span);
+  card.append(box);
+  root.append(svg, card);
+  return { root, svg, card, box, span };
+}
+
+function createPage() {
+  const root = document.createElement("div");
+  root.className = "sheet";
+  const slots = [0, 1].map((slot) => {
+    const faces = {};
+    FACES.forEach((face) => {
+      faces[face] = createPanel(slot, face);
+      root.append(faces[face].root);
+    });
+    return faces;
+  });
+  const marks = svgNode("svg", { class: "marks", "aria-hidden": "true", focusable: "false" });
+  root.append(marks);
+  return { root, slots, marks, dirty: true };
+}
+
+/** Passt die Zahl der Blaetter an die Schilder an und zeigt das aktuelle. */
+function syncPages() {
+  const count = Math.max(1, Math.ceil(badges.length / perSheet()));
+  let changed = false;
+  while (pages.length < count) {
+    const page = createPage();
+    el.fit.append(page.root);
+    pages.push(page);
+    changed = true;
+  }
+  while (pages.length > count) {
+    pages.pop().root.remove();
+  }
+
+  const shown = pageOf(active);
+  pages.forEach((page, n) => {
+    page.root.dataset.page = n;
+    page.root.classList.toggle("is-current", n === shown);
+  });
+
+  el.pillPage.hidden = pages.length < 2;
+  el.pillPage.textContent = "Blatt " + (shown + 1) + " / " + pages.length;
+  if (changed) fitSheet(true);
+}
+
+const viewOf = (index, face) => pages[pageOf(index)].slots[index % perSheet()][face];
 
 function layout() {
   const L = sheetLayout();
   const ps = sheetPanels(L);
-  current = { L, ps };
-
-  el.sheet.style.setProperty("--sw", L.page.w + "mm");
-  el.sheet.style.setProperty("--sh", L.page.h + "mm");
-  el.sheet.style.setProperty("--frame-color", sheetState.frameColor);
-  el.sheet.style.setProperty("--frame-width", sheetState.cardFrame ? CARD_BORDER_MM + "mm" : "0");
-
-  // Die Seite ist exakt das Papier der Vorlage. Das Blatt ist minimal
-  // niedriger, damit Rundungen nie eine zweite Seite anstossen.
-  el.pageRule.textContent =
-    `@page { size: ${L.page.w}mm ${L.page.h}mm; margin: 0; }\n` +
-    `@media print {\n` +
-    `  .sheet { width: ${L.page.w}mm !important; height: ${L.page.h - 0.5}mm !important; }\n` +
-    `}`;
 
   const pick = (filler) => GROUPS
     .filter((grp) => (grp.role === "filler") === filler)
     .flatMap((grp) => grp.items)
     .filter((m) => enabled.has(m.id))
     .map((m) => m.id);
-  const ids = { icons: pick(false), fillers: pick(true) };
+  current = { L, ps, ids: { icons: pick(false), fillers: pick(true) } };
 
+  el.fit.style.setProperty("--frame-color", sheetState.frameColor);
+  el.fit.style.setProperty("--frame-width", sheetState.cardFrame ? CARD_BORDER_MM + "mm" : "0");
+
+  // Die Seite ist exakt das Papier der Vorlage. Das Blatt ist minimal
+  // niedriger, damit Rundungen nie eine zusaetzliche Seite anstossen.
+  el.pageRule.textContent =
+    `@page { size: ${L.page.w}mm ${L.page.h}mm; margin: 0; }\n` +
+    `.sheet { --sw: ${L.page.w}mm; --sh: ${L.page.h}mm; }\n` +
+    `@media print {\n` +
+    `  .sheet { width: ${L.page.w}mm !important; height: ${L.page.h - 0.5}mm !important; }\n` +
+    `}`;
+
+  syncPages();
+  pages.forEach((page) => { page.dirty = true; });
+  renderPage(pageOf(active));
+
+  el.lblBand.textContent = sheetState.band + " mm";
+  el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
+  el.lblGap.textContent = nf(sheetState.gap, 1) + " mm";
+  el.lblEdge.textContent = sheetState.edge === 0 ? "Kante" : nf(sheetState.edge, 1) + " mm";
+  el.lblLine.textContent = nf(sheetState.lineWidth, 1) + "×";
+  el.lblSafe.textContent = mmText(sheetState.safe) + " mm";
+
+  const b = L.slots[0];
+  el.pillFormat.textContent = L.spec.paper + " · " + L.page.w + " × " + L.page.h + " mm";
+  el.brandSub.textContent = L.spec.label + " · " + L.orientLabel;
+  el.hintSheet.textContent = L.spec.label;
+  el.lblSheetSize.textContent = mmText(b.w) + " × " + mmText(b.h) + " mm" +
+    (L.slots.length === 2 ? " · je Schild" : "");
+  el.hintFrame.textContent = el.style.selectedOptions[0] ? el.style.selectedOptions[0].textContent : "";
+}
+
+/** Zeichnet ein Blatt: Lage der Panels, Motive, Marken und Texte. */
+function renderPage(n) {
+  const page = pages[n];
+  if (!page) return;
+  const { L, ps, ids } = current;
   const mm = (v) => v.toFixed(3) + "mm";
+  const occupied = [0, 1].map((slot) => slot < L.slots.length && n * perSheet() + slot < badges.length);
 
-  TEXT_KEYS.forEach((key) => {
-    const v = view[key];
-    const p = ps.find((q) => q.key === key);
-    v.root.hidden = !p;
-    if (!p) return;
+  page.slots.forEach((faces, slot) => {
+    FACES.forEach((face) => { faces[face].root.hidden = !occupied[slot]; });
+  });
 
+  ps.forEach((p) => {
+    if (!occupied[p.slot]) return;
+    const index = n * perSheet() + p.slot;
+    const badge = badges[index];
+    const v = page.slots[p.slot][p.face];
     const box = textBox(p.g);
+
     Object.assign(v.root.style, {
       left: mm(p.box.x), top: mm(p.box.y), width: mm(p.box.w), height: mm(p.box.h)
     });
@@ -2605,34 +2742,25 @@ function layout() {
       padding: mm(box.padY) + " " + mm(box.padX)
     });
 
-    const t = text[key];
-    buildScene(v.svg, p, sheetState.seed + SEED_OFFSET[key], ids, t.content === "lines" ? t.lines : 0);
+    const st = badge[p.face];
+    const seed = sheetState.seed + badge.seed + (p.back ? 977 : 0);
+    buildScene(v.svg, p, seed, ids, st.content === "lines" ? st.lines : 0);
   });
 
-  renderMarks(L);
-
-  el.lblBand.textContent = sheetState.band + " mm";
-  el.lblScale.textContent = Math.round(sheetState.motif * 100) + " %";
-  el.lblGap.textContent = nf(sheetState.gap, 1) + " mm";
-  el.lblEdge.textContent = sheetState.edge === 0 ? "Kante" : nf(sheetState.edge, 1) + " mm";
-  el.lblLine.textContent = nf(sheetState.lineWidth, 1) + "×";
-  el.lblSafe.textContent = mmText(sheetState.safe) + " mm";
-
-  const b = L.badges[0];
-  el.pillFormat.textContent = L.spec.paper + " · " + L.page.w + " × " + L.page.h + " mm";
-  el.brandSub.textContent = L.spec.label + " · " + L.orientLabel;
-  el.hintSheet.textContent = L.spec.label;
-  el.lblSheetSize.textContent = mmText(b.w) + " × " + mmText(b.h) + " mm" +
-    (L.badges.length === 2 ? " · je Schild" : "");
-  el.hintFrame.textContent = el.style.selectedOptions[0] ? el.style.selectedOptions[0].textContent : "";
+  renderMarks(page.marks, L, occupied);
+  page.dirty = false;
+  applyPageText(n);
 }
 
-function renderMarks(L) {
-  const svg = el.marksSvg;
+function ensureAllPages() {
+  pages.forEach((page, n) => { if (page.dirty) renderPage(n); });
+}
+
+function renderMarks(svg, L, occupied) {
   svg.setAttribute("viewBox", `0 0 ${L.page.w} ${L.page.h}`);
   while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-  markItems(L).forEach((it) => {
+  markItems(L, occupied).forEach((it) => {
     if (it.text) {
       const node = svgNode("text", {
         x: it.x, y: it.y, fill: it.ink, "font-size": it.size,
@@ -2660,23 +2788,24 @@ let turnTimer = 0;
 
 function fitSheet(force) {
   const avail = el.fit.clientWidth;
-  if (!avail) return;
+  if (!avail || !pages.length) return;
   if (!force && avail === lastFitWidth) return;
   lastFitWidth = avail;
 
   // Echte Blattmasse in px - transform zaehlt hier nicht mit.
-  const w = el.sheet.offsetWidth;
-  const h = el.sheet.offsetHeight;
+  const w = pages[0].root.offsetWidth;
+  const h = pages[0].root.offsetHeight;
   if (!w || !h) return;
 
   const roomy = window.innerWidth > 1100;
-  const maxH = Math.max(280, window.innerHeight - (roomy ? 230 : 170));
+  const maxH = Math.max(280, window.innerHeight - (roomy ? 260 : 200));
   const k = Math.min(avail / w, maxH / h);
 
   // Um die Mitte skalieren und drehen, dann oben buendig einpassen.
-  el.sheet.style.transform =
+  const transform =
     `translate(${(-w / 2).toFixed(2)}px, ${((k - 1) * h / 2).toFixed(2)}px) ` +
     `scale(${k}) rotate(${turned ? 180 : 0}deg)`;
+  pages.forEach((page) => { page.root.style.transform = transform; });
   el.fit.style.height = (h * k) + "px";
   el.pillZoom.textContent = Math.round(k * 100) + " %";
 }
@@ -2684,9 +2813,9 @@ function fitSheet(force) {
 function setTurn(on) {
   if (turned === on) return;
   turned = on;
-  el.sheet.classList.add("is-turning");
+  el.fit.classList.add("is-turning");
   clearTimeout(turnTimer);
-  turnTimer = setTimeout(() => el.sheet.classList.remove("is-turning"), 460);
+  turnTimer = setTimeout(() => el.fit.classList.remove("is-turning"), 460);
   fitSheet(true);
   el.turn.setAttribute("aria-pressed", String(turned));
   el.turn.classList.toggle("is-on", turned);
@@ -2706,9 +2835,10 @@ function overflows(span, box) {
   return span.scrollHeight > box.clientHeight + 1 || span.scrollWidth > box.clientWidth + 1;
 }
 
-function applyText(key) {
-  const s = text[key];
-  const v = view[key];
+function applyText(index, face) {
+  const badge = badges[index];
+  const s = badge[face];
+  const v = viewOf(index, face);
   const isText = s.content === "text";
 
   v.span.hidden = !isText;
@@ -2718,9 +2848,9 @@ function applyText(key) {
   const panelH = current.ps[0].g.H;
   const mm = (value) => (value * panelH / 100).toFixed(3) + "mm";
   const font = FONTS.find((f) => f.id === s.font) || FONTS[0];
-  const source = SOURCES[key];
+  const value = face === "front" ? badge.name : badge.text;
 
-  v.span.textContent = source.src.value.trim() ? source.src.value : source.fallback;
+  v.span.textContent = value.trim() ? value : (face === "front" ? "Name" : "Text");
   v.span.style.fontFamily = font.css;
   v.span.style.fontWeight = font.weight;
   v.span.style.color = s.color;
@@ -2753,6 +2883,20 @@ function applyText(key) {
   v.span.style.fontSize = mm(s.size);
 
   return overflows(v.span, v.box);
+}
+
+/** Setzt alle Texte eines Blattes; liefert, ob das aktive Feld ueberlaeuft. */
+function applyPageText(n) {
+  let over = false;
+  for (let slot = 0; slot < perSheet(); slot++) {
+    const index = n * perSheet() + slot;
+    if (index >= badges.length) break;
+    FACES.forEach((face) => {
+      const o = applyText(index, face);
+      if (index === active && face === side) over = o;
+    });
+  }
+  return over;
 }
 
 const shadowInk = (color) => (color === "#1a1a1a" ? "#f5c518" : "#1a1a1a");
@@ -2822,16 +2966,12 @@ function syncControls() {
   el.shadow.setAttribute("aria-pressed", String(s.shadow));
 
   syncSideFields();
+  syncTabs();
 }
 
 function syncSideFields() {
-  const twin = LAYOUTS[sheetState.layout].count === 2;
-  if (!twin) cardIndex = 1;
-  el.segCard.hidden = !twin;
-
   document.querySelectorAll("[data-only]").forEach((field) => {
-    const visible = field.dataset.only === side && Number(field.dataset.card || 1) === cardIndex;
-    field.hidden = !visible;
+    field.hidden = field.dataset.only !== side;
   });
 
   document.querySelectorAll("[data-side]").forEach((button) => {
@@ -2840,24 +2980,64 @@ function syncSideFields() {
     button.setAttribute("aria-selected", String(selected));
   });
 
-  document.querySelectorAll("[data-card-tab]").forEach((button) => {
-    const selected = Number(button.dataset.cardTab) === cardIndex;
-    button.classList.toggle("is-on", selected);
-    button.setAttribute("aria-selected", String(selected));
-  });
-
-  TEXT_KEYS.forEach((key) => view[key].card.classList.toggle("is-active", key === textKey()));
+  pages.forEach((page) => page.slots.forEach((faces) =>
+    FACES.forEach((face) => faces[face].card.classList.remove("is-active"))));
+  viewOf(active, side).card.classList.add("is-active");
 
   const content = { text: "", blank: " · leer", lines: " · Linien" }[cur().content];
   el.hintText.textContent =
-    (twin ? "Schild " + cardIndex + " · " : "") +
+    (badges.length > 1 ? "Schild " + (active + 1) + " · " : "") +
     (side === "front" ? "Vorderseite" : "Rückseite") + content;
 }
 
+/* ---------- Reiter ---------- */
+
+const CROSS_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+function syncTabs() {
+  // Nur neu aufbauen, wenn sich die Anzahl aendert - sonst ginge beim
+  // Bedienen mit der Tastatur der Fokus verloren.
+  if (el.tabs.children.length !== badges.length) {
+    el.tabs.replaceChildren(...badges.map((_, i) => {
+      const wrap = document.createElement("div");
+      wrap.className = "badge-tab";
+
+      const main = document.createElement("button");
+      main.type = "button";
+      main.className = "badge-tab-main";
+      main.setAttribute("role", "tab");
+      main.dataset.badge = i;
+      main.innerHTML = `<span class="num">${i + 1}</span><span class="nm"></span>`;
+      wrap.append(main);
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "badge-tab-del";
+      del.dataset.del = i;
+      del.title = "Schild löschen";
+      del.setAttribute("aria-label", "Schild " + (i + 1) + " löschen");
+      del.innerHTML = CROSS_ICON;
+      wrap.append(del);
+      return wrap;
+    }));
+  }
+
+  [...el.tabs.children].forEach((wrap, i) => {
+    const on = i === active;
+    const name = wrap.querySelector(".nm");
+    wrap.classList.toggle("is-on", on);
+    wrap.querySelector(".badge-tab-main").setAttribute("aria-selected", String(on));
+    wrap.querySelector(".badge-tab-del").hidden = badges.length < 2;
+    name.textContent = badgeLabel(badges[i]);
+    name.classList.toggle("is-empty", !badges[i].name.trim());
+  });
+
+  el.add.disabled = badges.length >= MAX_BADGES;
+}
+
 function renderText() {
-  const over = {};
-  TEXT_KEYS.forEach((key) => { over[key] = applyText(key); });
-  el.warn.hidden = !(over[textKey()] && !cur().auto);
+  const over = applyPageText(pageOf(active));
+  el.warn.hidden = !(over && !cur().auto);
   syncControls();
   saveDraft();
 }
@@ -2868,13 +3048,41 @@ function renderAll() {
   renderText();
 }
 
-function selectSide(nextSide, nextCard) {
-  side = nextSide;
-  cardIndex = nextCard;
-  syncSideFields();
+/** Wechselt zu einem Schild und einer Seite davon. */
+function selectBadge(index, face) {
+  active = Math.min(Math.max(index, 0), badges.length - 1);
+  side = face;
+  syncPages();
+  const n = pageOf(active);
+  if (pages[n].dirty) renderPage(n);
+  el.name.value = badges[active].name;
+  el.text.value = badges[active].text;
   renderText();
   // Beim Bearbeiten der Rueckseite steht der Text aufrecht.
   setTurn(side === "back");
+  const tab = el.tabs.children[active];
+  if (tab) tab.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+function addBadge() {
+  if (badges.length >= MAX_BADGES) return;
+  commit();
+  badges.push(badgeLike(badges[active]));
+  selectBadge(badges.length - 1, "front");
+  commit();
+  el.name.focus({ preventScroll: window.innerWidth <= 1100 });
+}
+
+function deleteBadge(index) {
+  if (badges.length < 2) return;
+  commit();
+  const [gone] = badges.splice(index, 1);
+  // Alle Schilder dahinter ruecken auf - ihre Blaetter muessen neu gezeichnet werden.
+  pages.forEach((page, n) => { if ((n + 1) * perSheet() > index) page.dirty = true; });
+  const next = active > index ? active - 1 : Math.min(active, badges.length - 1);
+  selectBadge(next, side);
+  commit();
+  toast("„" + badgeLabel(gone) + "“ gelöscht – mit Rückgängig lässt es sich zurückholen.");
 }
 
 /* ---------- Entwurf & Historie ---------- */
@@ -2885,21 +3093,47 @@ let commitTimer = 0;
 
 function projectData() {
   return {
-    version: 3,
+    version: 4,
     sheetState: { ...sheetState },
-    text: structuredClone(text),
-    values: {
-      name: el.name.value, text: el.text.value,
-      name2: el.name2.value, text2: el.text2.value
-    },
+    badges: structuredClone(badges),
     enabled: [...enabled],
-    side, cardIndex
+    side, active
+  };
+}
+
+function cleanStyle(src, d) {
+  const t = Object.assign({}, d, src);
+  t.content = pickOne(t.content, CONTENTS, "text");
+  t.lines = Math.round(clampNum(t.lines, 1, 4, d.lines));
+  t.font = pickOne(t.font, FONTS.map((f) => f.id), d.font);
+  t.color = /^#[0-9a-f]{6}$/i.test(t.color) ? t.color : d.color;
+  t.align = pickOne(t.align, ["left", "center", "right"], "center");
+  t.lh = clampNum(t.lh, 0.85, 1.9, d.lh);
+  t.size = clampNum(t.size, 3, 46, d.size);
+  t.auto = t.auto !== false;
+  t.upper = Boolean(t.upper);
+  t.shadow = Boolean(t.shadow);
+  // Die Groessengrenzen sind Programmvorgaben, keine Projekteinstellung.
+  t.max = d.max;
+  t.min = d.min;
+  return t;
+}
+
+function cleanBadge(b) {
+  const src = b && typeof b === "object" ? b : {};
+  return {
+    seed: Number.isFinite(src.seed) ? src.seed : Math.floor(Math.random() * 1e9),
+    name: typeof src.name === "string" ? src.name : "",
+    text: typeof src.text === "string" ? src.text : "",
+    front: cleanStyle(src.front, DEFAULT_TEXT.front),
+    back: cleanStyle(src.back, DEFAULT_TEXT.back)
   };
 }
 
 /**
  * Uebernimmt ein Projekt (Entwurf oder Schritt aus der Historie). Unbekannte
- * oder fehlende Angaben werden auf sinnvolle Werte gesetzt.
+ * oder fehlende Angaben werden auf sinnvolle Werte gesetzt; aeltere Entwuerfe
+ * mit festen Schildern 1 und 2 werden umgewandelt.
  */
 function applyProject(project) {
   const st = { ...(project.sheetState || {}) };
@@ -2930,32 +3164,19 @@ function applyProject(project) {
   sheetState.marks = sheetState.marks !== false;
   sheetState.cardFrame = sheetState.cardFrame !== false;
 
-  TEXT_KEYS.forEach((key) => {
-    const d = DEFAULT_TEXT[key];
-    const t = text[key];
-    Object.assign(t, d, project.text && project.text[key]);
-    t.content = pickOne(t.content, CONTENTS, "text");
-    t.lines = Math.round(clampNum(t.lines, 1, 4, d.lines));
-    t.font = pickOne(t.font, FONTS.map((f) => f.id), d.font);
-    t.color = /^#[0-9a-f]{6}$/i.test(t.color) ? t.color : d.color;
-    t.align = pickOne(t.align, ["left", "center", "right"], "center");
-    t.lh = clampNum(t.lh, 0.85, 1.9, d.lh);
-    t.size = clampNum(t.size, 3, 46, d.size);
-    t.auto = t.auto !== false;
-    t.upper = Boolean(t.upper);
-    t.shadow = Boolean(t.shadow);
-    // Die Groessengrenzen sind Programmvorgaben, keine Projekteinstellung.
-    t.max = d.max;
-    t.min = d.min;
-  });
-
-  const values = project.values;
-  if (values) {
-    el.name.value = values.name || "";
-    el.text.value = values.text || "";
-    if ("name2" in values) el.name2.value = values.name2 || "";
-    if ("text2" in values) el.text2.value = values.text2 || "";
+  let list = project.badges;
+  let activeIndex = project.active;
+  if (!Array.isArray(list)) {
+    const t = project.text || {};
+    const v = project.values || {};
+    list = [{ seed: 0, name: v.name, text: v.text, front: t.front, back: t.back }];
+    if (perSheet() === 2) {
+      list.push({ seed: 3319, name: v.name2, text: v.text2, front: t.front2, back: t.back2 });
+    }
+    activeIndex = project.cardIndex === 2 ? 1 : 0;
   }
+  badges = list.slice(0, MAX_BADGES).map(cleanBadge);
+  if (!badges.length) badges = [defaultBadge()];
 
   if (Array.isArray(project.enabled)) {
     enabled.clear();
@@ -2965,7 +3186,9 @@ function applyProject(project) {
   }
 
   side = project.side === "back" ? "back" : "front";
-  cardIndex = (project.cardIndex === 2 && LAYOUTS[sheetState.layout].count === 2) ? 2 : 1;
+  active = Math.round(clampNum(activeIndex, 0, badges.length - 1, 0));
+  el.name.value = badges[active].name;
+  el.text.value = badges[active].text;
 }
 
 function updateHistoryButtons() {
@@ -3003,6 +3226,7 @@ function moveHistory(direction) {
   applyProject(source.pop());
   syncMotifs();
   renderAll();
+  setTurn(side === "back");
   edits.applying = false;
   snapshot();
   updateHistoryButtons();
@@ -3087,7 +3311,7 @@ function domLines(span) {
   return out.map((l) => l.replace(/\s+$/, ""));
 }
 
-function drawCard(ctx, s, g, key) {
+function drawCard(ctx, s, g, st, span) {
   const c = g.card;
   const box = textBox(g);
 
@@ -3102,10 +3326,9 @@ function drawCard(ctx, s, g, key) {
     ctx.restore();
   }
 
-  const st = text[key];
   if (st.content !== "text" || box.w <= 0 || box.h <= 0) return;
 
-  const lines = domLines(view[key].span);
+  const lines = domLines(span);
   if (!lines.length) return;
 
   const font = FONTS.find((f) => f.id === st.font) || FONTS[0];
@@ -3164,17 +3387,22 @@ function drawMarks(ctx, s, items) {
   });
 }
 
-/** Hoechste Aufloesung, die der Browser fuer dieses Blatt noch zeichnen kann. */
+/** Hoechste Aufloesung, die der Browser fuer ein Blatt noch zeichnen kann. */
 function fitDpi(dpi, page) {
   const squareInches = (page.w / MM_PER_INCH) * (page.h / MM_PER_INCH);
   return Math.min(dpi, Math.floor(Math.sqrt(MAX_CANVAS_PIXELS / squareInches)));
 }
 
-async function renderSheetCanvas(dpi) {
+/** Macht Blaetter und Texte druckfertig - auch die gerade nicht sichtbaren. */
+async function prepareOutput() {
   await document.fonts.ready;
-  renderText();
+  ensureAllPages();
+  pages.forEach((_, n) => applyPageText(n));
+}
 
+async function renderSheetCanvas(n, dpi) {
   const { L, ps } = current;
+  const page = pages[n];
   const s = dpi / MM_PER_INCH;
 
   const canvas = document.createElement("canvas");
@@ -3186,29 +3414,34 @@ async function renderSheetCanvas(dpi) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  const occupied = [0, 1].map((slot) => slot < L.slots.length && n * perSheet() + slot < badges.length);
+
   for (const p of ps) {
+    if (!occupied[p.slot]) continue;
+    const badge = badges[n * perSheet() + p.slot];
+    const v = page.slots[p.slot][p.face];
+
     ctx.save();
     ctx.translate(p.origin.x * s, p.origin.y * s);
     if (p.back) ctx.rotate(Math.PI);
 
     const w = p.clip.x1 - p.clip.x0;
     try {
-      const url = sceneToDataUrl(view[p.key].svg, Math.round(w * s), Math.round(p.clip.y1 * s));
-      const img = await loadImage(url);
+      const img = await loadImage(sceneToDataUrl(v.svg, Math.round(w * s), Math.round(p.clip.y1 * s)));
       ctx.drawImage(img, p.clip.x0 * s, 0, w * s, p.clip.y1 * s);
     } catch (error) {
       // Ohne Motive weiterzeichnen ist besser als gar kein Export.
     }
 
-    drawCard(ctx, s, p.g, p.key);
+    drawCard(ctx, s, p.g, badge[p.face], v.span);
     ctx.restore();
   }
 
-  drawMarks(ctx, s, markItems(L));
+  drawMarks(ctx, s, markItems(L, occupied));
   return canvas;
 }
 
-/* ---------- Minimaler PDF-Schreiber ---------- */
+/* ---------- Minimaler PDF-Schreiber (mehrseitig) ---------- */
 
 function latin1(str) {
   const out = new Uint8Array(str.length);
@@ -3216,29 +3449,28 @@ function latin1(str) {
   return out;
 }
 
-async function canvasToPdf(canvas, wMm, hMm) {
+async function encodeCanvas(canvas) {
   const ctx = canvas.getContext("2d");
   const src = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-  const rgb = new Uint8Array(canvas.width * canvas.height * 3);
-  for (let i = 0, j = 0; j < rgb.length; i += 4) {
-    rgb[j++] = src[i];
-    rgb[j++] = src[i + 1];
-    rgb[j++] = src[i + 2];
-  }
-
-  let data;
-  let filter;
   if (typeof CompressionStream === "function") {
+    const rgb = new Uint8Array(canvas.width * canvas.height * 3);
+    for (let i = 0, j = 0; j < rgb.length; i += 4) {
+      rgb[j++] = src[i];
+      rgb[j++] = src[i + 1];
+      rgb[j++] = src[i + 2];
+    }
     const stream = new Blob([rgb]).stream().pipeThrough(new CompressionStream("deflate"));
-    data = new Uint8Array(await new Response(stream).arrayBuffer());
-    filter = "/FlateDecode";
-  } else {
-    const jpeg = await new Promise((r) => canvas.toBlob(r, "image/jpeg", 0.96));
-    data = new Uint8Array(await jpeg.arrayBuffer());
-    filter = "/DCTDecode";
+    const data = new Uint8Array(await new Response(stream).arrayBuffer());
+    return { data, filter: "/FlateDecode", width: canvas.width, height: canvas.height };
   }
 
+  const jpeg = await new Promise((r) => canvas.toBlob(r, "image/jpeg", 0.96));
+  const data = new Uint8Array(await jpeg.arrayBuffer());
+  return { data, filter: "/DCTDecode", width: canvas.width, height: canvas.height };
+}
+
+function writePdf(images, wMm, hMm) {
   const W = (wMm * 72 / MM_PER_INCH).toFixed(4);
   const H = (hMm * 72 / MM_PER_INCH).toFixed(4);
 
@@ -3256,51 +3488,63 @@ async function canvasToPdf(canvas, wMm, hMm) {
     put(n + " 0 obj\n" + body + "\nendobj\n");
   };
 
+  // Objektnummern: 1 Katalog, 2 Seitenbaum, danach je Seite Seite/Inhalt/Bild.
+  const pageObj = (k) => 3 + k * 3;
+  const kids = images.map((_, k) => pageObj(k) + " 0 R").join(" ");
+
   put("%PDF-1.4\n%âãÏÓ\n");
   obj(1, "<< /Type /Catalog /Pages 2 0 R >>");
-  obj(2, "<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
-  obj(3, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] ` +
-         `/Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R >>`);
+  obj(2, `<< /Type /Pages /Kids [${kids}] /Count ${images.length} >>`);
 
   const content = `q ${W} 0 0 ${H} 0 0 cm /Im0 Do Q\n`;
-  obj(4, `<< /Length ${content.length} >>\nstream\n${content}endstream`);
+  images.forEach((img, k) => {
+    const p = pageObj(k);
+    obj(p, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] ` +
+           `/Resources << /XObject << /Im0 ${p + 2} 0 R >> >> /Contents ${p + 1} 0 R >>`);
+    obj(p + 1, `<< /Length ${content.length} >>\nstream\n${content}endstream`);
+    offsets[p + 2] = pos;
+    put(`${p + 2} 0 obj\n`);
+    put(`<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} ` +
+        `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ${img.filter} /Length ${img.data.length} >>\nstream\n`);
+    put(img.data);
+    put("\nendstream\nendobj\n");
+  });
 
-  offsets[5] = pos;
-  put("5 0 obj\n");
-  put(`<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} ` +
-      `/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ${filter} /Length ${data.length} >>\nstream\n`);
-  put(data);
-  put("\nendstream\nendobj\n");
-
+  const size = pageObj(images.length);
   const xref = pos;
-  let table = "xref\n0 6\n0000000000 65535 f \n";
-  for (let i = 1; i <= 5; i++) table += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+  let table = `xref\n0 ${size}\n0000000000 65535 f \n`;
+  for (let i = 1; i < size; i++) table += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
   put(table);
-  put(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+  put(`trailer\n<< /Size ${size} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
 
   return new Blob(chunks, { type: "application/pdf" });
 }
 
-async function buildPdf(dpi) {
+/** PDF mit allen Blaettern. `onProgress` bekommt (fertig, gesamt). */
+async function buildPdf(dpi, onProgress) {
+  await prepareOutput();
   const page = current.L.page;
-  const canvas = await renderSheetCanvas(fitDpi(dpi, page));
-  try {
-    return await canvasToPdf(canvas, page.w, page.h);
-  } finally {
-    // Speicher sofort freigeben - iOS zaehlt alle Canvas-Flaechen zusammen.
-    canvas.width = 0;
-    canvas.height = 0;
+  const d = fitDpi(dpi, page);
+  const images = [];
+  for (let n = 0; n < pages.length; n++) {
+    if (onProgress) onProgress(n, pages.length);
+    const canvas = await renderSheetCanvas(n, d);
+    try {
+      images.push(await encodeCanvas(canvas));
+    } finally {
+      // Speicher sofort freigeben - iOS zaehlt alle Canvas-Flaechen zusammen.
+      canvas.width = 0;
+      canvas.height = 0;
+    }
   }
+  return writePdf(images, page.w, page.h);
 }
 
 /* ---------- Export ausloesen ---------- */
 
-function exportBasename() {
-  const twin = LAYOUTS[sheetState.layout].count === 2;
-  const raw = [el.name.value, twin ? el.name2.value : ""]
-    .map((v) => v.trim())
-    .filter(Boolean)
-    .join("-");
+function exportBasename(allBadges) {
+  if (allBadges && badges.length > 1) return "namensschilder";
+  const raw = badges[active].name.trim();
   const safe = raw.replace(/\s+/g, "-").replace(/[^\p{L}\p{N}_.-]+/gu, "");
   return safe ? "namensschild-" + safe : "namensschild";
 }
@@ -3327,10 +3571,15 @@ function updateExportNote() {
   const dpi = fitDpi(wanted, L.page);
   const w = Math.round(L.page.w * dpi / MM_PER_INCH);
   const h = Math.round(L.page.h * dpi / MM_PER_INCH);
+  const many = pages.length > 1
+    ? (exportFormat() === "pdf"
+      ? ` Die PDF enthält alle ${badges.length} Schilder auf ${pages.length} Blättern.`
+      : ` Das PNG zeigt Blatt ${pageOf(active) + 1} von ${pages.length} – für alle Blätter PDF wählen.`)
+    : "";
   el.expNote.textContent =
     `${L.spec.label} · ${L.page.w} × ${L.page.h} mm · ${w} × ${h} Pixel` +
     (dpi < wanted ? ` (auf ${dpi} dpi begrenzt – mehr schafft dieses Gerät nicht)` : "") +
-    ". Die Datei entspricht genau dem Blatt in der Vorschau.";
+    "." + many;
 }
 
 async function runExport() {
@@ -3343,14 +3592,18 @@ async function runExport() {
 
   try {
     if (format === "pdf") {
-      download(await buildPdf(dpi), exportBasename() + ".pdf");
+      const blob = await buildPdf(dpi, (done, total) => {
+        if (total > 1) el.expRun.textContent = `Blatt ${done + 1} von ${total} …`;
+      });
+      download(blob, exportBasename(true) + ".pdf");
     } else {
-      const canvas = await renderSheetCanvas(dpi);
+      await prepareOutput();
+      const canvas = await renderSheetCanvas(pageOf(active), dpi);
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
       canvas.width = 0;
       canvas.height = 0;
       if (!blob) throw new Error("Das Bild konnte nicht erzeugt werden.");
-      download(blob, exportBasename() + ".png");
+      download(blob, exportBasename(false) + ".png");
     }
 
     el.dlgExport.close();
@@ -3370,7 +3623,7 @@ async function runExport() {
    Die PDF entsteht in einem ersten Schritt; geoeffnet bzw. geteilt wird sie
    mit einem zweiten Tipp, damit der Browser das nicht als Popup blockiert. */
 
-const printPdf = { blob: null, url: "", busy: false };
+const printPdf = { blob: null, url: "", busy: false, progress: "" };
 
 function printMethod() {
   const picked = document.querySelector('input[name="pr-method"]:checked');
@@ -3395,10 +3648,11 @@ function canSharePdf() {
 function updatePrintDialog() {
   const L = current.L;
   const method = printMethod();
-  const twin = L.badges.length === 2;
+  const twin = L.slots.length === 2;
+  const sheets = pages.length;
 
-  el.prPaper.textContent = L.paperLabel + " einlegen";
-  el.prMode.textContent = {
+  el.prPaper.textContent = (sheets > 1 ? sheets + " Blatt " : "") + L.paperLabel + " einlegen";
+  el.prMode.textContent = (badges.length > 1 ? badges.length + " Schilder. " : "") + {
     trim: "Nach dem Druck an den Schnittmarken schneiden – dann bleibt kein weißer Rand.",
     safe: "Mit " + mmText(L.safe) + " mm weißem Rand – klappt mit jedem Drucker." + (twin ? " Danach in der Mitte teilen." : ""),
     borderless: "Randlos – nur für Drucker, die randlos drucken können." + (twin ? " Danach in der Mitte teilen." : "")
@@ -3437,7 +3691,7 @@ function updatePrintDialog() {
   el.prRun.disabled = printPdf.busy;
   el.prRun.textContent = method === "direct"
     ? "Drucken"
-    : printPdf.busy ? "Wird erstellt …"
+    : printPdf.busy ? (printPdf.progress || "Wird erstellt …")
     : !printPdf.blob ? "PDF erstellen"
     : canSharePdf() ? "Teilen" : "PDF öffnen";
 }
@@ -3452,6 +3706,7 @@ function openPrint() {
 async function runPrint() {
   if (printMethod() === "direct") {
     el.dlgPrint.close();
+    await prepareOutput();
     renderText();
     window.print();
     return;
@@ -3459,9 +3714,14 @@ async function runPrint() {
 
   if (!printPdf.blob) {
     printPdf.busy = true;
+    printPdf.progress = "";
     updatePrintDialog();
     try {
-      printPdf.blob = await buildPdf(300);
+      printPdf.blob = await buildPdf(300, (done, total) => {
+        if (total < 2) return;
+        printPdf.progress = `Blatt ${done + 1} von ${total} …`;
+        updatePrintDialog();
+      });
       printPdf.url = URL.createObjectURL(printPdf.blob);
     } catch (error) {
       toast("PDF konnte nicht erstellt werden: " + error.message, true);
@@ -3473,7 +3733,7 @@ async function runPrint() {
   }
 
   if (canSharePdf()) {
-    const file = new File([printPdf.blob], exportBasename() + ".pdf", { type: "application/pdf" });
+    const file = new File([printPdf.blob], exportBasename(true) + ".pdf", { type: "application/pdf" });
     try {
       await navigator.share({ files: [file], title: "Namensschild" });
     } catch (error) {
@@ -3483,7 +3743,7 @@ async function runPrint() {
   }
 
   const win = window.open(printPdf.url, "_blank");
-  if (!win) download(printPdf.blob, exportBasename() + ".pdf");
+  if (!win) download(printPdf.blob, exportBasename(true) + ".pdf");
 }
 
 /* ---------- Ereignisse ---------- */
@@ -3511,7 +3771,6 @@ document.querySelectorAll('input[name="layout"]').forEach((input) => {
   input.addEventListener("change", () => {
     if (!input.checked) return;
     sheetState.layout = input.value;
-    if (LAYOUTS[input.value].count === 1) cardIndex = 1;
     renderAll();
   });
 });
@@ -3538,22 +3797,31 @@ el.safe.addEventListener("input", () => {
 });
 
 document.querySelectorAll("[data-side]").forEach((b) => {
-  b.addEventListener("click", () => selectSide(b.dataset.side, cardIndex));
+  b.addEventListener("click", () => selectBadge(active, b.dataset.side));
 });
 
-document.querySelectorAll("[data-card-tab]").forEach((b) => {
-  b.addEventListener("click", () => selectSide(side, Number(b.dataset.cardTab)));
-});
-
-// Ein Tipp auf eine Haelfte des Blattes waehlt diese Seite zum Bearbeiten.
-el.sheet.addEventListener("click", (e) => {
+// Ein Tipp auf eine Haelfte eines Schildes waehlt Schild und Seite.
+el.fit.addEventListener("click", (e) => {
   const panel = e.target.closest(".panel");
   if (!panel) return;
-  const key = panel.dataset.key;
+  const n = Number(panel.closest(".sheet").dataset.page);
+  const index = n * perSheet() + Number(panel.dataset.slot);
+  if (index >= badges.length) return;
   $("pc-text").open = true;
-  selectSide(key.startsWith("back") ? "back" : "front", key.endsWith("2") ? 2 : 1);
+  selectBadge(index, panel.dataset.face);
 });
 
+el.tabs.addEventListener("click", (e) => {
+  const del = e.target.closest("[data-del]");
+  if (del) {
+    deleteBadge(Number(del.dataset.del));
+    return;
+  }
+  const tab = e.target.closest("[data-badge]");
+  if (tab) selectBadge(Number(tab.dataset.badge), side);
+});
+
+el.add.addEventListener("click", addBadge);
 el.turn.addEventListener("click", () => setTurn(!turned));
 
 document.querySelectorAll("[data-content]").forEach((b) => {
@@ -3628,8 +3896,8 @@ el.shuffle.addEventListener("click", () => {
   layout();
 });
 
-[el.name, el.text, el.name2, el.text2].forEach((input) =>
-  input.addEventListener("input", renderText));
+el.name.addEventListener("input", () => { badges[active].name = el.name.value; renderText(); });
+el.text.addEventListener("input", () => { badges[active].text = el.text.value; renderText(); });
 
 el.font.addEventListener("change", () => { cur().font = el.font.value; renderText(); });
 el.auto.addEventListener("change", () => { cur().auto = el.auto.checked; renderText(); });
@@ -3665,15 +3933,13 @@ el.redo.addEventListener("click", () => moveHistory("redo"));
 el.reset.addEventListener("click", () => {
   commit();
   Object.assign(sheetState, DEFAULT_SHEET);
-  TEXT_KEYS.forEach((key) => Object.assign(text[key], DEFAULT_TEXT[key]));
-  el.name.value = DEFAULT_VALUES.name;
-  el.text.value = DEFAULT_VALUES.text;
-  el.name2.value = DEFAULT_VALUES.name2;
-  el.text2.value = DEFAULT_VALUES.text2;
+  badges = [defaultBadge()];
+  active = 0;
+  side = "front";
+  el.name.value = badges[0].name;
+  el.text.value = badges[0].text;
   enabled.clear();
   ALL_ITEMS.forEach((item) => enabled.add(item.id));
-  side = "front";
-  cardIndex = 1;
   setTurn(false);
   syncMotifs();
   renderAll();
@@ -3694,7 +3960,7 @@ $("btn-print").addEventListener("click", openPrint);
 $("btn-print-m").addEventListener("click", openPrint);
 el.prRun.addEventListener("click", runPrint);
 el.prSave.addEventListener("click", () => {
-  if (printPdf.blob) download(printPdf.blob, exportBasename() + ".pdf");
+  if (printPdf.blob) download(printPdf.blob, exportBasename(true) + ".pdf");
 });
 
 document.querySelectorAll('input[name="pr-method"]').forEach((input) => {
@@ -3719,6 +3985,8 @@ function openExport() {
 $("btn-export-open").addEventListener("click", openExport);
 $("btn-export-open-m").addEventListener("click", openExport);
 el.expDpi.addEventListener("change", updateExportNote);
+document.querySelectorAll('input[name="exp-format"]').forEach((input) =>
+  input.addEventListener("change", updateExportNote));
 el.expRun.addEventListener("click", runExport);
 
 document.querySelectorAll("[data-close]").forEach((b) =>
@@ -3732,8 +4000,12 @@ document.querySelectorAll("[data-close]").forEach((b) =>
 
 // Die Groesse des Textes haengt nicht vom Fenster ab - nur das Einpassen.
 window.addEventListener("resize", () => fitSheet(true));
-window.addEventListener("beforeprint", renderText);
-document.fonts.ready.then(() => { fitSheet(true); renderText(); });
+// Auch bei Strg+P muessen alle Blaetter fertig gezeichnet sein.
+window.addEventListener("beforeprint", () => {
+  ensureAllPages();
+  pages.forEach((_, n) => applyPageText(n));
+});
+document.fonts.ready.then(() => { layout(); fitSheet(true); renderText(); });
 
 /* ---------- Design hell/dunkel ---------- */
 
@@ -3781,9 +4053,13 @@ $("btn-legal").addEventListener("click", () => legal.showModal());
 
 /* ---------- Start ---------- */
 
+el.name.value = badges[0].name;
+el.text.value = badges[0].text;
+
 try {
-  const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || localStorage.getItem(OLD_STORAGE_KEY));
-  if (draft && draft.sheetState && draft.text) applyProject(draft);
+  const raw = [STORAGE_KEY, ...OLD_STORAGE_KEYS].map((key) => localStorage.getItem(key)).find(Boolean);
+  const draft = raw ? JSON.parse(raw) : null;
+  if (draft && draft.sheetState) applyProject(draft);
 } catch (error) {
   // Ein unbrauchbarer Entwurf wird einfach ignoriert.
 }

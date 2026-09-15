@@ -9,6 +9,8 @@ Alles läuft in einer einzigen `index.html`, ohne Server und ohne Abhängigkeite
   - **2 Schilder zum Zuschneiden** – auf A4, je 184 × 135,5 mm
   - **A5-Papier** – ein Schild, kein Schneiden
   - **2 Schilder auf A4** – je A5, in der Mitte teilen
+- **Beliebig viele Schilder** über Reiter (+ anlegen, × löschen) – Druck und PDF enthalten alle,
+  bei den 2er-Vorlagen je zwei pro Blatt. Blatt- und Motiveinstellungen gelten für alle Schilder
 - Motivrahmen in vier Stilen, aus 83 an- und abwählbaren Motiven zusammengewürfelt
 - Vorder- und Rückseite getrennt gestalten: Text, **leer** oder **Schreiblinien** zum Selberschreiben
 - Schrift, Größe (auch automatisch), Zeilenabstand, Farbe, Ausrichtung, Versalien, Schatten
